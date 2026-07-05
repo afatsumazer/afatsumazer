@@ -151,32 +151,7 @@ AFATSUMAZER APP v1.0
 
 </div>
 
-<script>
 
-function register(){
-
-let nama=document.getElementById("nama").value;
-let email=document.getElementById("email").value;
-let pass=document.getElementById("password").value;
-let pass2=document.getElementById("password2").value;
-
-if(nama==""||email==""||pass==""||pass2==""){
-alert("Semua data wajib diisi.");
-return;
-}
-
-if(pass!=pass2){
-alert("Password tidak sama.");
-return;
-}
-
-alert("Registrasi berhasil.\n\nVersi berikutnya akan langsung membuat akun Firebase.");
-
-window.location.href="login.html";
-
-}
-
-</script>
 <script type="module" src="assets/js/auth.js"></script>
 </body>
 </html>
