@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Login - AFATSUMAZER</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:linear-gradient(180deg,#05070d,#111827);
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+
+.card{
+width:100%;
+max-width:380px;
+background:rgba(255,255,255,.05);
+backdrop-filter:blur(10px);
+border:1px solid rgba(255,255,255,.1);
+border-radius:25px;
+padding:30px;
+color:#fff;
+box-shadow:0 0 25px rgba(0,150,255,.3);
+}
+
+.logo{
+width:100px;
+height:100px;
+margin:auto;
+margin-bottom:20px;
+border-radius:50%;
+background:#0d6efd;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:45px;
+font-weight:bold;
+box-shadow:0 0 20px #0d6efd;
+}
+
+h2{
+text-align:center;
+margin-bottom:25px;
+}
+
+.input{
+margin-bottom:18px;
+}
+
+.input label{
+display:block;
+margin-bottom:6px;
+font-size:14px;
+}
+
+.input input{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+outline:none;
+font-size:15px;
+}
+
+button{
+width:100%;
+padding:15px;
+border:none;
+border-radius:15px;
+background:#0d6efd;
+color:#fff;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+transition:.3s;
+}
+
+button:hover{
+transform:scale(1.03);
+}
+
+.menu{
+margin-top:20px;
+display:flex;
+justify-content:space-between;
+font-size:14px;
+}
+
+.menu a{
+color:#4db8ff;
+text-decoration:none;
+}
+
+.footer{
+margin-top:25px;
+text-align:center;
+font-size:13px;
+color:#aaa;
+}
+</style>
+
+</head>
+<body>
+
+<div class="card">
+
+<div class="logo">
+A
+</div>
+
+<h2>AFATSUMAZER</h2>
+
+<div class="input">
+<label>Email</label>
+<input type="email" id="email" placeholder="Masukkan email">
+</div>
+
+<div class="input">
+<label>Password</label>
+<input type="password" id="password" placeholder="Masukkan password">
+</div>
+
+<button onclick="login()">LOGIN</button>
+
+<div class="menu">
+<a href="register.html">Daftar</a>
+<a href="#">Lupa Password?</a>
+</div>
+
+<div class="footer">
+Version 1.0
+</div>
+
+</div>
+
+<script>
+
+function login(){
+
+let email=document.getElementById("email").value;
+let password=document.getElementById("password").value;
+
+if(email=="" || password==""){
+alert("Lengkapi email dan password.");
+return;
+}
+
+//sementara simulasi login
+localStorage.setItem("login","true");
+
+window.location.href="dashboard.html";
+
+}
+
+</script>
+
+</body>
+</html>
