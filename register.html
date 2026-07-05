@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daftar - AFATSUMAZER</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:linear-gradient(180deg,#05070d,#101827);
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+
+.card{
+width:100%;
+max-width:400px;
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.1);
+backdrop-filter:blur(15px);
+padding:30px;
+border-radius:25px;
+box-shadow:0 0 30px rgba(0,140,255,.3);
+color:#fff;
+}
+
+.logo{
+width:90px;
+height:90px;
+border-radius:50%;
+margin:auto;
+background:#0d6efd;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:40px;
+font-weight:bold;
+margin-bottom:20px;
+box-shadow:0 0 25px #0d6efd;
+}
+
+h2{
+text-align:center;
+margin-bottom:25px;
+}
+
+.group{
+margin-bottom:15px;
+}
+
+.group label{
+display:block;
+margin-bottom:6px;
+font-size:14px;
+}
+
+.group input{
+width:100%;
+padding:13px;
+border:none;
+outline:none;
+border-radius:12px;
+font-size:15px;
+}
+
+button{
+width:100%;
+padding:15px;
+background:#0d6efd;
+border:none;
+border-radius:15px;
+color:#fff;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+transition:.3s;
+}
+
+button:hover{
+transform:scale(1.03);
+}
+
+.bottom{
+margin-top:20px;
+text-align:center;
+}
+
+.bottom a{
+color:#55b8ff;
+text-decoration:none;
+}
+
+.version{
+margin-top:20px;
+text-align:center;
+font-size:13px;
+color:#888;
+}
+</style>
+
+</head>
+<body>
+
+<div class="card">
+
+<div class="logo">A</div>
+
+<h2>Buat Akun</h2>
+
+<div class="group">
+<label>Nama</label>
+<input type="text" id="nama" placeholder="Nama Lengkap">
+</div>
+
+<div class="group">
+<label>Email</label>
+<input type="email" id="email" placeholder="Email">
+</div>
+
+<div class="group">
+<label>Password</label>
+<input type="password" id="password" placeholder="Password">
+</div>
+
+<div class="group">
+<label>Konfirmasi Password</label>
+<input type="password" id="password2" placeholder="Ulangi Password">
+</div>
+
+<button onclick="register()">DAFTAR</button>
+
+<div class="bottom">
+Sudah punya akun?<br>
+<a href="login.html">Login Sekarang</a>
+</div>
+
+<div class="version">
+AFATSUMAZER APP v1.0
+</div>
+
+</div>
+
+<script>
+
+function register(){
+
+let nama=document.getElementById("nama").value;
+let email=document.getElementById("email").value;
+let pass=document.getElementById("password").value;
+let pass2=document.getElementById("password2").value;
+
+if(nama==""||email==""||pass==""||pass2==""){
+alert("Semua data wajib diisi.");
+return;
+}
+
+if(pass!=pass2){
+alert("Password tidak sama.");
+return;
+}
+
+alert("Registrasi berhasil.\n\nVersi berikutnya akan langsung membuat akun Firebase.");
+
+window.location.href="login.html";
+
+}
+
+</script>
+
+</body>
+</html>
