@@ -146,26 +146,7 @@ Version 1.0
 
 </div>
 
-<script>
 
-function login(){
-
-let email=document.getElementById("email").value;
-let password=document.getElementById("password").value;
-
-if(email=="" || password==""){
-alert("Lengkapi email dan password.");
-return;
-}
-
-//sementara simulasi login
-localStorage.setItem("login","true");
-
-window.location.href="dashboard.html";
-
-}
-
-</script>
 <script type="module" src="assets/js/auth.js"></script>
 </body>
 </html>
