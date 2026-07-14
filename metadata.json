@@ -1,0 +1,6 @@
+{
+  "name": "Freelancer Portal",
+  "description": "Sebuah portal lengkap untuk freelancer mengelola proyek, waktu, keuangan, dan data klien secara aman dengan sistem autentikasi Firebase.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

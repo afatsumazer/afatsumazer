@@ -1,0 +1,145 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net - Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- Users Collection ---
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) 
+        && incoming().uid == request.auth.uid
+        && incoming().email is string
+        && incoming().name is string
+        && incoming().name.size() > 0
+        && incoming().name.size() <= 100;
+      allow update: if isOwner(userId)
+        && incoming().uid == existing().uid
+        && incoming().email == existing().email
+        && incoming().name is string
+        && incoming().name.size() > 0
+        && incoming().name.size() <= 100;
+      allow delete: if false; // Freelancer accounts cannot be deleted directly from client SDK
+    }
+
+    // --- Projects Collection ---
+    match /projects/{projectId} {
+      allow get: if isSignedIn() && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      
+      allow create: if isSignedIn() 
+        && isValidId(projectId)
+        && incoming().userId == request.auth.uid
+        && incoming().title is string && incoming().title.size() > 0 && incoming().title.size() <= 200
+        && incoming().clientName is string && incoming().clientName.size() > 0 && incoming().clientName.size() <= 200
+        && incoming().status in ['pitching', 'active', 'completed', 'paused'];
+        
+      allow update: if isSignedIn() 
+        && isValidId(projectId)
+        && existing().userId == request.auth.uid
+        && incoming().userId == request.auth.uid
+        && incoming().title is string && incoming().title.size() > 0 && incoming().title.size() <= 200
+        && incoming().clientName is string && incoming().clientName.size() > 0 && incoming().clientName.size() <= 200
+        && incoming().status in ['pitching', 'active', 'completed', 'paused'];
+        
+      allow delete: if isSignedIn() 
+        && existing().userId == request.auth.uid;
+    }
+
+    // --- Transactions Collection ---
+    match /transactions/{transactionId} {
+      allow get: if isSignedIn() && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      
+      allow create: if isSignedIn() 
+        && isValidId(transactionId)
+        && incoming().userId == request.auth.uid
+        && incoming().type in ['income', 'expense']
+        && incoming().amount is number && incoming().amount >= 0
+        && incoming().category is string && incoming().category.size() > 0 && incoming().category.size() <= 100
+        && incoming().status in ['paid', 'unpaid', 'pending'];
+        
+      allow update: if isSignedIn() 
+        && isValidId(transactionId)
+        && existing().userId == request.auth.uid
+        && incoming().userId == request.auth.uid
+        && incoming().type == existing().type
+        && incoming().amount is number && incoming().amount >= 0
+        && incoming().category is string && incoming().category.size() > 0 && incoming().category.size() <= 100
+        && incoming().status in ['paid', 'unpaid', 'pending'];
+        
+      allow delete: if isSignedIn() 
+        && existing().userId == request.auth.uid;
+    }
+
+    // --- TimeLogs Collection ---
+    match /timeLogs/{timeLogId} {
+      allow get: if isSignedIn() && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      
+      allow create: if isSignedIn() 
+        && isValidId(timeLogId)
+        && incoming().userId == request.auth.uid
+        && incoming().projectTitle is string && incoming().projectTitle.size() > 0 && incoming().projectTitle.size() <= 200
+        && incoming().hours is number && incoming().hours > 0 && incoming().hours <= 24;
+        
+      allow update: if isSignedIn() 
+        && isValidId(timeLogId)
+        && existing().userId == request.auth.uid
+        && incoming().userId == request.auth.uid
+        && incoming().projectTitle is string && incoming().projectTitle.size() > 0 && incoming().projectTitle.size() <= 200
+        && incoming().hours is number && incoming().hours > 0 && incoming().hours <= 24;
+        
+      allow delete: if isSignedIn() 
+        && existing().userId == request.auth.uid;
+    }
+
+    // --- Clients Collection ---
+    match /clients/{clientId} {
+      allow get: if isSignedIn() && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      
+      allow create: if isSignedIn() 
+        && isValidId(clientId)
+        && incoming().userId == request.auth.uid
+        && incoming().name is string && incoming().name.size() > 0 && incoming().name.size() <= 100
+        && incoming().email is string && incoming().email.size() > 0 && incoming().email.size() <= 100
+        && incoming().status in ['active', 'inactive'];
+        
+      allow update: if isSignedIn() 
+        && isValidId(clientId)
+        && existing().userId == request.auth.uid
+        && incoming().userId == request.auth.uid
+        && incoming().name is string && incoming().name.size() > 0 && incoming().name.size() <= 100
+        && incoming().email is string && incoming().email.size() > 0 && incoming().email.size() <= 100
+        && incoming().status in ['active', 'inactive'];
+        
+      allow delete: if isSignedIn() 
+        && existing().userId == request.auth.uid;
+    }
+  }
+}
