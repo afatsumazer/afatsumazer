@@ -1,42 +1,43 @@
-import { auth } from "./firebase-config.js";
-import { 
-    signInWithEmailAndPassword, 
-    setPersistence, 
-    browserLocalPersistence 
-} from "https://gstatic.com";
+// Menggunakan jalur absolut agar aman di hosting GitHub / eu.org
+import { auth } from "/js/firebase-config.js";
+import { signInWithEmailAndPassword } from "https://gstatic.com";
 
-const loginForm = document.getElementById('loginForm');
-const errorMsg = document.getElementById('errorMsg');
+// Pastikan skrip menunggu seluruh elemen HTML selesai dimuat
+document.addEventListener("DOMContentLoaded", () => {
+    const loginForm = document.getElementById('loginForm');
+    const errorMsg = document.getElementById('errorMsg');
 
-if (loginForm) {
+    if (!loginForm) {
+        console.error("Elemen form 'loginForm' tidak ditemukan di HTML!");
+        return;
+    }
+
     loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (errorMsg) errorMsg.innerText = '';
+        e.preventDefault(); // Menghentikan reload halaman bawaan browser
+        
+        if (errorMsg) errorMsg.innerText = 'Sedang memproses masuk...';
 
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
 
-        // MEMAKSA SESI TETAP TERSIMPAN DI BROWSER SAAT BERPINDAH HALAMAN
-        setPersistence(auth, browserLocalPersistence)
-            .then(() => {
-                // Setelah sesi dikunci di browser, lakukan login
-                return signInWithEmailAndPassword(auth, email, password);
-            })
-            .then(() => {
-                console.log("Login sukses, mengalihkan...");
-                window.location.href = 'dashboard.html';
+        // Eksekusi autentikasi Firebase
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                console.log("Login sukses!", userCredential.user);
+                // Pindah halaman dengan aman
+                window.location.replace('dashboard.html');
             })
             .catch((error) => {
-                console.error("Gagal Masuk:", error.code, error.message);
+                console.error("Firebase Auth Error:", error.code);
                 if (errorMsg) {
                     if (error.code === 'auth/invalid-credential') {
-                        errorMsg.innerText = 'Email atau password Anda salah.';
+                        errorMsg.innerText = 'Email atau password salah.';
                     } else if (error.code === 'auth/operation-not-allowed') {
-                        errorMsg.innerText = 'Fitur Email/Password belum diaktifkan di Firebase Console!';
+                        errorMsg.innerText = 'Fitur Email/Password belum aktif di Firebase Console.';
                     } else {
-                        errorMsg.innerText = 'Error: ' + error.message;
+                        errorMsg.innerText = 'Gagal masuk: ' + error.message;
                     }
                 }
             });
     });
-}
+});
