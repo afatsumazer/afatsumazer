@@ -1,0 +1,1 @@
+import {auth} from './firebase-config.js';console.log('Dashboard ready',auth);
