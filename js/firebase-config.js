@@ -1,0 +1,1 @@
+export const auth={}; // Ganti dengan firebase-config.js milik Anda
