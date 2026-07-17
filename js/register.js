@@ -1,37 +1,45 @@
-import { auth } from "./firebase-config.js";
+import { auth } from "/js/firebase-config.js";
 import { createUserWithEmailAndPassword, updateProfile } from "https://gstatic.com";
 
-const registerForm = document.getElementById('registerForm');
-const errorMsg = document.getElementById('errorMsg');
-const successMsg = document.getElementById('successMsg');
+document.addEventListener("DOMContentLoaded", () => {
+    const registerForm = document.getElementById('registerForm');
+    const errorMsg = document.getElementById('errorMsg');
+    const successMsg = document.getElementById('successMsg');
 
-registerForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    errorMsg.innerText = '';
-    successMsg.innerText = '';
+    if (!registerForm) {
+        console.error("Elemen form 'registerForm' tidak ditemukan di HTML!");
+        return;
+    }
 
-    const name = document.getElementById('regName').value.trim();
-    const email = document.getElementById('regEmail').value.trim();
-    const password = document.getElementById('regPassword').value;
+    registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        if (errorMsg) errorMsg.innerText = '';
+        if (successMsg) successMsg.innerText = 'Sedang mendaftarkan akun...';
 
-    createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            // Setelah akun terbuat, simpan nama lengkap ke profil Firebase pengguna
-            updateProfile(userCredential.user, {
-                displayName: name
-            }).then(() => {
-                successMsg.innerText = 'Pendaftaran berhasil! Mengalihkan...';
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1500);
+        const name = document.getElementById('regName').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Menyimpan nama lengkap ke database profil Firebase
+                return updateProfile(userCredential.user, { displayName: name });
+            })
+            .then(() => {
+                if (successMsg) successMsg.innerText = 'Akun berhasil dibuat! Mengalihkan...';
+                window.location.replace('dashboard.html');
+            })
+            .catch((error) => {
+                console.error("Firebase Reg Error:", error.code);
+                if (successMsg) successMsg.innerText = '';
+                if (errorMsg) {
+                    if (error.code === 'auth/email-already-in-use') {
+                        errorMsg.innerText = 'Email ini sudah digunakan oleh akun lain.';
+                    } else {
+                        errorMsg.innerText = 'Gagal mendaftar: ' + error.message;
+                    }
+                }
             });
-        })
-        .catch((error) => {
-            console.error(error.code);
-            if (error.code === 'auth/email-already-in-use') {
-                errorMsg.innerText = 'Email sudah terdaftar. Gunakan email lain.';
-            } else {
-                errorMsg.innerText = 'Gagal mendaftar: ' + error.message;
-            }
-        });
+    });
 });
