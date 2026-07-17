@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AFATSUMAZER - Freelancer Platform</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+color:#222;
+}
+
+header{
+background:#0f172a;
+color:#fff;
+padding:15px 8%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+position:sticky;
+top:0;
+}
+
+.logo{
+font-size:28px;
+font-weight:bold;
+}
+
+nav a{
+color:white;
+text-decoration:none;
+margin-left:20px;
+}
+
+.hero{
+padding:80px 8%;
+display:flex;
+flex-wrap:wrap;
+justify-content:space-between;
+align-items:center;
+}
+
+.hero-left{
+max-width:550px;
+}
+
+.hero-left h1{
+font-size:48px;
+margin-bottom:20px;
+}
+
+.hero-left p{
+font-size:18px;
+line-height:1.7;
+margin-bottom:30px;
+}
+
+.btn{
+padding:15px 30px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+text-decoration:none;
+display:inline-block;
+margin-right:10px;
+}
+
+.primary{
+background:#2563eb;
+color:white;
+}
+
+.secondary{
+background:white;
+border:2px solid #2563eb;
+color:#2563eb;
+}
+
+.hero img{
+width:420px;
+max-width:100%;
+}
+
+.stats{
+padding:60px 8%;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:20px;
+}
+
+.card{
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 5px 15px rgba(0,0,0,.08);
+text-align:center;
+}
+
+footer{
+background:#0f172a;
+color:white;
+text-align:center;
+padding:25px;
+margin-top:60px;
+}
+
+@media(max-width:768px){
+
+.hero{
+flex-direction:column;
+text-align:center;
+}
+
+.hero-left h1{
+font-size:34px;
+}
+
+header{
+flex-direction:column;
+}
+
+nav{
+margin-top:15px;
+}
+
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+AFATSUMAZER
+</div>
+
+<nav>
+
+<a href="#">Beranda</a>
+
+<a href="#">Freelancer</a>
+
+<a href="#">Project</a>
+
+<a href="#">Tentang</a>
+
+<a href="login.html">Login</a>
+
+<a href="register.html">Daftar</a>
+
+</nav>
+
+</header>
+
+<section class="hero">
+
+<div class="hero-left">
+
+<h1>Platform Freelancer Indonesia</h1>
+
+<p>
+
+Temukan freelancer terbaik atau jual jasa profesional Anda.
+Kelola proyek, client, file, dan pendapatan dalam satu dashboard.
+
+</p>
+
+<a href="register.html" class="btn primary">
+Mulai Sekarang
+</a>
+
+<a href="login.html" class="btn secondary">
+Masuk
+</a>
+
+</div>
+
+<div>
+
+<img src="assets/logo.png" alt="AFATSUMAZER">
+
+</div>
+
+</section>
+
+<section class="stats">
+
+<div class="card">
+
+<h2 id="totalFreelancer">0</h2>
+
+<p>Freelancer</p>
+
+</div>
+
+<div class="card">
+
+<h2 id="totalProject">0</h2>
+
+<p>Project</p>
+
+</div>
+
+<div class="card">
+
+<h2 id="totalClient">0</h2>
+
+<p>Client</p>
+
+</div>
+
+<div class="card">
+
+<h2 id="totalIncome">Rp0</h2>
+
+<p>Total Pendapatan</p>
+
+</div>
+
+</section>
+
+<footer>
+
+© 2026 AFATSUMAZER
+
+</footer>
+
+<script type="module">
+
+import { auth } from "./js/firebase-config.js";
+
+import {
+onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+onAuthStateChanged(auth,(user)=>{
+
+if(user){
+
+window.location="dashboard.html";
+
+}
+
+});
+
+</script>
+
+</body>
+</html>
