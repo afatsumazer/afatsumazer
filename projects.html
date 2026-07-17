@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects - AFATSUMAZER</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f5f5f5;
+}
+
+header{
+    background:#0d6efd;
+    color:#fff;
+    padding:18px;
+    text-align:center;
+}
+
+.container{
+    max-width:1100px;
+    margin:auto;
+    padding:20px;
+}
+
+.user{
+    background:#fff;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:20px;
+    box-shadow:0 3px 10px rgba(0,0,0,.1);
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:#fff;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 3px 10px rgba(0,0,0,.1);
+}
+
+.card h3{
+    margin-top:0;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    background:#0d6efd;
+    color:#fff;
+    margin-top:10px;
+}
+
+button:hover{
+    background:#0b5ed7;
+}
+
+.logout{
+    background:#dc3545;
+}
+
+.logout:hover{
+    background:#bb2d3b;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+<h2>Projects Dashboard</h2>
+</header>
+
+<div class="container">
+
+<div class="user">
+<h3 id="username">Memuat...</h3>
+<p id="email"></p>
+</div>
+
+<div class="grid">
+
+<div class="card">
+<h3>Project Saya</h3>
+<p>Total Project</p>
+<h1 id="projectCount">0</h1>
+<button id="newProject">Tambah Project</button>
+</div>
+
+<div class="card">
+<h3>Mining</h3>
+<p>Status</p>
+<h2>Coming Soon</h2>
+</div>
+
+<div class="card">
+<h3>Wallet</h3>
+<p>Saldo</p>
+<h2>Rp0</h2>
+</div>
+
+<div class="card">
+<h3>Akun</h3>
+
+<button onclick="location.href='dashboard.html'">
+Dashboard
+</button>
+
+<button class="logout" id="logoutBtn">
+Logout
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script type="module" src="js/projects.js"></script>
+
+</body>
+</html>
