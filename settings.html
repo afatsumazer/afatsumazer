@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Settings</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#f4f6f9;
+}
+
+.container{
+max-width:600px;
+margin:25px auto;
+background:white;
+padding:20px;
+border-radius:15px;
+box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+
+h2{
+text-align:center;
+margin-bottom:20px;
+}
+
+.setting{
+margin-bottom:15px;
+}
+
+label{
+display:block;
+margin-bottom:5px;
+font-weight:bold;
+}
+
+input{
+width:100%;
+padding:12px;
+border:1px solid #ccc;
+border-radius:8px;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:#0d6efd;
+color:white;
+font-size:15px;
+}
+
+.danger{
+background:#dc3545;
+}
+
+.success{
+background:#198754;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Pengaturan Akun</h2>
+
+<div class="setting">
+<label>Nama</label>
+<input type="text" id="displayName">
+</div>
+
+<button id="saveProfile">
+Simpan Nama
+</button>
+
+<button id="verifyEmail" class="success">
+Kirim Email Verifikasi
+</button>
+
+<button id="resetPassword">
+Reset Password
+</button>
+
+<button onclick="location.href='profile.html'">
+Profile
+</button>
+
+<button onclick="location.href='dashboard.html'">
+Dashboard
+</button>
+
+<button id="logout">
+Logout
+</button>
+
+<button id="deleteAccount" class="danger">
+Hapus Akun
+</button>
+
+</div>
+
+<script type="module" src="js/settings.js"></script>
+
+</body>
+</html>
