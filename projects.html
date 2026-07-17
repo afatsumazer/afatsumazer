@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Project Saya</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+margin:0;
+}
+
+header{
+
+background:#0f172a;
+color:white;
+padding:15px 30px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+}
+
+.container{
+
+padding:30px;
+
+}
+
+.top{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+
+}
+
+button{
+
+padding:12px 20px;
+background:#2563eb;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+
+}
+
+table{
+
+width:100%;
+background:white;
+border-collapse:collapse;
+
+}
+
+th{
+
+background:#2563eb;
+color:white;
+padding:15px;
+
+}
+
+td{
+
+padding:15px;
+border-bottom:1px solid #ddd;
+
+}
+
+.status{
+
+padding:5px 12px;
+border-radius:15px;
+font-size:13px;
+
+}
+
+.review{
+
+background:#fde68a;
+
+}
+
+.active{
+
+background:#86efac;
+
+}
+
+.done{
+
+background:#bfdbfe;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h2>Project Saya</h2>
+
+<a href="dashboard.html" style="color:white;text-decoration:none;">
+Dashboard
+</a>
+
+</header>
+
+<div class="container">
+
+<div class="top">
+
+<h3>Daftar Project</h3>
+
+<button id="newProject">
+
++ Project Baru
+
+</button>
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Judul</th>
+
+<th>Harga</th>
+
+<th>Status</th>
+
+<th>Aksi</th>
+
+</tr>
+
+</thead>
+
+<tbody id="projectTable">
+
+<tr>
+
+<td colspan="4">
+
+Belum ada project
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<script type="module" src="js/project.js"></script>
+
+</body>
+</html>
