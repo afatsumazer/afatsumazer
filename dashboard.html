@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Pengguna</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f6f9;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            background-color: #1e293b;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #38bdf8;
+        }
+
+        .sidebar a {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 12px;
+            display: block;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            background-color: #334155;
+            color: #fff;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #dc2626;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .user-info h1 {
+            font-size: 24px;
+            color: #0f172a;
+        }
+
+        /* Dashboard Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            color: #64748b;
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 28px;
+            font-weight: bold;
+            color: #0f172a;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Aplikasi Saya</h2>
+        <a href="#" class="active">🏠 Dashboard</a>
+        <a href="#">👤 Profil</a>
+        <a href="#">⚙️ Pengaturan</a>
+        <button class="logout-btn" onclick="logoutUser()">🚪 Keluar</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <div class="user-info">
+                <h1>Selamat Datang, <span id="user-display-name">Pengguna</span>!</h1>
+                <p id="user-display-email">email@contoh.com</p>
+            </div>
+        </div>
+
+        <!-- Dashboard Stats Demo -->
+        <div class="stats-grid">
+            <div class="card">
+                <h3>Status Akun</h3>
+                <p style="color: #22c55e; font-size: 20px;">Aktif</p>
+            </div>
+            <div class="card">
+                <h3>Total Log Masuk</h3>
+                <p>1</p>
+            </div>
+            <div class="card">
+                <h3>Notifikasi</h3>
+                <p>0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Sinkronisasi -->
+    <script>
+        // Fungsi proteksi halaman & ambil data login
+        function checkLogin() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            // Jika tidak ada data login, tendang kembali ke halaman login
+            if (!currentUser) {
+                alert('Akses ditolak. Silakan login terlebih dahulu.');
+                window.location.href = 'login.html'; 
+                return;
+            }
+
+            // Tampilkan data pengguna di dashboard
+            document.getElementById('user-display-name').innerText = currentUser.name;
+            document.getElementById('user-display-email').innerText = currentUser.email;
+        }
+
+        // Fungsi Logout
+        function logoutUser() {
+            localStorage.removeItem('currentUser'); // Hapus sesi login aktif
+            window.location.href = 'login.html'; // Alihkan ke login
+        }
+
+        // Jalankan proteksi saat halaman dimuat
+        window.onload = checkLogin;
+    </script>
+</body>
+</html>
