@@ -68,27 +68,33 @@
 
     <!-- KONTROL KEAMANAN DAN SYNC REALTIME -->
     <script type="module">
-        import { auth } from "./js/firebase-config.js";
-        import { onAuthStateChanged, signOut } from "https://gstatic.com";
+    import { auth } from "./js/firebase-config.js";
+    import { onAuthStateChanged, signOut } from "https://gstatic.com";
 
-        // Memantau kondisi login secara presisi di pelayan web
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // Tampilkan data profil asli dari database akun Firebase
-                document.getElementById('userName').innerText = user.displayName || "Freelancer";
-                document.getElementById('userEmail').innerText = user.email;
-            } else {
-                // Jika tidak terdeteksi token login, langsung lempar kembali ke gerbang login
-                window.location.href = 'login.html';
-            }
-        });
+    // Berikan status awal bahwa sistem sedang memvalidasi token
+    document.getElementById('userName').innerText = "Memvalidasi Sesi...";
 
-        // Event handler klik untuk fungsi keluar log keamanan
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            signOut(auth).then(() => {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log("Sesi terdeteksi untuk:", user.email);
+            // Sesi terkonfirmasi, tampilkan data pengguna
+            document.getElementById('userName').innerText = user.displayName || "Freelancer";
+            document.getElementById('userEmail').innerText = user.email;
+        } else {
+            console.warn("Tidak ada sesi aktif. Mengalihkan ke login.");
+            // Berikan jeda 500ms untuk memastikan token benar-benar kosong sebelum ditendang
+            setTimeout(() => {
                 window.location.href = 'login.html';
-            });
+            }, 500);
+        }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        signOut(auth).then(() => {
+            window.location.href = 'login.html';
         });
-    </script>
+    });
+</script>
+
 </body>
 </html>
