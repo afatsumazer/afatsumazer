@@ -1,149 +1,262 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webapp - Afatsumazer Soft System</title>
-    <!-- Tailwind CSS untuk Desain Soft -->
-    <script src="https://tailwindcss.com"></script>
-    <link href="https://googleapis.com" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AFATSUMAZER - Freelancer Platform</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+color:#222;
+}
+
+header{
+background:#0f172a;
+color:#fff;
+padding:15px 8%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+position:sticky;
+top:0;
+}
+
+.logo{
+font-size:28px;
+font-weight:bold;
+}
+
+nav a{
+color:white;
+text-decoration:none;
+margin-left:20px;
+}
+
+.hero{
+padding:80px 8%;
+display:flex;
+flex-wrap:wrap;
+justify-content:space-between;
+align-items:center;
+}
+
+.hero-left{
+max-width:550px;
+}
+
+.hero-left h1{
+font-size:48px;
+margin-bottom:20px;
+}
+
+.hero-left p{
+font-size:18px;
+line-height:1.7;
+margin-bottom:30px;
+}
+
+.btn{
+padding:15px 30px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+text-decoration:none;
+display:inline-block;
+margin-right:10px;
+}
+
+.primary{
+background:#2563eb;
+color:white;
+}
+
+.secondary{
+background:white;
+border:2px solid #2563eb;
+color:#2563eb;
+}
+
+.hero img{
+width:420px;
+max-width:100%;
+}
+
+.stats{
+padding:60px 8%;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:20px;
+}
+
+.card{
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 5px 15px rgba(0,0,0,.08);
+text-align:center;
+}
+
+footer{
+background:#0f172a;
+color:white;
+text-align:center;
+padding:25px;
+margin-top:60px;
+}
+
+@media(max-width:768px){
+
+.hero{
+flex-direction:column;
+text-align:center;
+}
+
+.hero-left h1{
+font-size:34px;
+}
+
+header{
+flex-direction:column;
+}
+
+nav{
+margin-top:15px;
+}
+
+}
+</style>
+
 </head>
-<body class="bg-gradient-to-tr from-[#f3f4f6] via-[#f5f3ff] to-[#ecfdf5] min-h-screen transition-all duration-500">
 
-    <!-- Notifikasi Alert Pop-up -->
-    <div id="alertToast" class="fixed top-5 right-5 z-50 transform translate-x-80 opacity-0 transition-all duration-300 bg-white/90 backdrop-blur-md px-5 py-3 rounded-2xl border shadow-lg hidden flex items-center gap-3">
-        <div id="alertIcon" class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold"></div>
-        <p id="alertMessage" class="text-sm font-medium text-slate-700"></p>
-    </div>
+<body>
 
-    <!-- ========================================== -->
-    <!-- SECTION 1: HALAMAN LOGIN                   -->
-    <!-- ========================================== -->
-    <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
-        <div class="bg-white/80 backdrop-blur-xl w-full max-w-md p-10 rounded-3xl shadow-xl shadow-slate-100 border border-white/60">
-            
-            <!-- Header Logo -->
-            <div class="text-center mb-8">
-                <div class="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                    </svg>
-                </div>
-                <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Afatsumazer App</h2>
-                <p class="text-sm text-slate-400 mt-2">Masuk atau buat akun baru di sini</p>
-            </div>
+<header>
 
-            <!-- Form Kontrol -->
-            <form id="loginForm" class="space-y-5">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Alamat Email</label>
-                    <input type="email" id="email" required placeholder="nama@email.com" 
-                        class="w-full px-4 py-3.5 bg-slate-50/50 border border-slate-200/80 rounded-2xl text-slate-700 placeholder-slate-400 text-sm focus:outline-none focus:border-purple-300 focus:bg-white focus:ring-4 focus:ring-purple-50 transition-all duration-300">
-                </div>
+<div class="logo">
+AFATSUMAZER
+</div>
 
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kata Sandi</label>
-                        <a href="#" class="text-xs font-medium text-purple-500 hover:text-purple-600 transition-colors">Lupa?</a>
-                    </div>
-                    <input type="password" id="password" required placeholder="••••••••" 
-                        class="w-full px-4 py-3.5 bg-slate-50/50 border border-slate-200/80 rounded-2xl text-slate-700 placeholder-slate-400 text-sm focus:outline-none focus:border-purple-300 focus:bg-white focus:ring-4 focus:ring-purple-50 transition-all duration-300">
-                </div>
+<nav>
 
-                <!-- Tombol -->
-                <div class="flex flex-col gap-3 pt-2">
-                    <button type="button" id="btnLogin"
-                        class="w-full py-3.5 bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-medium text-sm rounded-2xl shadow-lg shadow-purple-200 hover:opacity-95 transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center">
-                        <span>Masuk ke Aplikasi</span>
-                    </button>
-                    
-                    <button type="button" id="btnRegister"
-                        class="w-full py-3.5 bg-white border border-slate-200 text-slate-600 font-medium text-sm rounded-2xl hover:bg-slate-50 transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center">
-                        <span>Daftar Akun Baru</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+<a href="#">Beranda</a>
 
-    <!-- ========================================== -->
-    <!-- SECTION 2: HALAMAN DASHBOARD               -->
-    <!-- ========================================== -->
-    <div id="dashboardPage" class="hidden min-h-screen flex">
-        
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white/60 backdrop-blur-md border-r border-slate-200/60 p-6 flex flex-col justify-between hidden md:flex">
-            <div>
-                <div class="flex items-center gap-3 mb-8 px-2">
-                    <div class="w-8 h-8 bg-purple-500 rounded-xl flex items-center justify-center text-white font-bold text-sm">A</div>
-                    <span class="font-bold text-slate-800 text-lg">Afatsumazer</span>
-                </div>
-                <nav class="space-y-2">
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 bg-purple-50 text-purple-600 rounded-xl font-medium text-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"></path></svg>
-                        Dashboard
-                    </a>
-                </nav>
-            </div>
-            
-            <!-- Profil Sesi Kontrol -->
-            <div class="border-t border-slate-100 pt-4 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-purple-200 rounded-full flex items-center justify-center text-purple-700 font-semibold text-sm" id="userInitial">U</div>
-                    <div>
-                        <p class="text-xs font-semibold text-slate-700 max-w-[110px] truncate" id="userEmailNav">Memuat...</p>
-                        <span class="text-[10px] text-emerald-500 font-medium">Firebase Terhubung</span>
-                    </div>
-                </div>
-                <button id="btnLogout" class="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 transition-colors" title="Keluar">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                </button>
-            </div>
-        </aside>
+<a href="#">Freelancer</a>
 
-        <!-- Konten Panel Utama -->
-        <main class="flex-1 p-8 flex flex-col gap-6">
-            <header class="flex justify-between items-center">
-                <div>
-                    <h1 class="text-2xl font-bold text-slate-800">Panel Utama</h1>
-                    <p class="text-sm text-slate-400">Selamat datang di sistem manajemen cloud.</p>
-                </div>
-                <button id="btnLogoutMobile" class="md:hidden px-4 py-2 text-xs font-semibold text-red-500 bg-red-50 rounded-xl">Keluar</button>
-            </header>
+<a href="#">Project</a>
 
-            <div class="bg-white/80 backdrop-blur-md p-8 rounded-3xl border border-white/60 shadow-sm flex-1 flex items-center justify-center min-h-[300px]">
-                <div class="text-center max-w-sm">
-                    <div class="w-16 h-16 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-emerald-500">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-13.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                    </div>
-                    <h4 class="text-slate-700 font-semibold mb-1">Akses Tervalidasi</h4>
-                    <p class="text-xs text-slate-400">Autentikasi aman berhasil divalidasi langsung melalui node infrastruktur afatsumazer-app.</p>
-                </div>
-            </div>
-        </main>
-    </div>
+<a href="#">Tentang</a>
 
-    <!-- ========================================== -->
-    <!-- LOGIK MODUL BACKEND FIREBASE               -->
-    <!-- ========================================== -->
-    <script type="module">
-        import { initializeApp } from "https://gstatic.com";
-        import { getAnalytics } from "https://gstatic.com";
-        import { 
-            getAuth, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
-            signOut,
-            onAuthStateChanged 
-        } from "https://gstatic.com";
+<a href="login.html">Login</a>
 
-        // Konfigurasi Resmi Sesuai Data Proyek Anda
-        const firebaseConfig = {
-            apiKey: "AIzaSyDg2b6LERZ2zE86mTiYvUO1Uj--lAtpmgM",
-            authDomain: "afatsumazer-app.firebaseapp.com",
-            databaseURL: "https://afatsumazer-app-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "afatsumazer-app",
-            storageBucket: "afatsumazer-app.firebasestorage.app",
+<a href="register.html">Daftar</a>
+
+</nav>
+
+</header>
+
+<section class="hero">
+
+<div class="hero-left">
+
+<h1>Platform Freelancer Indonesia</h1>
+
+<p>
+
+Temukan freelancer terbaik atau jual jasa profesional Anda.
+Kelola proyek, client, file, dan pendapatan dalam satu dashboard.
+
+</p>
+
+<a href="register.html" class="btn primary">
+Mulai Sekarang
+</a>
+
+<a href="login.html" class="btn secondary">
+Masuk
+</a>
+
+</div>
+
+<div>
+
+<img src="assets/logo.png" alt="AFATSUMAZER">
+
+</div>
+
+</section>
+
+<section class="stats">
+
+<div class="card">
+
+<h2 id="totalFreelancer">0</h2>
+
+<p>Freelancer</p>
+
+</div>
+
+<div class="card">
+
+<h2 id="totalProject">0</h2>
+
+<p>Project</p>
+
+</div>
+
+<div class="card">
+
+<h2 id="totalClient">0</h2>
+
+<p>Client</p>
+
+</div>
+
+<div class="card">
+
+<h2 id="totalIncome">Rp0</h2>
+
+<p>Total Pendapatan</p>
+
+</div>
+
+</section>
+
+<footer>
+
+© 2026 AFATSUMAZER
+
+</footer>
+
+<script type="module">
+
+import { auth } from "./js/firebase-config.js";
+
+import {
+onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+onAuthStateChanged(auth,(user)=>{
+
+if(user){
+
+window.location="dashboard.html";
+
+}
+
+});
+
+</script>
+
+</body>
+</html>
