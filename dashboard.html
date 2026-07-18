@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AppSaya</title>
+    <!-- Menggunakan Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 font-sans min-h-screen flex flex-col md:flex-row">
+
+    <!-- SIDEBAR KIRI -->
+    <aside class="w-full md:w-64 bg-indigo-900 text-white flex flex-col justify-between p-6">
+        <div>
+            <!-- Logo / Nama Aplikasi -->
+            <div class="mb-8">
+                <span class="text-2xl font-bold tracking-tight">AppSaya</span>
+                <p class="text-xs text-indigo-300">Workspace Dashboard</p>
+            </div>
+            <!-- Menu Navigasi -->
+            <nav class="space-y-2">
+                <button onclick="switchTab('overview')" id="btn-overview" class="w-full text-left flex items-center space-x-3 px-4 py-2.5 rounded-lg bg-indigo-800 text-white font-medium transition">
+                    <span>Ringkasan</span>
+                </button>
+                <button onclick="switchTab('tasks')" id="btn-tasks" class="w-full text-left flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-indigo-800 text-indigo-100 hover:text-white font-medium transition">
+                    <span>Tugas Saya</span>
+                </button>
+                <button onclick="switchTab('files')" id="btn-files" class="w-full text-left flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-indigo-800 text-indigo-100 hover:text-white font-medium transition">
+                    <span>Penyimpanan File</span>
+                </button>
+                <button onclick="switchTab('profile')" id="btn-profile" class="w-full text-left flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-indigo-800 text-indigo-100 hover:text-white font-medium transition">
+                    <span>Profil Saya</span>
+                </button>
+            </nav>
+        </div>
+        <!-- Tombol Keluar di Bagian Bawah -->
+        <div class="pt-6 border-t border-indigo-800">
+            <button onclick="logout()" class="w-full text-left flex items-center space-x-3 px-4 py-2 text-red-300 hover:text-red-100 transition">
+                <span>Keluar Sesi</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- PANEL UTAMA (KANAN) -->
+    <main class="flex-grow flex flex-col">
+        <!-- Header Atas (Top Bar) -->
+        <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 md:px-8">
+            <h2 id="page-title" class="text-xl font-bold text-gray-800">Ringkasan</h2>
+            <div class="flex items-center space-x-3">
+                <span id="user-display-name" class="text-sm font-medium text-gray-600">Memuat...</span>
+                <img id="user-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-8 h-8 rounded-full border border-gray-200">
+            </div>
+        </header>
+
+        <!-- AREA KONTEN KERJA UTAMA -->
+        <div class="p-6 md:p-8 flex-grow">
+
+            <!-- TAB 1: OVERVIEW (RINGKASAN) -->
+            <div id="tab-overview" class="space-y-6">
+                <!-- Grid Kartu Statistik -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                        <span class="text-sm text-gray-500 font-medium uppercase tracking-wider">Tugas Tersisa</span>
+                        <h3 id="stat-tasks-pending" class="text-3xl font-extrabold text-indigo-600 mt-2">0</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                        <span class="text-sm text-gray-500 font-medium uppercase tracking-wider">Tugas Selesai</span>
+                        <h3 id="stat-tasks-completed" class="text-3xl font-extrabold text-green-600 mt-2">0</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                        <span class="text-sm text-gray-500 font-medium uppercase tracking-wider">File Disimpan</span>
+                        <h3 id="stat-files-count" class="text-3xl font-extrabold text-blue-600 mt-2">0</h3>
+                    </div>
+                </div>
+                <!-- Selamat Datang Widget -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="text-lg font-bold">Selamat Datang di Workspace Anda</h3>
+                    <p class="text-gray-500 mt-1 text-sm">Gunakan menu di sisi kiri untuk mulai mengelola tugas harian atau mengamankan dokumen penting Anda.</p>
+                </div>
+            </div>
+
+            <!-- TAB 2: TUGAS SAYA -->
+            <div id="tab-tasks" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-2xl">
+                    <h3 class="text-lg font-bold mb-4">Daftar Tugas Harian</h3>
+                    
+                    <!-- Form Tambah Tugas -->
+                    <form onsubmit="addTask(event)" class="flex space-x-2 mb-6">
+                        <input id="task-input" type="text" placeholder="Tulis rencana tugas baru..." required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Tambah</button>
+                    </form>
+
+                    <!-- List Tugas -->
+                    <ul id="task-list" class="space-y-3">
+                        <!-- Dimuat otomatis via JS -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- TAB 3: PENYIMPANAN FILE -->
+            <div id="tab-files" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-3xl">
+                    <h3 class="text-lg font-bold mb-1">Penyimpanan Dokumen Aman</h3>
+                    <p class="text-sm text-gray-500 mb-6">Unggah file Anda secara aman ke enkripsi Firebase Storage. Anda dapat membagikan link unduhan ke orang lain [2].</p>
+
+                    <!-- Form Unggah File -->
+                    <div class="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-indigo-400 transition mb-6">
+                        <input type="file" id="file-selector" class="hidden" onchange="updateFileLabel()">
+                        <label for="file-selector" class="cursor-pointer block">
+                            <span id="file-label" class="text-sm text-gray-600 font-medium block">Pilih file dari komputer Anda...</span>
+                            <span class="text-xs text-gray-400 mt-1 block">Maksimal ukuran file disarankan 10 MB</span>
+                        </label>
+                        <button onclick="uploadSelectedFile()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition inline-flex items-center">
+                            Unggah Sekarang
+                        </button>
+                    </div>
+
+                    <!-- Daftar File Terunggah -->
+                    <h4 class="text-sm font-bold text-gray-700 mb-3">Daftar File Anda</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left font-semibold text-gray-500">Nama File</th>
+                                    <th class="px-6 py-3 text-right font-semibold text-gray-500">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="file-table-body" class="divide-y divide-gray-200">
+                                <tr>
+                                    <td colspan="2" class="px-6 py-4 text-center text-gray-400">Memuat berkas...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: PROFIL SAYA -->
+            <div id="tab-profile" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-md text-center">
+                    <img id="profile-card-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-24 h-24 rounded-full border border-gray-200 mx-auto mb-4">
+                    <h3 id="profile-card-name" class="text-xl font-bold text-gray-900">Nama Pengguna</h3>
+                    <p id="profile-card-email" class="text-sm text-gray-500">user@email.com</p>
+                    <div class="mt-6 pt-6 border-t border-gray-100 text-left text-sm text-gray-500 space-y-1">
+                        <p><strong>Penyedia Login:</strong> Google / Akun AppSaya</p>
+                        <p><strong>Status Akun:</strong> Terverifikasi Aman</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- INTEGRASI SDK FIREBASE MODULE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getStorage, ref, uploadBytes, listAll, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+        // Konfigurasi Firebase dari proyek Anda
+        const firebaseConfig = {
+          apiKey: "AIzaSyDg2b6LERZ2zE86mTiYvUO1Uj--lAtpmgM",
+          authDomain: "afatsumazer-app.firebaseapp.com",
+          databaseURL: "https://afatsumazer-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "afatsumazer-app",
+          storageBucket: "afatsumazer-app.firebasestorage.app",
+          messagingSenderId: "16280759060",
+          appId: "1:16280759060:web:fd4deacafdf5cadd777001",
+          measurementId: "G-WB9YW9D726"
+        };
+
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+
+        let userUID = "";
+
+        // Pengaman Halaman: Cek apakah sesi valid menggunakan Firebase Auth
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userUID = user.uid;
+                
+                // Set data profil di Header & Tab Profil
+                document.getElementById('user-display-name').innerText = user.displayName || "Pengguna";
+                document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/150";
+                
+                document.getElementById('profile-card-name').innerText = user.displayName || "Pengguna";
+                document.getElementById('profile-card-email').innerText = user.email;
+                document.getElementById('profile-card-avatar').src = user.photoURL || "https://via.placeholder.com/150";
+
+                // Muat file dari Firebase Storage untuk pengguna ini [2]
+                loadUserFiles();
+            } else {
+                // Sesi kadaluarsa / belum masuk -> Paksa keluar ke login.html
+                localStorage.removeItem('userSession');
+                window.location.href = "login.html";
+            }
+        });
+
+        // ================= LOGIKA TAB BROWSER (MENU SWITCHER) =================
+        window.switchTab = function(tabName) {
+            const tabs = ['overview', 'tasks', 'files', 'profile'];
+            tabs.forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`btn-${t}`).classList.remove('bg-indigo-800', 'text-white');
+                document.getElementById(`btn-${t}`).classList.add('text-indigo-100', 'hover:bg-indigo-800');
+            });
+
+            // Tampilkan tab yang dipilih
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            
+            // Aktifkan visual tombol menu di sidebar
+            const activeBtn = document.getElementById(`btn-${tabName}`);
+            activeBtn.classList.add('bg-indigo-800', 'text-white');
+            activeBtn.classList.remove('text-indigo-100', 'hover:bg-indigo-800');
+
+            // Ganti Title di Header
+            const titles = { overview: 'Ringkasan', tasks: 'Tugas Saya', files: 'Penyimpanan File', profile: 'Profil Saya' };
+            document.getElementById('page-title').innerText = titles[tabName];
+        }
+
+        // ================= LOGIKA TUGAS (TODO LIST) =================
+        let tasks = JSON.parse(localStorage.getItem('localTasks') || '[]');
+
+        window.addTask = function(event) {
+            event.preventDefault();
+            const input = document.getElementById('task-input');
+            const newTask = { id: Date.now(), title: input.value, completed: false };
+            tasks.push(newTask);
+            input.value = '';
+            saveAndRenderTasks();
+        }
+
+        window.toggleTask = function(id) {
+            tasks = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+            saveAndRenderTasks();
+        }
+
+        window.deleteTask = function(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveAndRenderTasks();
+        }
+
+        function saveAndRenderTasks() {
+            localStorage.setItem('localTasks', JSON.stringify(tasks));
+            const list = document.getElementById('task-list');
+            list.innerHTML = '';
+
+            let completedCount = 0;
+            let pendingCount = 0;
+
+            tasks.forEach(t => {
+                if (t.completed) completedCount++; else pendingCount++;
+
+                const li = document.createElement('li');
+                li.className = "flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-lg";
+                li.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" ${t.completed ? 'checked' : ''} onclick="toggleTask(${t.id})" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                        <span class="${t.completed ? 'line-through text-gray-400' : 'text-gray-700 font-medium'}">${t.title}</span>
+                    </div>
+                    <button onclick="deleteTask(${t.id})" class="text-xs font-semibold text-red-500 hover:text-red-700 transition">Hapus</button>
+                `;
+                list.appendChild(li);
+            });
+
+            // Update statistik di tab Overview
+            document.getElementById('stat-tasks-pending').innerText = pendingCount;
+            document.getElementById('stat-tasks-completed').innerText = completedCount;
+        }
+
+        // Jalankan render tugas pertama kali
+        saveAndRenderTasks();
+
+
+        // ================= LOGIKA FIREBASE STORAGE (UPLOAD / DOWNLOAD / SHARE) =================
+        
+        // Memperbarui nama label saat file dipilih
+        window.updateFileLabel = function() {
+            const selector = document.getElementById('file-selector');
+            if (selector.files.length > 0) {
+                document.getElementById('file-label').innerText = selector.files[0].name;
+            }
+        }
+
+        // Unggah File terpilih ke Firebase Storage [2]
+        window.uploadSelectedFile = function() {
+            const selector = document.getElementById('file-selector');
+            if (selector.files.length === 0) {
+                alert("Pilih file terlebih dahulu!");
+                return;
+            }
+
+            const file = selector.files[0];
+            const fileRef = ref(storage, `users/${userUID}/${file.name}`);
+
+            alert("Sedang mengunggah... Harap tunggu sebentar.");
+
+            uploadBytes(fileRef, file).then((snapshot) => {
+                alert("File berhasil diunggah secara aman!");
+                document.getElementById('file-label').innerText = "Pilih file dari komputer Anda...";
+                selector.value = ""; // reset input
+                loadUserFiles(); // segarkan daftar berkas
+            }).catch((error) => {
+                console.error("Gagal mengunggah berkas:", error);
+                alert("Gagal mengunggah: " + error.message);
+            });
+        }
+
+        // Muat & tampilkan daftar file milik pengguna saat ini [2]
+        function loadUserFiles() {
+            if (!userUID) return;
+
+            const listRef = ref(storage, `users/${userUID}`);
+            const tableBody = document.getElementById('file-table-body');
+            
+            listAll(listRef).then((res) => {
+                tableBody.innerHTML = '';
+                document.getElementById('stat-files-count').innerText = res.items.length;
+
+                if (res.items.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-gray-400">Belum ada file tersimpan.</td></tr>`;
+                    return;
+                }
+
+                res.items.forEach((itemRef) => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-50";
+
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 font-medium text-gray-800">${itemRef.name}</td>
+                        <td class="px-6 py-4 text-right space-x-3">
+                            <button onclick="downloadFile('${itemRef.fullPath}')" class="text-indigo-600 hover:text-indigo-800 font-semibold transition text-xs">Unduh</button>
+                            <button onclick="shareFile('${itemRef.fullPath}')" class="text-green-600 hover:text-green-800 font-semibold transition text-xs">Bagikan Link</button>
+                            <button onclick="deleteFile('${itemRef.fullPath}')" class="text-red-500 hover:text-red-700 font-semibold transition text-xs">Hapus</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            }).catch((error) => {
+                console.error("Gagal memuat daftar berkas:", error);
+                tableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-red-500">Gagal memuat data.</td></tr>`;
+            });
+        }
+
+        // Fungsi Unduh File [2]
+        window.downloadFile = function(path) {
+            const fileRef = ref(storage, path);
+            getDownloadURL(fileRef).then((url) => {
+                // Membuka file di tab baru agar browser mengunduhnya
+                window.open(url, '_blank');
+            }).catch((error) => {
+                alert("Gagal mengambil file unduhan: " + error.message);
+            });
+        }
+
+        // Fungsi Salin Link Berbagi File [2]
+        window.shareFile = function(path) {
+            const fileRef = ref(storage, path);
+            getDownloadURL(fileRef).then((url) => {
+                // Menyalin tautan publik hasil generate token Firebase ke papan klip
+                navigator.clipboard.writeText(url).then(() => {
+                    alert("Tautan unduhan berhasil disalin ke clipboard! Anda dapat membagikannya sekarang.");
+                });
+            }).catch((error) => {
+                alert("Gagal membuat tautan berbagi: " + error.message);
+            });
+        }
+
+        // Fungsi Hapus File [2]
+        window.deleteFile = function(path) {
+            if (confirm("Apakah Anda yakin ingin menghapus file ini secara permanen?")) {
+                const fileRef = ref(storage, path);
+                deleteObject(fileRef).then(() => {
+                    alert("File berhasil dihapus!");
+                    loadUserFiles(); // memuat ulang daftar berkas
+                }).catch((error) => {
+                    alert("Gagal menghapus file: " + error.message);
+                });
+            }
+        }
+
+        // ================= LOGIKA KELUAR SESI (LOGOUT) =================
+        window.logout = function() {
+            signOut(auth).then(() => {
+                localStorage.removeItem('userSession');
+                alert("Anda telah berhasil keluar.");
+                window.location.href = "index.html";
+            }).catch((error) => {
+                alert("Gagal keluar sesi: " + error.message);
+            });
+        }
+    </script>
+</body>
+</html>
