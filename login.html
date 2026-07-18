@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk - AppSaya</title>
+    <!-- Menggunakan Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col justify-between font-sans">
+
+    <!-- Tombol Navigasi Kembali -->
+    <header class="p-6">
+        <div class="max-w-7xl mx-auto flex justify-start">
+            <a href="index.html" class="flex items-center text-sm font-medium text-gray-600 hover:text-indigo-600 transition">
+                <svg class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Kembali ke Beranda
+            </a>
+        </div>
+    </header>
+
+    <!-- Kartu Login Utama -->
+    <main class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-md border border-gray-100">
+            
+            <!-- Header Kartu -->
+            <div class="text-center">
+                <span class="text-3xl font-extrabold text-indigo-600 tracking-tight">AppSaya</span>
+                <h2 class="mt-6 text-2xl font-bold text-gray-900">Masuk ke Akun Anda</h2>
+                <p class="mt-2 text-sm text-gray-500">
+                    Atau
+                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 transition">
+                        daftar akun baru gratis
+                    </a>
+                </p>
+            </div>
+
+            <!-- Form Isian Manual -->
+            <form id="loginForm" class="mt-8 space-y-6" onsubmit="handleLogin(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Alamat Email</label>
+                        <input id="email" name="email" type="email" required autocomplete="email" 
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150" 
+                            placeholder="nama@email.com">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700">Kata Sandi</label>
+                        <input id="password" name="password" type="password" required autocomplete="current-password" 
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150" 
+                            placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" 
+                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-900 select-none">
+                            Ingat saya
+                        </label>
+                    </div>
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 transition">
+                            Lupa kata sandi?
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" 
+                        class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150">
+                        Masuk
+                    </button>
+                </div>
+            </form>
+
+            <!-- Pembatas Alternatif Login -->
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-200"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Atau masuk dengan</span>
+                    </div>
+                </div>
+
+                <div class="mt-6 grid grid-cols-2 gap-3">
+                    <!-- Google Login Button -->
+                    <button onclick="oauthLogin('Google')" 
+                        class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition">
+                        <span class="sr-only">Masuk dengan Google</span>
+                        <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-6.887 4.114-4.694 0-8.503-3.809-8.503-8.5s3.81-8.5 8.503-8.5c2.296 0 4.387.833 6.018 2.199l3.125-3.125C18.667 1.056 15.65 0 12.24 0 5.48 0 0 5.48 0 12.24s5.48 12.24 12.24 12.24c6.88 0 12.24-5.36 12.24-12.24 0-.84-.078-1.637-.215-2.455H12.24z"/>
+                        </svg>
+                    </button>
+                    <!-- GitHub Placeholder -->
+                    <button onclick="oauthLogin('GitHub')" 
+                        class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition">
+                        <span class="sr-only">Masuk dengan GitHub</span>
+                        <svg class="w-5 h-5 text-gray-800" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer Ringkas -->
+    <footer class="py-6 text-center text-xs text-gray-400">
+        <p>&copy; 2026 AppSaya. Hak Cipta Dilindungi.</p>
+    </footer>
+
+    <!-- Integrasi SDK Firebase Auth -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // Konfigurasi Firebase dari proyek Anda
+        const firebaseConfig = {
+          apiKey: "AIzaSyDg2b6LERZ2zE86mTiYvUO1Uj--lAtpmgM",
+          authDomain: "afatsumazer-app.firebaseapp.com",
+          databaseURL: "https://afatsumazer-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "afatsumazer-app",
+          storageBucket: "afatsumazer-app.firebasestorage.app",
+          messagingSenderId: "16280759060",
+          appId: "1:16280759060:web:fd4deacafdf5cadd777001",
+          measurementId: "G-WB9YW9D726"
+        };
+
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // Menyediakan fungsi OAuth secara global di lingkup window
+        window.oauthLogin = function(providerName) {
+            if (providerName === 'Google') {
+                signInWithPopup(auth, googleProvider)
+                    .then((result) => {
+                        const user = result.user;
+                        console.log("Pengguna terautentikasi:", user);
+
+                        // Simpan informasi pengguna di localStorage browser
+                        localStorage.setItem('userSession', JSON.stringify({
+                            displayName: user.displayName,
+                            email: user.email,
+                            photoURL: user.photoURL
+                        }));
+
+                        alert(`Selamat datang kembali, ${user.displayName}!`);
+                        
+                        // Alihkan pengguna ke halaman beranda
+                        window.location.href = "index.html";
+                    })
+                    .catch((error) => {
+                        console.error("Gagal melakukan login Google:", error);
+                        alert("Gagal masuk: " + error.message);
+                    });
+            } else {
+                alert(`Login dengan ${providerName} belum dikonfigurasi.`);
+            }
+        }
+
+        // Penanganan input email manual (sementara dinonaktifkan)
+        window.handleLogin = function(event) {
+            event.preventDefault();
+            alert("Login email manual dinonaktifkan sementara. Silakan masuk menggunakan Google.");
+        }
+    </script>
+</body>
+</html>
