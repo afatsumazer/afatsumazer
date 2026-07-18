@@ -1,6 +1,9 @@
 import { createUserWithEmailAndPassword } from "https://gstatic.com";
 import { ref, set } from "https://gstatic.com";
 import { auth, database } from "./firebase-config.js";
+import { createUserWithEmailAndPassword } from "https://gstatic.com";
+import { ref, set } from "https://gstatic.com";
+import { auth, database } from "../js/firebase-config.js"; // Pastikan mengarah ke ../js/
 
 const registerForm = document.getElementById('registerForm'); // Pastikan id form di register.html adalah 'registerForm'
 
