@@ -7,11 +7,23 @@
     <!-- Menggunakan Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 text-gray-900 font-sans min-h-screen">
+<body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
+
+    <!-- === TAMPILAN BERBAGI FILE (MODAL OVERLAY) === -->
+    <!-- Muncul otomatis jika ada orang luar membuka link share/berbagi file [2] -->
+    <div id="share-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full text-center">
+            <h3 class="text-lg font-bold text-gray-900">Unduh Berkas Bersama</h3>
+            <p id="share-file-name" class="text-sm text-gray-500 mt-2 font-medium">Memuat nama berkas...</p>
+            <div class="mt-6 flex space-x-3 justify-center">
+                <button onclick="downloadSharedFile()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Unduh Sekarang</button>
+                <button onclick="closeShareModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition">Tutup</button>
+            </div>
+        </div>
+    </div>
 
     <!-- === NAVIGASI BAWAH (MOBILE / HP) === -->
-    <!-- Hanya muncul di layar HP, otomatis tersembunyi di komputer -->
-    <div class="md:hidden fixed bottom-0 left-0 w-full bg-indigo-900 text-white h-16 z-50 flex justify-around items-center shadow-lg border-t border-indigo-850">
+    <div class="md:hidden fixed bottom-0 left-0 w-full bg-indigo-900 text-white h-16 z-40 flex justify-around items-center shadow-lg border-t border-indigo-850">
         <button onclick="switchTab('overview')" id="btn-overview-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg bg-indigo-800 text-white">
             <span class="text-[10px] font-medium">Ringkasan</span>
         </button>
@@ -27,15 +39,12 @@
     </div>
 
     <!-- === BILAH SAMPING / SIDEBAR (DESKTOP) === -->
-    <!-- Menempel di sisi kiri pada layar komputer, otomatis tersembunyi di layar HP -->
-    <aside class="hidden md:flex fixed top-0 left-0 h-screen w-64 bg-indigo-900 text-white flex-col justify-between p-6 z-40 shadow-md">
+    <aside class="hidden md:flex fixed top-0 left-0 h-screen w-64 bg-indigo-900 text-white flex-col justify-between p-6 z-30 shadow-md">
         <div>
-            <!-- Logo -->
             <div class="mb-8">
                 <span class="text-2xl font-bold tracking-tight">AppSaya</span>
                 <p class="text-xs text-indigo-300">Workspace Dashboard</p>
             </div>
-            <!-- Menu Navigasi Samping -->
             <nav class="space-y-2">
                 <button onclick="switchTab('overview')" id="btn-overview" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg bg-indigo-800 text-white font-medium transition">
                     <span>Ringkasan</span>
@@ -51,7 +60,6 @@
                 </button>
             </nav>
         </div>
-        <!-- Keluar Sesi -->
         <div class="pt-6 border-t border-indigo-800">
             <button onclick="logout()" class="w-full text-left flex items-center px-4 py-2 text-red-300 hover:text-red-100 transition">
                 <span>Keluar Sesi</span>
@@ -60,10 +68,8 @@
     </aside>
 
     <!-- === PANEL KONTEN UTAMA === -->
-    <!-- md:pl-64 memberikan jarak kosong di sebelah kiri agar konten tidak tertabrak oleh sidebar -->
-    <!-- pb-20 di HP mencegah konten terpotong oleh navigasi bawah HP -->
     <div class="md:pl-64 flex flex-col min-h-screen pb-20 md:pb-0">
-        <!-- Header Atas (Top Bar) -->
+        <!-- Header Atas -->
         <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 md:px-8 shadow-sm">
             <h2 id="page-title" class="text-xl font-bold text-gray-800">Ringkasan</h2>
             <div class="flex items-center space-x-3">
@@ -76,9 +82,8 @@
         <!-- Area Konten Utama -->
         <div class="p-6 md:p-8 flex-grow">
 
-            <!-- TAB 1: OVERVIEW (RINGKASAN) -->
+            <!-- TAB 1: OVERVIEW -->
             <div id="tab-overview" class="space-y-6">
-                <!-- Grid Kartu Statistik -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                         <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Tugas Tersisa</span>
@@ -93,10 +98,9 @@
                         <h3 id="stat-files-count" class="text-3xl font-extrabold text-blue-600 mt-2">0</h3>
                     </div>
                 </div>
-                <!-- Info Penyimpanan (Kuota) [2] -->
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                     <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider">Status Ruang Penyimpanan</h3>
-                    <p id="kuota-info" class="text-sm text-gray-500 mt-2">Menghitung penggunaan penyimpanan...</p>
+                    <p id="kuota-info" class="text-sm text-gray-500 mt-2">Menghitung kapasitas...</p>
                 </div>
             </div>
 
@@ -112,26 +116,40 @@
                 </div>
             </div>
 
-            <!-- TAB 3: PENYIMPANAN FILE [2] -->
-            <div id="tab-files" class="hidden space-y-6">
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-3xl mx-auto">
-                    <h3 class="text-lg font-bold mb-1">Penyimpanan Dokumen Aman</h3>
-                    <p class="text-sm text-gray-500 mb-6">Unggah file Anda secara aman ke enkripsi Firebase Storage. Anda dapat membagikan link unduhan ke orang lain [2].</p>
+            <!-- TAB 3: PENYIMPANAN FILE -->
+            <div id="tab-files" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Sisi Kiri: Daftar Folder -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-sm font-bold text-gray-700 uppercase">Folder Saya</h4>
+                        <button onclick="createFolder()" class="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-2 py-1 rounded font-semibold transition">+ Folder</button>
+                    </div>
+                    <ul id="folder-list" class="space-y-1">
+                        <!-- Dimuat otomatis -->
+                    </ul>
+                </div>
 
-                    <!-- Form Unggah File -->
-                    <div class="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-indigo-400 transition mb-6">
+                <!-- Sisi Kanan: Area Upload & Daftar File [2] -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm md:col-span-2 space-y-6">
+                    <div>
+                        <h3 class="text-lg font-bold">Penyimpanan File Aman</h3>
+                        <p class="text-xs text-gray-500">Folder Aktif: <span id="active-folder-name" class="font-bold text-indigo-600">Utama</span></p>
+                    </div>
+
+                    <!-- Input Upload File -->
+                    <div class="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-indigo-400 transition">
                         <input type="file" id="file-selector" class="hidden" onchange="updateFileLabel()">
                         <label for="file-selector" class="cursor-pointer block">
                             <span id="file-label" class="text-sm text-gray-600 font-medium block">Pilih file dari komputer Anda...</span>
-                            <span class="text-xs text-gray-400 mt-1 block">Maksimal kuota per pengguna: 50 MB (Free) [2]</span>
+                            <span class="text-xs text-gray-400 mt-1 block">Batas ukuran file disarankan maksimal 2 MB [2]</span>
                         </label>
-                        <button onclick="uploadSelectedFile()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition inline-flex items-center">
-                            Unggah Sekarang
+                        <button onclick="uploadSelectedFile()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+                            Unggah ke Folder Ini
                         </button>
                     </div>
 
-                    <!-- Daftar File Terunggah -->
-                    <h4 class="text-sm font-bold text-gray-700 mb-3">Daftar File Anda</h4>
+                    <!-- Tabel File -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 text-sm">
                             <thead class="bg-gray-50">
@@ -142,7 +160,7 @@
                             </thead>
                             <tbody id="file-table-body" class="divide-y divide-gray-200">
                                 <tr>
-                                    <td colspan="2" class="px-6 py-4 text-center text-gray-400">Memuat berkas...</td>
+                                    <td colspan="2" class="px-6 py-4 text-center text-gray-400">Pilih folder di sebelah kiri terlebih dahulu.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -158,7 +176,7 @@
                     <p id="profile-card-email" class="text-sm text-gray-500">user@email.com</p>
                     <div class="mt-6 pt-6 border-t border-gray-100 text-left text-sm text-gray-500 space-y-1">
                         <p><strong>Penyedia Login:</strong> Google / Akun AppSaya</p>
-                        <p><strong>Status Akun:</strong> Terverifikasi Aman</p>
+                        <p><strong>Database:</strong> Realtime Database (Bebas Biaya)</p>
                     </div>
                 </div>
             </div>
@@ -166,13 +184,12 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT UTAMA (TERINTEGRASI DI SINI) -->
+    <!-- JAVASCRIPT UTAMA (SINKRONISASI REALTIME DATABASE) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getStorage, ref, uploadBytes, listAll, getDownloadURL, deleteObject, getMetadata } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+        import { getDatabase, ref, set, push, onValue, remove, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Konfigurasi Firebase dari proyek Anda
         const firebaseConfig = {
           apiKey: "AIzaSyDg2b6LERZ2zE86mTiYvUO1Uj--lAtpmgM",
           authDomain: "afatsumazer-app.firebaseapp.com",
@@ -184,21 +201,30 @@
           measurementId: "G-WB9YW9D726"
         };
 
-        // Inisialisasi Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const storage = getStorage(app);
+        const database = getDatabase(app);
 
         let userUID = "";
-        let limitMB = 50; // Batasan kuota [2]
+        let currentFolder = "Utama"; // Folder aktif default
+        let limitMB = 50;
         let sisaKuotaCukup = true;
+        let sharedFileToDownload = null; // Menyimpan data file yang di-share sementara
 
-        // Cek status sesi login pengguna
+        // 1. Pengaman Sesi & Load Data Utama
         onAuthStateChanged(auth, (user) => {
+            // Cek apakah halaman dibuka melalui Link Berbagi Berkas
+            const urlParams = new URLSearchParams(window.location.search);
+            const shareId = urlParams.get('share');
+            
+            if (shareId) {
+                loadSharedFile(shareId);
+                return; // Jangan redirect jika hanya ingin unduh file bersama
+            }
+
             if (user) {
                 userUID = user.uid;
                 
-                // Set Header & Tab Profil
                 document.getElementById('user-display-name').innerText = user.displayName || "Pengguna";
                 document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/150";
                 
@@ -206,7 +232,8 @@
                 document.getElementById('profile-card-email').innerText = user.email;
                 document.getElementById('profile-card-avatar').src = user.photoURL || "https://via.placeholder.com/150";
 
-                // Muat file pengguna [2]
+                // Muat Database Pengguna
+                loadFolders();
                 loadUserFiles();
             } else {
                 localStorage.removeItem('userSession');
@@ -214,21 +241,53 @@
             }
         });
 
-        // ================= LOGIKA NAVIGASI TAB (MENDUKUNG DESKTOP & HP) =================
+        // ================= PENANGANAN LINK SHARE (BERBAGI FILE) [2] =================
+        function loadSharedFile(shareId) {
+            const shareRef = ref(database, `shared/${shareId}`);
+            get(shareRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const fileData = snapshot.val();
+                    sharedFileToDownload = fileData;
+                    
+                    document.getElementById('share-file-name').innerText = `${fileData.name} (${(fileData.size / 1024).toFixed(1)} KB)`;
+                    document.getElementById('share-modal').classList.remove('hidden');
+                } else {
+                    alert("Tautan rusak atau berkas telah dihapus oleh pemiliknya.");
+                    window.location.href = "index.html";
+                }
+            }).catch((err) => {
+                console.error("Gagal memuat link share:", err);
+            });
+        }
+
+        window.downloadSharedFile = function() {
+            if (sharedFileToDownload) {
+                const a = document.createElement('a');
+                a.href = sharedFileToDownload.data; // data base64 [2]
+                a.download = sharedFileToDownload.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        }
+
+        window.closeShareModal = function() {
+            document.getElementById('share-modal').classList.add('hidden');
+            window.location.href = "index.html";
+        }
+
+        // ================= LOGIKA NAVIGASI TAB =================
         window.switchTab = function(tabName) {
             const tabs = ['overview', 'tasks', 'files', 'profile'];
             tabs.forEach(t => {
-                // Sembunyikan konten tab lain
                 document.getElementById(`tab-${t}`).classList.add('hidden');
                 
-                // Atur ulang tombol navigasi desktop
                 const dBtn = document.getElementById(`btn-${t}`);
                 if (dBtn) {
                     dBtn.classList.remove('bg-indigo-800', 'text-white');
                     dBtn.classList.add('text-indigo-100', 'hover:bg-indigo-800', 'hover:text-white');
                 }
 
-                // Atur ulang tombol navigasi HP
                 const mBtn = document.getElementById(`btn-${t}-mobile`);
                 if (mBtn) {
                     mBtn.classList.remove('bg-indigo-800', 'text-white');
@@ -236,17 +295,14 @@
                 }
             });
 
-            // Tampilkan tab aktif
             document.getElementById(`tab-${tabName}`).classList.remove('hidden');
             
-            // Aktifkan visual tombol aktif desktop
             const activeBtn = document.getElementById(`btn-${tabName}`);
             if (activeBtn) {
                 activeBtn.classList.add('bg-indigo-800', 'text-white');
                 activeBtn.classList.remove('text-indigo-100', 'hover:bg-indigo-800', 'hover:text-white');
             }
 
-            // Aktifkan visual tombol aktif HP
             const activeMBtn = document.getElementById(`btn-${tabName}-mobile`);
             if (activeMBtn) {
                 activeMBtn.classList.add('bg-indigo-800', 'text-white');
@@ -308,7 +364,7 @@
 
         saveAndRenderTasks();
 
-        // ================= LOGIKA FIREBASE STORAGE (UPLOAD / DOWNLOAD / SHARE) =================
+        // ================= LOGIKA PENYIMPANAN BERKAS DATABASE (MENDUKUNG FOLDER) =================
         
         window.updateFileLabel = function() {
             const selector = document.getElementById('file-selector');
@@ -317,7 +373,54 @@
             }
         }
 
-        // Unggah File Terpilih [2]
+        // Membuat Folder baru [2]
+        window.createFolder = function() {
+            const name = prompt("Masukkan nama folder baru:");
+            if (!name) return;
+
+            // Bersihkan nama folder dari simbol dilarang di Firebase path
+            const cleanName = name.replace(/[.#$\[\]]/g, ""); 
+            const folderRef = ref(database, `users/${userUID}/folders/${cleanName}`);
+            
+            set(folderRef, {
+                name: cleanName,
+                created_at: Date.now()
+            }).then(() => {
+                alert(`Folder "${cleanName}" berhasil dibuat!`);
+            });
+        }
+
+        // Mengganti Folder Aktif
+        window.selectFolder = function(folderName) {
+            currentFolder = folderName;
+            document.getElementById('active-folder-name').innerText = folderName;
+            loadUserFiles(); // Muat ulang list file khusus folder ini [2]
+        }
+
+        // Memuat Folder Pengguna Realtime
+        function loadFolders() {
+            const folderRef = ref(database, `users/${userUID}/folders`);
+            onValue(folderRef, (snapshot) => {
+                const list = document.getElementById('folder-list');
+                list.innerHTML = '';
+
+                // Default Folder Utama
+                const liDefault = document.createElement('li');
+                liDefault.innerHTML = `<button onclick="selectFolder('Utama')" class="w-full text-left px-3 py-1.5 rounded text-sm hover:bg-gray-100 font-medium">📁 Utama</button>`;
+                list.appendChild(liDefault);
+
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    Object.keys(data).forEach(key => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<button onclick="selectFolder('${key}')" class="w-full text-left px-3 py-1.5 rounded text-sm hover:bg-gray-100 font-medium">📁 ${key}</button>`;
+                        list.appendChild(li);
+                    });
+                }
+            });
+        }
+
+        // Proses Unggah File (Konversi ke Base64 & Simpan ke Realtime Database) [2]
         window.uploadSelectedFile = function() {
             const selector = document.getElementById('file-selector');
             if (selector.files.length === 0) {
@@ -326,108 +429,147 @@
             }
 
             if (!sisaKuotaCukup) {
-                alert("Batas kuota penyimpanan gratis Anda (50 MB) telah penuh. Silakan upgrade untuk kapasitas lebih besar!");
+                alert("Batas kuota penyimpanan gratis Anda (50 MB) telah penuh!");
                 return;
             }
 
             const file = selector.files[0];
-            const fileRef = ref(storage, `users/${userUID}/${file.name}`);
 
-            alert("Sedang mengunggah file... Mohon tunggu.");
+            // Proteksi ukuran: Batasi maks 2 MB agar database tetap stabil & kencang [2]
+            if (file.size > 2 * 1024 * 1024) {
+                alert("Untuk menjamin kecepatan & kestabilan database gratis, batas unggah maksimal adalah 2 MB per file [2].");
+                return;
+            }
 
-            uploadBytes(fileRef, file).then((snapshot) => {
-                alert("File berhasil diunggah secara aman!");
-                document.getElementById('file-label').innerText = "Pilih file dari komputer Anda...";
-                selector.value = ""; 
-                loadUserFiles(); 
-            }).catch((error) => {
-                console.error("Gagal mengunggah:", error);
-                alert("Gagal mengunggah: Pastikan Aturan Keamanan (Rules) Firebase Storage Anda sudah diaktifkan di Firebase Console.");
-            });
+            alert("Sedang mengonversi dan menyimpan berkas ke database...");
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = e.target.result; // Data string Base64 file [2]
+                
+                // Buat ID unik untuk file baru
+                const fileListRef = ref(database, `users/${userUID}/files`);
+                const newFileRef = push(fileListRef);
+
+                set(newFileRef, {
+                    id: newFileRef.key,
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    folder: currentFolder, // Disimpan ke folder aktif saat ini [2]
+                    data: base64Data, // Data Base64 [2]
+                    pubDate: Date.now()
+                }).then(() => {
+                    alert("Berkas berhasil disimpan!");
+                    document.getElementById('file-label').innerText = "Pilih file dari komputer Anda...";
+                    selector.value = "";
+                    loadUserFiles();
+                }).catch((error) => {
+                    alert("Gagal mengunggah berkas: " + error.message);
+                });
+            }
+            reader.readAsDataURL(file); // Konversi file biner ke text base64 [2]
         }
 
-        // Memuat berkas dan menghitung kuota penyimpanan otomatis [2]
+        // Memuat File Sesuai Folder Aktif & Menghitung Kuota [2]
         function loadUserFiles() {
             if (!userUID) return;
 
-            const listRef = ref(storage, `users/${userUID}`);
-            const tableBody = document.getElementById('file-table-body');
-            
-            listAll(listRef).then(async (res) => {
+            const fileRef = ref(database, `users/${userUID}/files`);
+            onValue(fileRef, (snapshot) => {
+                const tableBody = document.getElementById('file-table-body');
                 tableBody.innerHTML = '';
-                document.getElementById('stat-files-count').innerText = res.items.length;
 
-                if (res.items.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-gray-400">Belum ada file tersimpan.</td></tr>`;
+                let totalBytes = 0;
+                let fileCount = 0;
+
+                if (!snapshot.exists()) {
+                    tableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-gray-400">Belum ada file di folder ini.</td></tr>`;
+                    document.getElementById('stat-files-count').innerText = 0;
                     document.getElementById('kuota-info').innerText = `Penyimpanan Digunakan: 0 MB dari ${limitMB} MB (Free)`;
                     sisaKuotaCukup = true;
                     return;
                 }
 
-                let totalBytes = 0;
+                const data = snapshot.val();
+                
+                // Lakukan kalkulasi total memori yang digunakan [2]
+                Object.keys(data).forEach(key => {
+                    const file = data[key];
+                    totalBytes += file.size;
 
-                // Loop asinkron untuk merender file & menghitung ukuran total [2]
-                for (const itemRef of res.items) {
-                    try {
-                        const metadata = await getMetadata(itemRef);
-                        totalBytes += metadata.size;
-                    } catch (err) {
-                        console.error("Gagal memuat ukuran metadata:", err);
+                    // Filter: Hanya tampilkan file yang folder-nya cocok dengan folder aktif [2]
+                    if (file.folder === currentFolder) {
+                        fileCount++;
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-gray-50";
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 font-medium text-gray-800">${file.name}</td>
+                            <td class="px-6 py-4 text-right space-x-3">
+                                <button onclick="downloadFile('${key}')" class="text-indigo-600 hover:text-indigo-800 font-semibold transition text-xs">Unduh</button>
+                                <button onclick="shareFile('${key}')" class="text-green-600 hover:text-green-800 font-semibold transition text-xs">Bagikan Link</button>
+                                <button onclick="deleteFile('${key}')" class="text-red-500 hover:text-red-700 font-semibold transition text-xs">Hapus</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(tr);
                     }
+                });
 
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-gray-50";
-                    tr.innerHTML = `
-                        <td class="px-6 py-4 font-medium text-gray-800">${itemRef.name}</td>
-                        <td class="px-6 py-4 text-right space-x-3">
-                            <button onclick="downloadFile('${itemRef.fullPath}')" class="text-indigo-600 hover:text-indigo-800 font-semibold transition text-xs">Unduh</button>
-                            <button onclick="shareFile('${itemRef.fullPath}')" class="text-green-600 hover:text-green-800 font-semibold transition text-xs">Bagikan Link</button>
-                            <button onclick="deleteFile('${itemRef.fullPath}')" class="text-red-500 hover:text-red-700 font-semibold transition text-xs">Hapus</button>
-                        </td>
-                    `;
-                    tableBody.appendChild(tr);
+                if (fileCount === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-gray-400">Tidak ada file di folder "${currentFolder}".</td></tr>`;
                 }
 
-                // Kalkulasi Sisa Kuota [2]
+                // Kalkulasi Sisa Kuota & Statistik [2]
                 const totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
                 document.getElementById('kuota-info').innerText = `Penyimpanan Digunakan: ${totalMB} MB dari ${limitMB} MB (Free)`;
-                
+                document.getElementById('stat-files-count').innerText = Object.keys(data).length;
+
                 sisaKuotaCukup = totalMB < limitMB;
-
-            }).catch((error) => {
-                console.error("Gagal memuat daftar berkas:", error);
-                tableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-red-500">Gagal memuat data. Periksa pengaturan Storage Rules di Firebase Console Anda.</td></tr>`;
             });
         }
 
-        window.downloadFile = function(path) {
-            const fileRef = ref(storage, path);
-            getDownloadURL(fileRef).then((url) => {
-                window.open(url, '_blank');
-            }).catch((error) => {
-                alert("Gagal mengunduh berkas: " + error.message);
+        // Fungsi Unduh Berkas (Merender kembali Base64 ke file asli) [2]
+        window.downloadFile = function(fileId) {
+            const fileRef = ref(database, `users/${userUID}/files/${fileId}`);
+            get(fileRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const file = snapshot.val();
+                    const a = document.createElement('a');
+                    a.href = file.data; // Sumber base64 [2]
+                    a.download = file.name;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
             });
         }
 
-        window.shareFile = function(path) {
-            const fileRef = ref(storage, path);
-            getDownloadURL(fileRef).then((url) => {
-                navigator.clipboard.writeText(url).then(() => {
-                    alert("Link berbagi berhasil disalin! Siapa pun yang memiliki link ini kini dapat melihat file tersebut.");
-                });
-            }).catch((error) => {
-                alert("Gagal membagikan berkas: " + error.message);
+        // Berbagi berkas ke publik melalui Realtime Database [2]
+        window.shareFile = function(fileId) {
+            const fileRef = ref(database, `users/${userUID}/files/${fileId}`);
+            get(fileRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const fileData = snapshot.val();
+                    
+                    // Salin berkas ke simpul global `/shared` agar bisa diakses orang luar [2]
+                    set(ref(database, `shared/${fileId}`), fileData).then(() => {
+                        const shareUrl = `${window.location.origin}${window.location.pathname}?share=${fileId}`;
+                        navigator.clipboard.writeText(shareUrl).then(() => {
+                            alert("Link Berbagi Berhasil Disalin! Siapa pun yang membuka tautan ini dapat mengunduh berkas.");
+                        });
+                    });
+                }
             });
         }
 
-        window.deleteFile = function(path) {
-            if (confirm("Apakah Anda yakin ingin menghapus berkas ini?")) {
-                const fileRef = ref(storage, path);
-                deleteObject(fileRef).then(() => {
-                    alert("Berkas terhapus!");
-                    loadUserFiles(); 
-                }).catch((error) => {
-                    alert("Gagal menghapus berkas: " + error.message);
+        // Hapus Berkas dari database
+        window.deleteFile = function(fileId) {
+            if (confirm("Apakah Anda yakin ingin menghapus berkas ini dari database?")) {
+                // Hapus dari data pengguna
+                remove(ref(database, `users/${userUID}/files/${fileId}`)).then(() => {
+                    // Coba juga hapus dari folder shared jika pernah dibagikan
+                    remove(ref(database, `shared/${fileId}`));
+                    alert("Berkas berhasil dihapus!");
                 });
             }
         }
