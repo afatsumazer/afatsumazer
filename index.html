@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nama Aplikasi Anda - Selamat Datang</title>
+    <!-- Menggunakan Tailwind CSS CDN untuk mempermudah penataan gaya (styling) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans min-h-screen flex flex-col justify-between">
+
+    <!-- Navigasi / Header -->
+    <header class="bg-white shadow-sm border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo / Nama Aplikasi -->
+                <div class="flex-shrink-0">
+                    <span class="text-xl font-bold text-indigo-600">AppSaya</span>
+                </div>
+                <!-- Menu Utama -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 transition text-sm font-medium">Fitur</a>
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 transition text-sm font-medium">Harga</a>
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 transition text-sm font-medium">Tentang Kami</a>
+                </nav>
+                <!-- Tombol Masuk/Daftar -->
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 transition text-sm font-medium">Masuk</a>
+                    <a href="#" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition shadow-sm">Daftar</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Konten Utama (Hero Section) -->
+    <main class="flex-grow flex items-center py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight">
+                Kelola Tugas Anda dengan <span class="text-indigo-600">Lebih Mudah</span>
+            </h1>
+            <p class="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                Aplikasi web sederhana untuk membantu Anda mengatur rutinitas harian, mencatat prioritas, dan menyelesaikan pekerjaan tepat waktu.
+            </p>
+            
+            <!-- Tombol Aksi (Call to Action) -->
+            <div class="mt-8 max-w-md mx-auto sm:flex sm:justify-center md:mt-10">
+                <div class="rounded-md shadow">
+                    <button onclick="mulaiSekarang()" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10 transition">
+                        Mulai Sekarang
+                    </button>
+                </div>
+                <div class="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
+                    <a href="#" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10 transition">
+                        Pelajari Fitur
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
+            <p>&copy; 2026 AppSaya. Hak Cipta Dilindungi.</p>
+            <div class="flex space-x-6 mt-4 sm:mt-0">
+                <a href="#" class="hover:text-indigo-600">Kebijakan Privasi</a>
+                <a href="#" class="hover:text-indigo-600">Ketentuan Layanan</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interaktivitas Sederhana dengan JavaScript -->
+    <script>
+        function mulaiSekarang() {
+            alert("Tombol diklik! Di langkah selanjutnya, tombol ini akan mengarahkan pengguna ke form pendaftaran atau halaman dashboard utama.");
+        }
+    </script>
+</body>
+</html>
