@@ -78,8 +78,8 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
+    <footer class="bg-white border-t border-gray-200 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
             <p>&copy; 2026 AppSaya. Hak Cipta Dilindungi.</p>
             <div class="flex space-x-6 mt-4 sm:mt-0">
                 <a href="#" class="hover:text-indigo-600">Kebijakan Privasi</a>
@@ -239,31 +239,32 @@
 
             if (userSession) {
                 const user = JSON.parse(userSession);
-                // Ganti tombol login menjadi info profil pengguna
+                // Ganti tombol login menjadi tombol menuju "Dashboard" langsung
                 authContainer.innerHTML = `
                     <div class="flex items-center space-x-3">
+                        <a href="dashboard.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-md text-xs font-medium transition shadow-sm">Buka Dashboard</a>
                         <img src="${user.photoURL || 'https://via.placeholder.com/150'}" alt="${user.displayName}" class="w-8 h-8 rounded-full border border-gray-200">
-                        <span class="text-sm font-medium text-gray-700 hidden sm:inline">${user.displayName}</span>
-                        <button onclick="logout()" class="text-sm font-medium text-red-600 hover:text-red-800 transition">Keluar</button>
+                        <button onclick="logout()" class="text-xs font-medium text-red-600 hover:text-red-800 transition">Keluar</button>
                     </div>
                 `;
             }
         });
+
+        // Tombol "Mulai Sekarang" langsung mengarah ke Dashboard jika user sudah login
+        function mulaiSekarang() {
+            const userSession = localStorage.getItem('userSession');
+            if (userSession) {
+                window.location.href = "dashboard.html";
+            } else {
+                window.location.href = "login.html";
+            }
+        }
 
         // 7. Fungsi Keluar (Logout)
         window.logout = function() {
             localStorage.removeItem('userSession');
             alert("Anda telah berhasil keluar.");
             window.location.reload();
-        }
-
-        function mulaiSekarang() {
-            const userSession = localStorage.getItem('userSession');
-            if (userSession) {
-                alert("Anda sudah masuk. Langkah berikutnya adalah membuka halaman dasbor aplikasi Anda.");
-            } else {
-                window.location.href = "login.html";
-            }
         }
     </script>
 </body>
