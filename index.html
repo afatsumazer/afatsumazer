@@ -4,52 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nama Aplikasi Anda - Selamat Datang</title>
-    <!-- Menggunakan Tailwind CSS CDN untuk mempermudah penataan gaya (styling) -->
+    <!-- Menggunakan Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans min-h-screen flex flex-col justify-between">
+<!-- pt-16 ditambahkan agar konten utama tidak tertutup oleh navbar yang berposisi fixed -->
+<body class="bg-gray-50 text-gray-900 font-sans min-h-screen flex flex-col justify-between pt-16">
 
-    <!-- Navigasi / Header -->
-    <header class="bg-white shadow-sm border-b border-gray-100">
+    <!-- Navigasi / Header (Fixed & Auto-hide) -->
+    <!-- 
+      - 'fixed top-0 left-0 w-full z-50' membuat navbar menempel di atas.
+      - 'bg-white/90 backdrop-blur-md' memberikan efek latar belakang transparan kabur yang modern.
+      - 'transition-all duration-300' membuat efek transisi bayangan dan sembunyi menjadi mulus.
+    -->
+    <header id="navbar" class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b border-gray-100 transition-all duration-300 transform translate-y-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <!-- Logo / Nama Aplikasi -->
+                <!-- Logo -->
                 <div class="flex-shrink-0">
                     <span class="text-xl font-bold text-indigo-600">AppSaya</span>
                 </div>
-                <!-- Menu Utama -->
+                <!-- Menu -->
                 <nav class="hidden md:flex space-x-8">
                     <a href="#" class="text-gray-600 hover:text-indigo-600 transition text-sm font-medium">Fitur</a>
                     <a href="#" class="text-gray-600 hover:text-indigo-600 transition text-sm font-medium">Harga</a>
                     <a href="#" class="text-gray-600 hover:text-indigo-600 transition text-sm font-medium">Tentang Kami</a>
                 </nav>
-                <!-- Tombol Masuk/Daftar -->
+                <!-- Tombol -->
                 <div class="flex items-center space-x-4">
                     <a href="#" class="text-gray-600 hover:text-indigo-600 transition text-sm font-medium">Masuk</a>
-                    <a href="#" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition shadow-sm">Daftar</a>
+                    <a href="#" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition shadow-sm hover:shadow-md">Daftar</a>
                 </div>
             </div>
         </div>
     </header>
 
     <!-- Konten Utama (Hero Section) -->
-    <main class="flex-grow flex items-center py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <!-- h-[120vh] ditambahkan hanya sebagai contoh konten yang panjang agar halaman bisa di-scroll -->
+    <main class="flex-grow flex items-center min-h-[120vh]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-20">
             <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight">
                 Kelola Tugas Anda dengan <span class="text-indigo-600">Lebih Mudah</span>
             </h1>
             <p class="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-                Aplikasi web sederhana untuk membantu Anda mengatur rutinitas harian, mencatat prioritas, dan menyelesaikan pekerjaan tepat waktu.
+                Aplikasi web sederhana untuk membantu Anda mengatur rutinitas harian, mencatat prioritas, dan menyelesaikan pekerjaan tepat waktu. Cobalah scroll ke bawah untuk melihat efek navbar.
             </p>
             
-            <!-- Tombol Aksi (Call to Action) -->
             <div class="mt-8 max-w-md mx-auto sm:flex sm:justify-center md:mt-10">
-                <div class="rounded-md shadow">
+                <div class="rounded-md shadow-md hover:shadow-lg transition-shadow duration-300">
                     <button onclick="mulaiSekarang()" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10 transition">
                         Mulai Sekarang
                     </button>
                 </div>
-                <div class="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
+                <div class="mt-3 rounded-md shadow-sm sm:mt-0 sm:ml-3 hover:shadow-md transition-shadow duration-300">
                     <a href="#" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10 transition">
                         Pelajari Fitur
                     </a>
@@ -69,10 +75,39 @@
         </div>
     </footer>
 
-    <!-- Interaktivitas Sederhana dengan JavaScript -->
+    <!-- Logika JavaScript untuk Auto-Hide & Efek Bayangan -->
     <script>
+        let lastScrollY = window.scrollY;
+        const navbar = document.getElementById('navbar');
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+
+            // 1. Logika Efek Bayangan Dinamis
+            // Jika halaman di-scroll lebih dari 10 pixel, berikan bayangan yang lebih tegas (shadow-md)
+            if (currentScrollY > 10) {
+                navbar.classList.add('shadow-md');
+                navbar.classList.remove('shadow-sm');
+            } else {
+                navbar.classList.add('shadow-sm');
+                navbar.classList.remove('shadow-md');
+            }
+
+            // 2. Logika Auto-Hide Navbar
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                // Jika pengguna scroll KE BAWAH dan sudah melewati 100px: Sembunyikan navbar
+                navbar.classList.add('-translate-y-full');
+            } else {
+                // Jika pengguna scroll KE ATAS: Tampilkan kembali navbar
+                navbar.classList.remove('-translate-y-full');
+            }
+
+            // Perbarui posisi scroll terakhir
+            lastScrollY = currentScrollY;
+        });
+
         function mulaiSekarang() {
-            alert("Tombol diklik! Di langkah selanjutnya, tombol ini akan mengarahkan pengguna ke form pendaftaran atau halaman dashboard utama.");
+            alert("Tombol diklik!");
         }
     </script>
 </body>
