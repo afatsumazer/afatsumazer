@@ -7,52 +7,73 @@
     <!-- Menggunakan Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 text-gray-900 font-sans min-h-screen flex flex-col md:flex-row">
+<body class="bg-gray-100 text-gray-900 font-sans min-h-screen">
 
-    <!-- SIDEBAR KIRI -->
-    <aside class="w-full md:w-64 bg-indigo-900 text-white flex flex-col justify-between p-6">
+    <!-- === NAVIGASI BAWAH (MOBILE / HP) === -->
+    <!-- Hanya muncul di layar HP, otomatis tersembunyi di komputer -->
+    <div class="md:hidden fixed bottom-0 left-0 w-full bg-indigo-900 text-white h-16 z-50 flex justify-around items-center shadow-lg border-t border-indigo-850">
+        <button onclick="switchTab('overview')" id="btn-overview-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg bg-indigo-800 text-white">
+            <span class="text-[10px] font-medium">Ringkasan</span>
+        </button>
+        <button onclick="switchTab('tasks')" id="btn-tasks-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg text-indigo-200">
+            <span class="text-[10px] font-medium">Tugas</span>
+        </button>
+        <button onclick="switchTab('files')" id="btn-files-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg text-indigo-200">
+            <span class="text-[10px] font-medium">Berkas</span>
+        </button>
+        <button onclick="switchTab('profile')" id="btn-profile-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg text-indigo-200">
+            <span class="text-[10px] font-medium">Profil</span>
+        </button>
+    </div>
+
+    <!-- === BILAH SAMPING / SIDEBAR (DESKTOP) === -->
+    <!-- Menempel di sisi kiri pada layar komputer, otomatis tersembunyi di layar HP -->
+    <aside class="hidden md:flex fixed top-0 left-0 h-screen w-64 bg-indigo-900 text-white flex-col justify-between p-6 z-40 shadow-md">
         <div>
-            <!-- Logo / Nama Aplikasi -->
+            <!-- Logo -->
             <div class="mb-8">
                 <span class="text-2xl font-bold tracking-tight">AppSaya</span>
                 <p class="text-xs text-indigo-300">Workspace Dashboard</p>
             </div>
-            <!-- Menu Navigasi -->
+            <!-- Menu Navigasi Samping -->
             <nav class="space-y-2">
-                <button onclick="switchTab('overview')" id="btn-overview" class="w-full text-left flex items-center space-x-3 px-4 py-2.5 rounded-lg bg-indigo-800 text-white font-medium transition">
+                <button onclick="switchTab('overview')" id="btn-overview" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg bg-indigo-800 text-white font-medium transition">
                     <span>Ringkasan</span>
                 </button>
-                <button onclick="switchTab('tasks')" id="btn-tasks" class="w-full text-left flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-indigo-800 text-indigo-100 hover:text-white font-medium transition">
+                <button onclick="switchTab('tasks')" id="btn-tasks" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
                     <span>Tugas Saya</span>
                 </button>
-                <button onclick="switchTab('files')" id="btn-files" class="w-full text-left flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-indigo-800 text-indigo-100 hover:text-white font-medium transition">
+                <button onclick="switchTab('files')" id="btn-files" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
                     <span>Penyimpanan File</span>
                 </button>
-                <button onclick="switchTab('profile')" id="btn-profile" class="w-full text-left flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-indigo-800 text-indigo-100 hover:text-white font-medium transition">
+                <button onclick="switchTab('profile')" id="btn-profile" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
                     <span>Profil Saya</span>
                 </button>
             </nav>
         </div>
-        <!-- Tombol Keluar di Bagian Bawah -->
+        <!-- Keluar Sesi -->
         <div class="pt-6 border-t border-indigo-800">
-            <button onclick="logout()" class="w-full text-left flex items-center space-x-3 px-4 py-2 text-red-300 hover:text-red-100 transition">
+            <button onclick="logout()" class="w-full text-left flex items-center px-4 py-2 text-red-300 hover:text-red-100 transition">
                 <span>Keluar Sesi</span>
             </button>
         </div>
     </aside>
 
-    <!-- PANEL UTAMA (KANAN) -->
-    <main class="flex-grow flex flex-col">
+    <!-- === PANEL KONTEN UTAMA === -->
+    <!-- md:pl-64 memberikan jarak kosong di sebelah kiri agar konten tidak tertabrak oleh sidebar -->
+    <!-- pb-20 di HP mencegah konten terpotong oleh navigasi bawah HP -->
+    <div class="md:pl-64 flex flex-col min-h-screen pb-20 md:pb-0">
         <!-- Header Atas (Top Bar) -->
-        <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 md:px-8">
+        <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 md:px-8 shadow-sm">
             <h2 id="page-title" class="text-xl font-bold text-gray-800">Ringkasan</h2>
             <div class="flex items-center space-x-3">
                 <span id="user-display-name" class="text-sm font-medium text-gray-600">Memuat...</span>
                 <img id="user-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-8 h-8 rounded-full border border-gray-200">
+                <button onclick="logout()" class="md:hidden text-xs font-semibold text-red-600 hover:text-red-800 transition">Keluar</button>
             </div>
         </header>
 
-        <!-- AREA KONTEN KERJA UTAMA -->
+        <!-- Area Konten Utama -->
         <div class="p-6 md:p-8 flex-grow">
 
             <!-- TAB 1: OVERVIEW (RINGKASAN) -->
@@ -60,46 +81,40 @@
                 <!-- Grid Kartu Statistik -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                        <span class="text-sm text-gray-500 font-medium uppercase tracking-wider">Tugas Tersisa</span>
+                        <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Tugas Tersisa</span>
                         <h3 id="stat-tasks-pending" class="text-3xl font-extrabold text-indigo-600 mt-2">0</h3>
                     </div>
                     <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                        <span class="text-sm text-gray-500 font-medium uppercase tracking-wider">Tugas Selesai</span>
+                        <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Tugas Selesai</span>
                         <h3 id="stat-tasks-completed" class="text-3xl font-extrabold text-green-600 mt-2">0</h3>
                     </div>
                     <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                        <span class="text-sm text-gray-500 font-medium uppercase tracking-wider">File Disimpan</span>
+                        <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">File Disimpan</span>
                         <h3 id="stat-files-count" class="text-3xl font-extrabold text-blue-600 mt-2">0</h3>
                     </div>
                 </div>
-                <!-- Selamat Datang Widget -->
+                <!-- Info Penyimpanan (Kuota) [2] -->
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h3 class="text-lg font-bold">Selamat Datang di Workspace Anda</h3>
-                    <p class="text-gray-500 mt-1 text-sm">Gunakan menu di sisi kiri untuk mulai mengelola tugas harian atau mengamankan dokumen penting Anda.</p>
+                    <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider">Status Ruang Penyimpanan</h3>
+                    <p id="kuota-info" class="text-sm text-gray-500 mt-2">Menghitung penggunaan penyimpanan...</p>
                 </div>
             </div>
 
             <!-- TAB 2: TUGAS SAYA -->
             <div id="tab-tasks" class="hidden space-y-6">
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-2xl">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-2xl mx-auto">
                     <h3 class="text-lg font-bold mb-4">Daftar Tugas Harian</h3>
-                    
-                    <!-- Form Tambah Tugas -->
                     <form onsubmit="addTask(event)" class="flex space-x-2 mb-6">
                         <input id="task-input" type="text" placeholder="Tulis rencana tugas baru..." required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Tambah</button>
                     </form>
-
-                    <!-- List Tugas -->
-                    <ul id="task-list" class="space-y-3">
-                        <!-- Dimuat otomatis via JS -->
-                    </ul>
+                    <ul id="task-list" class="space-y-3"></ul>
                 </div>
             </div>
 
-            <!-- TAB 3: PENYIMPANAN FILE -->
+            <!-- TAB 3: PENYIMPANAN FILE [2] -->
             <div id="tab-files" class="hidden space-y-6">
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-3xl">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-3xl mx-auto">
                     <h3 class="text-lg font-bold mb-1">Penyimpanan Dokumen Aman</h3>
                     <p class="text-sm text-gray-500 mb-6">Unggah file Anda secara aman ke enkripsi Firebase Storage. Anda dapat membagikan link unduhan ke orang lain [2].</p>
 
@@ -108,7 +123,7 @@
                         <input type="file" id="file-selector" class="hidden" onchange="updateFileLabel()">
                         <label for="file-selector" class="cursor-pointer block">
                             <span id="file-label" class="text-sm text-gray-600 font-medium block">Pilih file dari komputer Anda...</span>
-                            <span class="text-xs text-gray-400 mt-1 block">Maksimal ukuran file disarankan 10 MB</span>
+                            <span class="text-xs text-gray-400 mt-1 block">Maksimal kuota per pengguna: 50 MB (Free) [2]</span>
                         </label>
                         <button onclick="uploadSelectedFile()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition inline-flex items-center">
                             Unggah Sekarang
@@ -137,7 +152,7 @@
 
             <!-- TAB 4: PROFIL SAYA -->
             <div id="tab-profile" class="hidden space-y-6">
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-md text-center">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-md text-center mx-auto">
                     <img id="profile-card-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-24 h-24 rounded-full border border-gray-200 mx-auto mb-4">
                     <h3 id="profile-card-name" class="text-xl font-bold text-gray-900">Nama Pengguna</h3>
                     <p id="profile-card-email" class="text-sm text-gray-500">user@email.com</p>
@@ -149,13 +164,13 @@
             </div>
 
         </div>
-    </main>
+    </div>
 
-    <!-- INTEGRASI SDK FIREBASE MODULE -->
+    <!-- JAVASCRIPT UTAMA (TERINTEGRASI DI SINI) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getStorage, ref, uploadBytes, listAll, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+        import { getStorage, ref, uploadBytes, listAll, getDownloadURL, deleteObject, getMetadata } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         // Konfigurasi Firebase dari proyek Anda
         const firebaseConfig = {
@@ -175,13 +190,15 @@
         const storage = getStorage(app);
 
         let userUID = "";
+        let limitMB = 50; // Batasan kuota [2]
+        let sisaKuotaCukup = true;
 
-        // Pengaman Halaman: Cek apakah sesi valid menggunakan Firebase Auth
+        // Cek status sesi login pengguna
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 userUID = user.uid;
                 
-                // Set data profil di Header & Tab Profil
+                // Set Header & Tab Profil
                 document.getElementById('user-display-name').innerText = user.displayName || "Pengguna";
                 document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/150";
                 
@@ -189,33 +206,53 @@
                 document.getElementById('profile-card-email').innerText = user.email;
                 document.getElementById('profile-card-avatar').src = user.photoURL || "https://via.placeholder.com/150";
 
-                // Muat file dari Firebase Storage untuk pengguna ini [2]
+                // Muat file pengguna [2]
                 loadUserFiles();
             } else {
-                // Sesi kadaluarsa / belum masuk -> Paksa keluar ke login.html
                 localStorage.removeItem('userSession');
                 window.location.href = "login.html";
             }
         });
 
-        // ================= LOGIKA TAB BROWSER (MENU SWITCHER) =================
+        // ================= LOGIKA NAVIGASI TAB (MENDUKUNG DESKTOP & HP) =================
         window.switchTab = function(tabName) {
             const tabs = ['overview', 'tasks', 'files', 'profile'];
             tabs.forEach(t => {
+                // Sembunyikan konten tab lain
                 document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`btn-${t}`).classList.remove('bg-indigo-800', 'text-white');
-                document.getElementById(`btn-${t}`).classList.add('text-indigo-100', 'hover:bg-indigo-800');
+                
+                // Atur ulang tombol navigasi desktop
+                const dBtn = document.getElementById(`btn-${t}`);
+                if (dBtn) {
+                    dBtn.classList.remove('bg-indigo-800', 'text-white');
+                    dBtn.classList.add('text-indigo-100', 'hover:bg-indigo-800', 'hover:text-white');
+                }
+
+                // Atur ulang tombol navigasi HP
+                const mBtn = document.getElementById(`btn-${t}-mobile`);
+                if (mBtn) {
+                    mBtn.classList.remove('bg-indigo-800', 'text-white');
+                    mBtn.classList.add('text-indigo-200');
+                }
             });
 
-            // Tampilkan tab yang dipilih
+            // Tampilkan tab aktif
             document.getElementById(`tab-${tabName}`).classList.remove('hidden');
             
-            // Aktifkan visual tombol menu di sidebar
+            // Aktifkan visual tombol aktif desktop
             const activeBtn = document.getElementById(`btn-${tabName}`);
-            activeBtn.classList.add('bg-indigo-800', 'text-white');
-            activeBtn.classList.remove('text-indigo-100', 'hover:bg-indigo-800');
+            if (activeBtn) {
+                activeBtn.classList.add('bg-indigo-800', 'text-white');
+                activeBtn.classList.remove('text-indigo-100', 'hover:bg-indigo-800', 'hover:text-white');
+            }
 
-            // Ganti Title di Header
+            // Aktifkan visual tombol aktif HP
+            const activeMBtn = document.getElementById(`btn-${tabName}-mobile`);
+            if (activeMBtn) {
+                activeMBtn.classList.add('bg-indigo-800', 'text-white');
+                activeMBtn.classList.remove('text-indigo-200');
+            }
+
             const titles = { overview: 'Ringkasan', tasks: 'Tugas Saya', files: 'Penyimpanan File', profile: 'Profil Saya' };
             document.getElementById('page-title').innerText = titles[tabName];
         }
@@ -265,18 +302,14 @@
                 list.appendChild(li);
             });
 
-            // Update statistik di tab Overview
             document.getElementById('stat-tasks-pending').innerText = pendingCount;
             document.getElementById('stat-tasks-completed').innerText = completedCount;
         }
 
-        // Jalankan render tugas pertama kali
         saveAndRenderTasks();
-
 
         // ================= LOGIKA FIREBASE STORAGE (UPLOAD / DOWNLOAD / SHARE) =================
         
-        // Memperbarui nama label saat file dipilih
         window.updateFileLabel = function() {
             const selector = document.getElementById('file-selector');
             if (selector.files.length > 0) {
@@ -284,7 +317,7 @@
             }
         }
 
-        // Unggah File terpilih ke Firebase Storage [2]
+        // Unggah File Terpilih [2]
         window.uploadSelectedFile = function() {
             const selector = document.getElementById('file-selector');
             if (selector.files.length === 0) {
@@ -292,42 +325,58 @@
                 return;
             }
 
+            if (!sisaKuotaCukup) {
+                alert("Batas kuota penyimpanan gratis Anda (50 MB) telah penuh. Silakan upgrade untuk kapasitas lebih besar!");
+                return;
+            }
+
             const file = selector.files[0];
             const fileRef = ref(storage, `users/${userUID}/${file.name}`);
 
-            alert("Sedang mengunggah... Harap tunggu sebentar.");
+            alert("Sedang mengunggah file... Mohon tunggu.");
 
             uploadBytes(fileRef, file).then((snapshot) => {
                 alert("File berhasil diunggah secara aman!");
                 document.getElementById('file-label').innerText = "Pilih file dari komputer Anda...";
-                selector.value = ""; // reset input
-                loadUserFiles(); // segarkan daftar berkas
+                selector.value = ""; 
+                loadUserFiles(); 
             }).catch((error) => {
-                console.error("Gagal mengunggah berkas:", error);
-                alert("Gagal mengunggah: " + error.message);
+                console.error("Gagal mengunggah:", error);
+                alert("Gagal mengunggah: Pastikan Aturan Keamanan (Rules) Firebase Storage Anda sudah diaktifkan di Firebase Console.");
             });
         }
 
-        // Muat & tampilkan daftar file milik pengguna saat ini [2]
+        // Memuat berkas dan menghitung kuota penyimpanan otomatis [2]
         function loadUserFiles() {
             if (!userUID) return;
 
             const listRef = ref(storage, `users/${userUID}`);
             const tableBody = document.getElementById('file-table-body');
             
-            listAll(listRef).then((res) => {
+            listAll(listRef).then(async (res) => {
                 tableBody.innerHTML = '';
                 document.getElementById('stat-files-count').innerText = res.items.length;
 
                 if (res.items.length === 0) {
                     tableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-gray-400">Belum ada file tersimpan.</td></tr>`;
+                    document.getElementById('kuota-info').innerText = `Penyimpanan Digunakan: 0 MB dari ${limitMB} MB (Free)`;
+                    sisaKuotaCukup = true;
                     return;
                 }
 
-                res.items.forEach((itemRef) => {
+                let totalBytes = 0;
+
+                // Loop asinkron untuk merender file & menghitung ukuran total [2]
+                for (const itemRef of res.items) {
+                    try {
+                        const metadata = await getMetadata(itemRef);
+                        totalBytes += metadata.size;
+                    } catch (err) {
+                        console.error("Gagal memuat ukuran metadata:", err);
+                    }
+
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-gray-50";
-
                     tr.innerHTML = `
                         <td class="px-6 py-4 font-medium text-gray-800">${itemRef.name}</td>
                         <td class="px-6 py-4 text-right space-x-3">
@@ -337,46 +386,48 @@
                         </td>
                     `;
                     tableBody.appendChild(tr);
-                });
+                }
+
+                // Kalkulasi Sisa Kuota [2]
+                const totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
+                document.getElementById('kuota-info').innerText = `Penyimpanan Digunakan: ${totalMB} MB dari ${limitMB} MB (Free)`;
+                
+                sisaKuotaCukup = totalMB < limitMB;
+
             }).catch((error) => {
                 console.error("Gagal memuat daftar berkas:", error);
-                tableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-red-500">Gagal memuat data.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-red-500">Gagal memuat data. Periksa pengaturan Storage Rules di Firebase Console Anda.</td></tr>`;
             });
         }
 
-        // Fungsi Unduh File [2]
         window.downloadFile = function(path) {
             const fileRef = ref(storage, path);
             getDownloadURL(fileRef).then((url) => {
-                // Membuka file di tab baru agar browser mengunduhnya
                 window.open(url, '_blank');
             }).catch((error) => {
-                alert("Gagal mengambil file unduhan: " + error.message);
+                alert("Gagal mengunduh berkas: " + error.message);
             });
         }
 
-        // Fungsi Salin Link Berbagi File [2]
         window.shareFile = function(path) {
             const fileRef = ref(storage, path);
             getDownloadURL(fileRef).then((url) => {
-                // Menyalin tautan publik hasil generate token Firebase ke papan klip
                 navigator.clipboard.writeText(url).then(() => {
-                    alert("Tautan unduhan berhasil disalin ke clipboard! Anda dapat membagikannya sekarang.");
+                    alert("Link berbagi berhasil disalin! Siapa pun yang memiliki link ini kini dapat melihat file tersebut.");
                 });
             }).catch((error) => {
-                alert("Gagal membuat tautan berbagi: " + error.message);
+                alert("Gagal membagikan berkas: " + error.message);
             });
         }
 
-        // Fungsi Hapus File [2]
         window.deleteFile = function(path) {
-            if (confirm("Apakah Anda yakin ingin menghapus file ini secara permanen?")) {
+            if (confirm("Apakah Anda yakin ingin menghapus berkas ini?")) {
                 const fileRef = ref(storage, path);
                 deleteObject(fileRef).then(() => {
-                    alert("File berhasil dihapus!");
-                    loadUserFiles(); // memuat ulang daftar berkas
+                    alert("Berkas terhapus!");
+                    loadUserFiles(); 
                 }).catch((error) => {
-                    alert("Gagal menghapus file: " + error.message);
+                    alert("Gagal menghapus berkas: " + error.message);
                 });
             }
         }
