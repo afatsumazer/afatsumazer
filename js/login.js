@@ -1,5 +1,8 @@
 import { signInWithEmailAndPassword } from "https://gstatic.com";
 import { auth } from "./firebase-config.js";
+// Menggunakan jalur relatif yang lebih aman untuk server produksi GitHub
+import { signInWithEmailAndPassword } from "https://gstatic.com";
+import { auth } from "../js/firebase-config.js"; // Diubah menggunakan ../js/ agar mutlak mencari di dalam folder js
 
 const loginForm = document.getElementById('loginForm');
 const loadingElement = document.getElementById('loading');
