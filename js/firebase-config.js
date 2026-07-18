@@ -1,6 +1,9 @@
 import { initializeApp } from "https://gstatic.com";
 import { getAuth } from "https://gstatic.com";
 import { getDatabase } from "https://gstatic.com";
+// Menggunakan jalur relatif yang lebih aman untuk server produksi GitHub
+import { signInWithEmailAndPassword } from "https://gstatic.com";
+import { auth } from "../js/firebase-config.js"; // Diubah menggunakan ../js/ agar mutlak mencari di dalam folder js
 
 const firebaseConfig = {
   apiKey: "AIzaSyDg2b6LERZ2zE86mTiYvUO1Uj--lAtpmgM",
@@ -16,3 +19,4 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const database = getDatabase(app);
+
