@@ -177,51 +177,137 @@
         <!-- Area Konten Utama -->
         <div class="p-6 md:p-8 flex-grow">
 
-            <!-- TAB 1: OVERVIEW (DILINDUNGI OLEH GERBANG OTORISASI PROFESIONAL) -->
-            <div id="tab-overview" class="space-y-6">
-                
-                <!-- GERBANG MASUK KODE UNIK DENGAN LOGO PORTAL KEAMANAN -->
-                <div id="overview-gate" class="bg-slate-900 text-white rounded-2xl p-8 border border-slate-800 text-center space-y-6 max-w-md mx-auto shadow-xl">
-                    <div class="mx-auto w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                        <!-- Ikon Kunci Portal Keamanan -->
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                        </svg>
-                    </div>
-                    <div class="space-y-2">
-                        <h3 class="text-xl font-extrabold tracking-tight">Otorisasi Workspace</h3>
-                        <p class="text-xs text-slate-300">Masukkan <strong>@Kode-Unik</strong> Anda untuk mengakses Dashboard Workspace.</p>
-                    </div>
-                    <div class="space-y-3">
-                        <input type="text" id="gate-code-input" placeholder="@KODE-WORKSPACE" class="w-full px-4 py-3 bg-slate-850 border border-slate-700 rounded-xl text-center font-mono text-sm tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500 uppercase">
-                        <button onclick="verifyGateCode()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-bold text-sm transition shadow-lg shadow-indigo-600/20">Akses Masuk</button>
-                    </div>
-                    <p class="text-[10px] text-slate-400">Gunakan kode bawaan: <code class="bg-slate-800 px-1.5 py-0.5 rounded text-indigo-300 font-mono">@APPSAYA</code></p>
-                </div>
+            <!-- TAB 1: OVERVIEW (REDESIGN: BERKAS UTAMA & REKOMENDASI PENCARIAN) -->
+            <div id="tab-overview" class="space-y-8 max-w-5xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- SISI KIRI & TENGAH: KARTU PROFIL & BERKAS UTAMA -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 space-y-6">
+                            
+                            <!-- Header Profil Pemilik Berkas -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3.5">
+                                    <img id="featured-owner-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80" alt="Avatar" onclick="showProfilePopup('Sarah Amelia')" class="w-12 h-12 rounded-full border border-gray-200 object-cover cursor-pointer hover:scale-105 transition">
+                                    <div>
+                                        <h3 id="featured-owner-name" onclick="showProfilePopup('Sarah Amelia')" class="text-base font-extrabold text-gray-900 cursor-pointer hover:text-indigo-600 transition leading-tight">Sarah Amelia</h3>
+                                        <p id="featured-owner-username" class="text-xs text-gray-500 font-mono mt-0.5">@sarah_amelia</p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 bg-indigo-50 text-indigo-700 font-bold rounded-full text-[10px] uppercase tracking-wider">Penerbit Utama</span>
+                            </div>
 
-                <!-- TAMPILAN DASHBOARD (HIDDEN SECARA DEFAULT SEBELUM LOGIN) -->
-                <div id="overview-content" class="hidden space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h4 class="text-xs font-bold text-gray-700 uppercase tracking-widest">Informasi Workspace Anda</h4>
-                        <button onclick="lockGate()" class="text-xs text-red-500 font-semibold bg-red-50 border border-red-200 px-2 py-1 rounded-lg hover:bg-red-100 transition">Kunci Kembali</button>
+                            <!-- Gambar/Tampilan Berkas (Anti-Patah) -->
+                            <div id="featured-file-display" class="rounded-2xl overflow-hidden border border-gray-100 max-h-80 bg-slate-100 flex items-center justify-center">
+                                <img id="featured-file-image" src="https://images.unsplash.com/photo-1541462608141-27b2c7452167?auto=format&fit=crop&w=600&q=80" alt="Berkas Unggulan" class="max-w-full h-auto max-h-80 object-contain rounded-2xl">
+                            </div>
+
+                            <!-- Detail Deskripsi & Baris Status Loading/Popularitas Berkas -->
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h4 id="featured-file-title" class="text-lg font-bold text-gray-900 leading-snug">UI-Draft-v2.jpg</h4>
+                                        <p id="featured-file-meta" class="text-xs text-gray-400 mt-1">Diterbitkan pada: 19 Juli 2026 • Ukuran: 1.4 MB</p>
+                                    </div>
+                                    <span id="featured-file-badge" class="px-2.5 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-lg font-mono">JPG IMAGE</span>
+                                </div>
+
+                                <!-- Baris Status Interaktif (Activity Line Bar) -->
+                                <div class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <div class="flex justify-between items-center text-xs font-semibold">
+                                        <span class="text-gray-500">Popularitas & Keandalan Berkas</span>
+                                        <span id="featured-popularity-text" class="text-indigo-600">85% Indeks Kinerja</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div id="featured-popularity-bar" class="bg-gradient-to-r from-indigo-500 to-indigo-700 h-2 rounded-full transition-all duration-500" style="width: 85%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-[10px] text-gray-400">
+                                        <span>342 Dilihat</span>
+                                        <span id="featured-download-stat-text">85 Diunduh</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Baris Tombol Interaksi File -->
+                            <div class="flex items-center justify-between pt-4 border-t border-gray-150">
+                                <div class="flex items-center space-x-6">
+                                    <!-- Tombol Like -->
+                                    <button onclick="toggleFeaturedLike()" id="featured-like-btn" class="flex items-center space-x-2 text-gray-500 hover:text-red-500 transition group">
+                                        <svg id="featured-like-icon" class="w-5 h-5 group-hover:scale-110 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                        </svg>
+                                        <span id="featured-like-count" class="text-xs font-bold">124</span>
+                                    </button>
+                                    
+                                    <!-- Angka Komentar -->
+                                    <div class="flex items-center space-x-2 text-gray-500">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                        </svg>
+                                        <span id="featured-comment-count" class="text-xs font-bold">2</span>
+                                    </div>
+                                </div>
+
+                                <!-- Tombol Unduh Langsung -->
+                                <button onclick="triggerFeaturedDownload()" class="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-md shadow-indigo-600/10">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    <span>Unduh Sekarang</span>
+                                </button>
+                            </div>
+
+                            <!-- Area Komentar Berkas -->
+                            <div class="space-y-4 pt-4 border-t border-gray-150">
+                                <h4 class="text-xs font-extrabold text-gray-400 uppercase tracking-widest">Komentar Berkas</h4>
+                                
+                                <!-- Daftar Komentar -->
+                                <div id="featured-comments-list" class="space-y-3 max-h-48 overflow-y-auto pr-2">
+                                    <!-- Dimuat dinamis -->
+                                </div>
+
+                                <!-- Tulis Komentar Baru -->
+                                <div class="flex space-x-3 pt-2">
+                                    <input type="text" id="featured-comment-input" placeholder="Tulis tanggapan atau komentar mengenai berkas ini..." class="flex-grow px-4 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+                                    <button onclick="submitFeaturedComment()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-4 rounded-xl text-xs font-bold transition">Kirim</button>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                            <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Total Postingan</span>
-                            <h3 id="stat-posts-count" class="text-3xl font-extrabold text-indigo-600 mt-2">0</h3>
+
+                    <!-- SISI KANAN: REKOMENDASI & PENCARIAN DATABASE -->
+                    <div class="space-y-6">
+                        
+                        <!-- Panel Pencarian Database Workspace -->
+                        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+                            <h4 class="text-xs font-extrabold text-gray-400 uppercase tracking-widest">Pencarian Database</h4>
+                            <div class="relative">
+                                <input type="text" id="database-search-input" onkeyup="handleDatabaseSearch()" placeholder="Cari profil, file, atau link..." class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+                                <div class="absolute left-3 top-3 text-gray-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                            <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Total Pengikut</span>
-                            <h3 id="stat-followers-count" class="text-3xl font-extrabold text-green-600 mt-2">142</h3>
+
+                        <!-- Rekomendasi Profil -->
+                        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+                            <h4 class="text-xs font-extrabold text-gray-400 uppercase tracking-widest">Rekomendasi Profil</h4>
+                            <div id="recommended-profiles-list" class="space-y-3">
+                                <!-- Dimuat dinamis -->
+                            </div>
                         </div>
-                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                            <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">File Disimpan</span>
-                            <h3 id="stat-files-count" class="text-3xl font-extrabold text-blue-600 mt-2">0</h3>
+
+                        <!-- Rekomendasi Berkas Populer -->
+                        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+                            <h4 class="text-xs font-extrabold text-gray-400 uppercase tracking-widest">Rekomendasi Berkas</h4>
+                            <div id="recommended-files-list" class="space-y-3">
+                                <!-- Dimuat dinamis -->
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                        <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider">Status Ruang Penyimpanan</h3>
-                        <p id="kuota-info" class="text-sm text-gray-500 mt-2">Menghitung kapasitas...</p>
+
                     </div>
                 </div>
             </div>
@@ -236,17 +322,17 @@
                             <span>Workspace Grup</span>
                             <span class="text-indigo-600 hover:text-indigo-800 cursor-pointer text-sm" title="Tambah Saluran">+</span>
                         </div>
-                        <div class="space-y-1" id="discord-channel-list">
+                        <div class="space-y-1-mobile-scroll md:space-y-1 flex md:flex-col overflow-x-auto md:overflow-x-visible pb-2 md:pb-0" id="discord-channel-list">
                             <!-- Tombol Saluran Pengumuman -->
-                            <button onclick="switchChannel('pengumuman')" id="chan-pengumuman" class="w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm bg-indigo-50 text-indigo-700 font-bold transition">
+                            <button onclick="switchChannel('pengumuman')" id="chan-pengumuman" class="w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm bg-indigo-50 text-indigo-700 font-bold transition whitespace-nowrap md:whitespace-normal">
                                 <span class="mr-2 text-indigo-400 font-mono font-bold">#</span> pengumuman
                             </button>
                             <!-- Tombol Saluran Daftar Pekerjaan -->
-                            <button onclick="switchChannel('daftar-tugas')" id="chan-daftar-tugas" class="w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                            <button onclick="switchChannel('daftar-tugas')" id="chan-daftar-tugas" class="w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition whitespace-nowrap md:whitespace-normal">
                                 <span class="mr-2 text-gray-400 font-mono">#</span> daftar-tugas
                             </button>
                             <!-- Tombol Saluran Link Penting -->
-                            <button onclick="switchChannel('link-penting')" id="chan-link-penting" class="w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                            <button onclick="switchChannel('link-penting')" id="chan-link-penting" class="w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition whitespace-nowrap md:whitespace-normal">
                                 <span class="mr-2 text-gray-400 font-mono">#</span> link-penting
                             </button>
                         </div>
@@ -260,7 +346,7 @@
                             <span class="text-2xl text-gray-400 font-bold font-mono">#</span>
                             <div>
                                 <h3 id="active-channel-title" class="text-base font-extrabold text-gray-900 leading-tight">pengumuman</h3>
-                                <p id="active-channel-desc" class="text-[11px] text-gray-500 mt-0.5">Ruang informasi resmi dan pengumuman umum workspace.</p>
+                                <p id="active-channel-desc" class="text-[11px] text-gray-500 mt-0.5">Ruang informasi resmi dan pengumuman umum grup.</p>
                             </div>
                         </div>
 
@@ -269,10 +355,33 @@
                             <img id="feed-composer-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-10 h-10 rounded-full border border-gray-200 object-cover flex-shrink-0 cursor-pointer" onclick="showProfilePopup('Anda (Saya)')">
                             <div class="flex-grow space-y-3">
                                 <textarea id="feed-composer-text" placeholder="Bagikan pengumuman atau selipkan tautan pekerjaan baru di sini..." rows="3" class="w-full text-sm border-0 focus:ring-0 focus:outline-none resize-none placeholder-gray-400" required></textarea>
+                                
+                                <!-- Pratinjau Berkas Terpilih Langsung di Postingan -->
+                                <div id="composer-file-preview" class="hidden flex items-center justify-between p-2.5 bg-gray-50 rounded-xl border border-gray-200">
+                                    <div class="flex items-center space-x-2 overflow-hidden">
+                                        <svg class="w-4 h-4 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                        </svg>
+                                        <span id="composer-preview-name" class="text-xs font-semibold text-gray-700 truncate">nama_file.png</span>
+                                    </div>
+                                    <button type="button" onclick="clearComposerFile()" class="text-gray-400 hover:text-red-500 transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+
                                 <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                                    <!-- Pilihan Visibilitas -->
-                                    <div class="flex items-center space-x-2">
-                                        <label for="feed-composer-visibility" class="sr-only">Visibilitas</label>
+                                    <div class="flex items-center space-x-3">
+                                        <!-- Unggah Berkas dari Komposer (Paperclip) -->
+                                        <input type="file" id="composer-file-selector" class="hidden" onchange="handleComposerFileSelection()">
+                                        <label for="composer-file-selector" class="cursor-pointer text-gray-400 hover:text-indigo-600 transition" title="Sematkan Berkas ke Postingan">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                            </svg>
+                                        </label>
+
+                                        <!-- Pilihan Visibilitas -->
                                         <select id="feed-composer-visibility" class="text-xs font-semibold text-gray-500 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg py-1 px-2.5 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
                                             <option value="public">🌐 Publik</option>
                                             <option value="private">🔒 Privat</option>
@@ -325,7 +434,7 @@
                             <span id="selected-file-name" class="text-xs font-semibold text-gray-700 truncate">nama_file.pdf</span>
                         </div>
                         <button type="button" onclick="clearSelectedFileLocal()" class="text-gray-400 hover:text-red-500 transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                         </button>
@@ -431,7 +540,7 @@
     <!-- Hubungkan ke JS eksternal -->
     <script type="module" src="js/dashboard.js"></script>
 
-    <!-- Script Utama Integrasi Sosial & Persistensi Data -->
+    <!-- Script Utama Integrasi Sosial, Upload, dan Persistensi Lokal Browser -->
     <script>
         // Database Profil Pengguna Sinkron
         let usersDatabase = {
@@ -467,10 +576,9 @@
             }
         };
 
-        // Saluran Aktif saat ini
+        // Saluran Aktif saat ini di Tab 2
         let activeChannel = 'pengumuman';
 
-        // Deskripsi Saluran
         const channelDetails = {
             'pengumuman': {
                 title: 'pengumuman',
@@ -486,7 +594,7 @@
             }
         };
 
-        // Postingan Bawaan dengan kategori Saluran
+        // Data Simulasi default jika penyimpanan kosong
         let defaultPosts = [
             {
                 id: 1,
@@ -508,7 +616,7 @@
                 author: "Budi Santoso",
                 avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
                 time: "5 jam yang lalu",
-                content: "Berikut link dokumen backup keamanan database internal. Tolong ditinjau kembali ya: https://drive.google.com/drive/folders/test",
+                content: "Berikut link dokumen backup keamanan database internal: https://drive.google.com/drive/folders/test",
                 fileAttached: null,
                 channel: "link-penting",
                 isPublic: false,
@@ -522,12 +630,38 @@
 
         let appPosts = [];
         let currentSelectedFile = null;
+        let composerAttachedFile = null;
+
+        // Data Berkas Unggulan Tab 1
+        let featuredStats = JSON.parse(localStorage.getItem('featured_stats')) || {
+            likes: 124,
+            downloads: 85,
+            views: 342,
+            liked: false
+        };
+
+        let featuredComments = JSON.parse(localStorage.getItem('featured_comments')) || [
+            { author: "Budi Santoso", text: "Terlihat sangat bersih dan rapi desainnya! Lanjutkan." },
+            { author: "Sarah Amelia", text: "Draf ini masih butuh penyesuaian di bagian skema warna." }
+        ];
+
+        let currentFeaturedFile = JSON.parse(localStorage.getItem('featured_file')) || {
+            title: "UI-Draft-v2.jpg",
+            size: "1.4 MB",
+            date: "19 Juli 2026",
+            badge: "JPG IMAGE",
+            url: "https://images.unsplash.com/photo-1541462608141-27b2c7452167?auto=format&fit=crop&w=600&q=80",
+            type: "image",
+            owner: "Sarah Amelia"
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
             loadGateState();
             loadPostsFromLocalStorage();
             syncComposerAvatar();
             renderFeed();
+            renderFeaturedCard();
+            renderRecommendations();
         });
 
         // === OTORISASI GATEWAY ===
@@ -563,6 +697,8 @@
             loadGateState();
             syncComposerAvatar();
             renderFeed();
+            renderFeaturedCard();
+            renderRecommendations();
             
             input.value = '';
         }
@@ -572,7 +708,7 @@
             loadGateState();
         }
 
-        // === PERSISTENSI LOCALSTORAGE ===
+        // === PERSISTENSI DATA POSTINGAN ===
 
         function loadPostsFromLocalStorage() {
             const localData = localStorage.getItem('appPosts_data');
@@ -588,245 +724,233 @@
             localStorage.setItem('appPosts_data', JSON.stringify(appPosts));
         }
 
-        // === PERPINDAHAN SALURAN GAYA DISCORD ===
+        // === RENDERING TAB 1 (BERKAS UTAMA & REKOMENDASI) ===
+
+        function renderFeaturedCard() {
+            const owner = usersDatabase[currentFeaturedFile.owner] || usersDatabase["Anda (Saya)"];
+            
+            document.getElementById('featured-owner-avatar').src = owner.avatar;
+            document.getElementById('featured-owner-name').textContent = owner.name;
+            document.getElementById('featured-owner-username').textContent = owner.username;
+            document.getElementById('featured-owner-avatar').setAttribute('onclick', `showProfilePopup('${owner.name}')`);
+            document.getElementById('featured-owner-name').setAttribute('onclick', `showProfilePopup('${owner.name}')`);
+
+            // Atur Gambar atau File Ikon
+            const imgEl = document.getElementById('featured-file-image');
+            imgEl.src = currentFeaturedFile.url;
+
+            // Atur Detail Info
+            document.getElementById('featured-file-title').textContent = currentFeaturedFile.title;
+            document.getElementById('featured-file-meta').textContent = `Diterbitkan pada: ${currentFeaturedFile.date} • Ukuran: ${currentFeaturedFile.size}`;
+            document.getElementById('featured-file-badge').textContent = currentFeaturedFile.badge;
+
+            // Atur Like & Download
+            document.getElementById('featured-like-count').textContent = featuredStats.likes;
+            document.getElementById('featured-download-stat-text').textContent = `${featuredStats.downloads} Diunduh`;
+            
+            const likeIcon = document.getElementById('featured-like-icon');
+            if (featuredStats.liked) {
+                likeIcon.setAttribute('fill', 'currentColor');
+                likeIcon.classList.add('text-red-500');
+            } else {
+                likeIcon.setAttribute('fill', 'none');
+                likeIcon.classList.remove('text-red-500');
+            }
+
+            // Render Komentar Berkas
+            const listEl = document.getElementById('featured-comments-list');
+            listEl.innerHTML = '';
+            featuredComments.forEach(c => {
+                const isAnda = c.author === "Anda (Saya)";
+                const u = usersDatabase[c.author] || { username: "@member" };
+                const html = `
+                    <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs">
+                        <div class="flex justify-between font-bold text-gray-800">
+                            <span class="hover:text-indigo-600 cursor-pointer" onclick="showProfilePopup('${c.author}')">${c.author}</span>
+                            <span class="text-[9px] text-gray-400">${u.username}</span>
+                        </div>
+                        <p class="text-gray-600 mt-0.5 leading-relaxed">${c.text}</p>
+                    </div>
+                `;
+                listEl.insertAdjacentHTML('beforeend', html);
+            });
+            document.getElementById('featured-comment-count').textContent = featuredComments.length;
+        }
+
+        function toggleFeaturedLike() {
+            featuredStats.liked = !featuredStats.liked;
+            featuredStats.likes += featuredStats.liked ? 1 : -1;
+            
+            localStorage.setItem('featured_stats', JSON.stringify(featuredStats));
+            renderFeaturedCard();
+        }
+
+        function triggerFeaturedDownload() {
+            featuredStats.downloads += 1;
+            localStorage.setItem('featured_stats', JSON.stringify(featuredStats));
+            renderFeaturedCard();
+            alert(`Selesai mengunduh berkas [${currentFeaturedFile.title}]!`);
+        }
+
+        function submitFeaturedComment() {
+            const input = document.getElementById('featured-comment-input');
+            if (!input.value.trim()) return;
+
+            featuredComments.push({
+                author: "Anda (Saya)",
+                text: input.value.trim()
+            });
+
+            input.value = '';
+            localStorage.setItem('featured_comments', JSON.stringify(featuredComments));
+            renderFeaturedCard();
+        }
+
+        // Render Panel Rekomendasi di Seluruh Database
+        function renderRecommendations() {
+            // Rekomendasi Profil
+            const recProfiles = document.getElementById('recommended-profiles-list');
+            recProfiles.innerHTML = '';
+            Object.keys(usersDatabase).forEach(key => {
+                if (key === "Anda (Saya)") return;
+                const user = usersDatabase[key];
+                const html = `
+                    <div class="flex items-center justify-between p-2 hover:bg-slate-50 rounded-xl transition">
+                        <div class="flex items-center space-x-3 overflow-hidden">
+                            <img src="${user.avatar}" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
+                            <div class="min-w-0">
+                                <h5 class="text-xs font-bold text-gray-800 truncate">${user.name}</h5>
+                                <p class="text-[10px] text-gray-400 truncate">${user.username}</p>
+                            </div>
+                        </div>
+                        <button onclick="showProfilePopup('${user.name}')" class="text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2.5 py-1 rounded-lg transition">Lihat</button>
+                    </div>
+                `;
+                recProfiles.insertAdjacentHTML('beforeend', html);
+            });
+
+            // Rekomendasi Berkas Populer
+            const recFiles = document.getElementById('recommended-files-list');
+            recFiles.innerHTML = `
+                <div onclick="selectFeaturedPreset('Database-Backup-July.sql', '6.5 MB', 'SQL BACKUP', 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=600&q=80', 'Budi Santoso')" class="p-3 bg-slate-50 hover:bg-indigo-50/50 rounded-xl border border-slate-100 cursor-pointer transition flex items-center justify-between">
+                    <div class="flex items-center space-x-2.5 overflow-hidden">
+                        <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                        <span class="text-xs font-bold text-gray-800 truncate">Database-Backup-July.sql</span>
+                    </div>
+                    <span class="text-[9px] text-gray-400 font-semibold font-mono">6.5 MB</span>
+                </div>
+                <div onclick="selectFeaturedPreset('Protokol-Kerja-v1.pdf', '820 KB', 'PDF DOCUMENT', 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=600&q=80', 'Sarah Amelia')" class="p-3 bg-slate-50 hover:bg-indigo-50/50 rounded-xl border border-slate-100 cursor-pointer transition flex items-center justify-between">
+                    <div class="flex items-center space-x-2.5 overflow-hidden">
+                        <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        <span class="text-xs font-bold text-gray-800 truncate">Protokol-Kerja-v1.pdf</span>
+                    </div>
+                    <span class="text-[9px] text-gray-400 font-semibold font-mono">820 KB</span>
+                </div>
+            `;
+        }
+
+        // Mengubah Berkas Unggulan di Tab 1 dari Daftar Rekomendasi
+        function selectFeaturedPreset(title, size, badge, url, owner) {
+            currentFeaturedFile = {
+                title: title,
+                size: size,
+                date: "Hari Ini",
+                badge: badge,
+                url: url,
+                type: title.includes('.pdf') ? 'document' : 'image',
+                owner: owner
+            };
+            
+            // Set statistik awal baru acak
+            featuredStats = {
+                likes: Math.floor(Math.random() * 50) + 10,
+                downloads: Math.floor(Math.random() * 30) + 5,
+                views: Math.floor(Math.random() * 100) + 60,
+                liked: false
+            };
+
+            // Set komentar awal acak
+            featuredComments = [
+                { author: owner, text: `Berkas ${title} resmi diunggah untuk referensi pengerjaan.` }
+            ];
+
+            localStorage.setItem('featured_file', JSON.stringify(currentFeaturedFile));
+            localStorage.setItem('featured_stats', JSON.stringify(featuredStats));
+            localStorage.setItem('featured_comments', JSON.stringify(featuredComments));
+            
+            renderFeaturedCard();
+        }
+
+        // Fungsi Pencarian Database Workspace Realtime
+        function handleDatabaseSearch() {
+            const val = document.getElementById('database-search-input').value.toLowerCase();
+            const recProfiles = document.getElementById('recommended-profiles-list');
+            const items = recProfiles.getElementsByTagName('div');
+
+            // Cari filter profil
+            for (let i = 0; i < items.length; i++) {
+                const nameText = items[i].getElementsByTagName('h5')[0];
+                if (nameText) {
+                    const txtValue = nameText.textContent || nameText.innerText;
+                    if (txtValue.toLowerCase().indexOf(val) > -1) {
+                        items[i].style.display = "";
+                    } else {
+                        items[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        // === LOGIKA SALURAN (TAB 2) ===
 
         function switchChannel(channelId) {
             activeChannel = channelId;
 
-            // Reset status aktif tombol sidebar
             const channels = ['pengumuman', 'daftar-tugas', 'link-penting'];
             channels.forEach(ch => {
                 const btn = document.getElementById(`chan-${ch}`);
                 if (ch === channelId) {
-                    btn.className = "w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm bg-indigo-50 text-indigo-700 font-bold transition";
+                    btn.className = "w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm bg-indigo-50 text-indigo-700 font-bold transition whitespace-nowrap md:whitespace-normal";
                     btn.querySelector('span').className = "mr-2 text-indigo-400 font-mono font-bold";
                 } else {
-                    btn.className = "w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition";
+                    btn.className = "w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition whitespace-nowrap md:whitespace-normal";
                     btn.querySelector('span').className = "mr-2 text-gray-400 font-mono";
                 }
             });
 
-            // Update Header Saluran
             document.getElementById('active-channel-title').textContent = channelDetails[channelId].title;
             document.getElementById('active-channel-desc').textContent = channelDetails[channelId].desc;
-
-            // Update Placeholder Input Komposer
             document.getElementById('feed-composer-text').placeholder = `Tulis pesan atau letakkan link baru di #${channelDetails[channelId].title}...`;
 
             renderFeed();
         }
 
-        // === POPUP PROFIL SINKRON ===
+        // === PENANGANAN UNGGAL BERKAS DARI KOMPOSER LINIMASA ===
 
-        function showProfilePopup(authorName) {
-            let user = usersDatabase[authorName];
-            if (!user) {
-                user = {
-                    username: "@" + authorName.toLowerCase().replace(/\s+/g, '_'),
-                    name: authorName,
-                    avatar: "https://via.placeholder.com/150",
-                    bio: "Pengguna aktif yang berkontribusi pada workspace AppSaya.",
-                    joined: "Juli 2026",
-                    followers: 12,
-                    following: 4,
-                    badges: ["Member"]
+        function handleComposerFileSelection() {
+            const input = document.getElementById('composer-file-selector');
+            const preview = document.getElementById('composer-file-preview');
+            const previewName = document.getElementById('composer-preview-name');
+
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                previewName.textContent = file.name;
+                preview.classList.remove('hidden');
+
+                const isImg = file.type.includes('image');
+                composerAttachedFile = {
+                    name: file.name,
+                    type: isImg ? 'image' : 'document',
+                    url: isImg ? URL.createObjectURL(file) : null
                 };
             }
-
-            document.getElementById('popup-avatar').src = user.avatar;
-            document.getElementById('popup-name').textContent = user.name;
-            document.getElementById('popup-username').textContent = user.username;
-            document.getElementById('popup-bio').textContent = user.bio;
-            document.getElementById('popup-followers').textContent = user.followers;
-            document.getElementById('popup-following').textContent = user.following;
-            document.getElementById('popup-joined').textContent = user.joined;
-
-            const badgeContainer = document.getElementById('popup-badges');
-            badgeContainer.innerHTML = '';
-            user.badges.forEach(badge => {
-                const badgeEl = document.createElement('span');
-                badgeEl.className = "px-2 py-0.5 text-[9px] font-extrabold uppercase rounded bg-indigo-500/30 text-indigo-300 border border-indigo-500/20";
-                badgeEl.textContent = badge;
-                badgeContainer.appendChild(badgeEl);
-            });
-
-            document.getElementById('profile-popup').classList.remove('hidden');
         }
 
-        function closeProfilePopup() {
-            document.getElementById('profile-popup').classList.add('hidden');
-        }
-
-        // === LOGIKA RENDER FEED LINIMASA ===
-
-        function syncComposerAvatar() {
-            const mainAvatar = document.getElementById('user-avatar');
-            const composerAvatar = document.getElementById('feed-composer-avatar');
-            const cardAvatar = document.getElementById('profile-card-avatar');
-            const cardName = document.getElementById('profile-card-name');
-            const cardUsername = document.getElementById('profile-card-username-display');
-            const headerName = document.getElementById('user-display-name');
-
-            const savedUsername = localStorage.getItem('user_discord_username') || "@anda_saya";
-            usersDatabase["Anda (Saya)"].username = savedUsername;
-
-            if (mainAvatar) {
-                if (composerAvatar) composerAvatar.src = mainAvatar.src;
-                if (cardAvatar) cardAvatar.src = mainAvatar.src;
-                document.getElementById('popup-avatar').src = mainAvatar.src;
-            }
-            if (cardName) cardName.textContent = "Anda (Saya)";
-            if (cardUsername) cardUsername.textContent = savedUsername;
-            if (headerName) headerName.textContent = `Anda (${savedUsername})`;
-        }
-
-        function renderFeed() {
-            const feedContainer = document.getElementById('feed-container');
-            if (!feedContainer) return;
-            
-            feedContainer.innerHTML = '';
-
-            // Filter postingan yang hanya milik Saluran aktif saat ini
-            const filteredPosts = appPosts.filter(p => (p.channel || 'pengumuman') === activeChannel);
-
-            if (filteredPosts.length === 0) {
-                feedContainer.innerHTML = `
-                    <div class="bg-white p-8 text-center rounded-2xl border border-gray-150 text-gray-400 text-sm">
-                        Belum ada postingan di saluran <strong class="text-indigo-600">#${activeChannel}</strong>. Jadilah yang pertama memposting!
-                    </div>
-                `;
-                return;
-            }
-
-            filteredPosts.forEach(post => {
-                const isSelf = post.author === "Anda (Saya)";
-                
-                let profileInfo = usersDatabase[post.author] || {
-                    username: "@" + post.author.toLowerCase().replace(/\s+/g, '_'),
-                    avatar: post.avatar || "https://via.placeholder.com/150"
-                };
-
-                const visibilityIcon = post.isPublic 
-                    ? `<svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM3.6 9h16.8M3.6 15h16.8M12 3v18"></path></svg>`
-                    : `<svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>`;
-                
-                const visibilityText = post.isPublic ? 'Publik' : 'Privat';
-
-                // Tampilan lampiran berkas anti-patah (object-contain di dalam bingkai terkontrol)
-                let attachmentHTML = '';
-                if (post.fileAttached) {
-                    if (post.fileAttached.type === 'image') {
-                        attachmentHTML = `
-                            <div class="mt-3 rounded-xl overflow-hidden border border-gray-150 max-h-72 bg-gray-100 flex items-center justify-center max-w-full">
-                                <img src="${post.fileAttached.url}" alt="Attachment" class="max-w-full h-auto max-h-72 object-contain rounded-xl">
-                            </div>
-                            <div class="mt-1 flex items-center space-x-1.5 text-xs text-indigo-600 font-semibold bg-indigo-50/50 p-2.5 rounded-lg border border-indigo-100">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                                <span class="truncate">${post.fileAttached.name}</span>
-                            </div>
-                        `;
-                    } else {
-                        attachmentHTML = `
-                            <div class="mt-3 flex items-center justify-between p-3.5 bg-gray-50 rounded-xl border border-gray-200">
-                                <div class="flex items-center space-x-3 overflow-hidden">
-                                    <svg class="w-5 h-5 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                    <span class="text-xs font-semibold text-gray-700 truncate">${post.fileAttached.name}</span>
-                                </div>
-                                <span class="text-[10px] text-gray-400 font-mono uppercase bg-gray-200/50 px-1.5 py-0.5 rounded">dokumen</span>
-                            </div>
-                        `;
-                    }
-                }
-
-                const followButtonHTML = isSelf ? '' : `
-                    <button onclick="toggleFollow(${post.id})" class="text-xs font-bold px-3 py-1 rounded-full border transition duration-200 ${post.isFollowing ? 'bg-gray-100 hover:bg-gray-200 border-gray-300 text-gray-700' : 'bg-indigo-600 hover:bg-indigo-700 border-indigo-600 text-white'}">
-                        ${post.isFollowing ? 'Mengikuti' : 'Ikuti'}
-                    </button>
-                `;
-
-                const likeColor = post.liked ? 'text-red-500 fill-red-500' : 'text-gray-400 group-hover:text-red-500';
-                const repostColor = post.reposted ? 'text-green-500' : 'text-gray-400 group-hover:text-green-500';
-
-                // Mengubah URL text mentah di dalam postingan menjadi link aktif secara otomatis
-                const linkedContent = post.content.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-indigo-600 hover:underline font-semibold">$1</a>');
-
-                const postHTML = `
-                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex space-x-4 relative hover:border-gray-200 transition">
-                        <img src="${profileInfo.avatar}" alt="Avatar" onclick="showProfilePopup('${post.author}')" class="w-10 h-10 rounded-full border border-gray-100 object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition duration-150">
-                        <div class="flex-grow space-y-2">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-2">
-                                    <span onclick="showProfilePopup('${post.author}')" class="text-sm font-bold text-gray-900 cursor-pointer hover:text-indigo-600 transition">${post.author}</span>
-                                    <span class="text-xs text-gray-400">${post.time}</span>
-                                    <span class="flex items-center space-x-0.5 px-1.5 py-0.5 bg-gray-50 rounded text-[9px] font-medium text-gray-500" title="Visibilitas">
-                                        ${visibilityIcon}
-                                        <span>${visibilityText}</span>
-                                    </span>
-                                </div>
-                                ${followButtonHTML}
-                            </div>
-                            <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">${linkedContent}</p>
-                            
-                            ${attachmentHTML}
-
-                            <!-- Aksi Sosial -->
-                            <div class="flex items-center space-x-8 pt-2.5 text-xs text-gray-400">
-                                <button class="flex items-center space-x-1.5 group hover:text-indigo-600 transition">
-                                    <svg class="w-4 h-4 group-hover:scale-110 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                                    <span class="font-medium">1</span>
-                                </button>
-                                <button onclick="toggleRepost(${post.id})" class="flex items-center space-x-1.5 group hover:text-green-500 transition ${repostColor}">
-                                    <svg class="w-4 h-4 group-hover:scale-110 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17m-.002-2h.002"></path></svg>
-                                    <span class="font-semibold">${post.reposts}</span>
-                                </button>
-                                <button onclick="toggleLike(${post.id})" class="flex items-center space-x-1.5 group hover:text-red-500 transition ${likeColor}">
-                                    <svg class="w-4 h-4 group-hover:scale-110 transition" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                    <span class="font-semibold">${post.likes}</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                feedContainer.insertAdjacentHTML('beforeend', postHTML);
-            });
-
-            // Sinkronisasi data statistik di dashboard utama
-            const statPosts = document.getElementById('stat-posts-count');
-            if (statPosts) statPosts.textContent = appPosts.length;
-        }
-
-        function toggleLike(postId) {
-            const post = appPosts.find(p => p.id === postId);
-            if (post) {
-                post.liked = !post.liked;
-                post.likes += post.liked ? 1 : -1;
-                savePostsToLocalStorage();
-                renderFeed();
-            }
-        }
-
-        function toggleRepost(postId) {
-            const post = appPosts.find(p => p.id === postId);
-            if (post) {
-                post.reposted = !post.reposted;
-                post.reposts += post.reposted ? 1 : -1;
-                savePostsToLocalStorage();
-                renderFeed();
-            }
-        }
-
-        function toggleFollow(postId) {
-            const post = appPosts.find(p => p.id === postId);
-            if (post) {
-                post.isFollowing = !post.isFollowing;
-                const followerStat = document.getElementById('stat-followers-count');
-                if (followerStat) {
-                    let current = parseInt(followerStat.textContent) || 0;
-                    followerStat.textContent = current + (post.isFollowing ? 1 : -1);
-                }
-                savePostsToLocalStorage();
-                renderFeed();
-            }
+        function clearComposerFile() {
+            const input = document.getElementById('composer-file-selector');
+            input.value = '';
+            composerAttachedFile = null;
+            document.getElementById('composer-file-preview').classList.add('hidden');
         }
 
         function createPostFromComposer() {
@@ -834,8 +958,8 @@
             const visibilitySelect = document.getElementById('feed-composer-visibility');
             const mainAvatar = document.getElementById('user-avatar');
 
-            if (!textarea.value.trim()) {
-                alert('Tulis pesan terlebih dahulu sebelum memposting!');
+            if (!textarea.value.trim() && !composerAttachedFile) {
+                alert('Tulis pesan atau pilih berkas terlebih dahulu!');
                 return;
             }
 
@@ -845,8 +969,8 @@
                 avatar: mainAvatar ? mainAvatar.src : "https://via.placeholder.com/150",
                 time: "Baru saja",
                 content: textarea.value,
-                fileAttached: null,
-                channel: activeChannel, // Otomatis mengelompokkan ke saluran yang sedang dibuka
+                fileAttached: composerAttachedFile ? { ...composerAttachedFile } : null,
+                channel: activeChannel,
                 isPublic: visibilitySelect.value === 'public',
                 likes: 0,
                 liked: false,
@@ -858,11 +982,12 @@
             appPosts.unshift(newPost);
             textarea.value = '';
             
+            clearComposerFile();
             savePostsToLocalStorage();
             renderFeed();
         }
 
-        // === KONTROL UNGGAL FILE (TAB 3) ===
+        // === LOGIKA PROSES UNGGAL TAB 3 ===
 
         function handleFileSelectionLocal() {
             const fileInput = document.getElementById('file-selector');
@@ -878,7 +1003,7 @@
                 currentSelectedFile = {
                     name: file.name,
                     type: isImg ? 'image' : 'document',
-                    url: isImg ? URL.createObjectURL(file) : null
+                    url: isImg ? URL.createObjectURL(file) : "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=600&q=80"
                 };
 
                 document.getElementById('upload-progress-container').classList.add('hidden');
@@ -941,14 +1066,14 @@
             const isPublic = (actionType === 'Bagikan' || actionType === 'Posting');
             
             let contentText = "";
-            let targetChannel = 'pengumuman'; // Default channel pengumuman
+            let targetChannel = 'pengumuman';
 
             if (actionType === 'Bagikan') {
                 contentText = `Membagikan berkas baru secara publik. Unduh berkas di bawah ini.`;
-                targetChannel = 'link-penting'; // Berkas bagikan otomatis masuk saluran link-penting
+                targetChannel = 'link-penting';
             } else if (actionType === 'Simpan') {
                 contentText = `Menyimpan arsip berkas pekerjaan baru di cloud.`;
-                targetChannel = 'daftar-tugas'; // Simpan privat masuk saluran daftar-tugas
+                targetChannel = 'daftar-tugas';
             } else {
                 contentText = `Memposting dokumen kerja terbaru di saluran pengumuman.`;
                 targetChannel = 'pengumuman';
@@ -971,7 +1096,27 @@
             };
 
             appPosts.unshift(newPost);
-            
+
+            // Perbarui berkas unggulan di Tab 1 secara cerdas agar langsung sinkron dengan hasil unggahan
+            currentFeaturedFile = {
+                title: currentSelectedFile.name,
+                size: "Berkas Baru",
+                date: "Hari Ini",
+                badge: currentSelectedFile.type === 'image' ? 'IMAGE FILE' : 'DOCUMENT',
+                url: currentSelectedFile.url,
+                type: currentSelectedFile.type,
+                owner: "Anda (Saya)"
+            };
+
+            // Set ulang interaksi
+            featuredStats = { likes: 0, downloads: 0, views: 1, liked: false };
+            featuredComments = [{ author: "Anda (Saya)", text: "Silakan kirimkan masukan mengenai dokumen yang baru saya unggah ini." }];
+
+            localStorage.setItem('featured_file', JSON.stringify(currentFeaturedFile));
+            localStorage.setItem('featured_stats', JSON.stringify(featuredStats));
+            localStorage.setItem('featured_comments', JSON.stringify(featuredComments));
+
+            // Perbarui statistik
             const fileStat = document.getElementById('stat-files-count');
             if (fileStat) {
                 let count = parseInt(fileStat.textContent) || 0;
@@ -981,14 +1126,36 @@
             clearSelectedFileLocal();
             savePostsToLocalStorage();
             renderFeed();
+            renderFeaturedCard();
 
-            // Pindah tab ke Linimasa dan set saluran yang dituju secara otomatis
+            // Pindahkan halaman ke Tab 1 (Ringkasan) secara halus untuk langsung melihat hasilnya
             setTimeout(() => {
                 if (typeof switchTab === "function") {
-                    switchTab('tasks');
-                    switchChannel(targetChannel);
+                    switchTab('overview');
                 }
             }, 1000);
+        }
+
+        // Tampilkan foto profil di popup kartu profil Discord
+        function syncComposerAvatar() {
+            const mainAvatar = document.getElementById('user-avatar');
+            const composerAvatar = document.getElementById('feed-composer-avatar');
+            const cardAvatar = document.getElementById('profile-card-avatar');
+            const cardName = document.getElementById('profile-card-name');
+            const cardUsername = document.getElementById('profile-card-username-display');
+            const headerName = document.getElementById('user-display-name');
+
+            const savedUsername = localStorage.getItem('user_discord_username') || "@anda_saya";
+            usersDatabase["Anda (Saya)"].username = savedUsername;
+
+            if (mainAvatar) {
+                if (composerAvatar) composerAvatar.src = mainAvatar.src;
+                if (cardAvatar) cardAvatar.src = mainAvatar.src;
+                document.getElementById('popup-avatar').src = mainAvatar.src;
+            }
+            if (cardName) cardName.textContent = "Anda (Saya)";
+            if (cardUsername) cardUsername.textContent = savedUsername;
+            if (headerName) headerName.textContent = `Anda (${savedUsername})`;
         }
     </script>
 </body>
