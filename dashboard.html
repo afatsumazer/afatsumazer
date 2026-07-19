@@ -23,8 +23,8 @@
         </div>
     </div>
 
-    <!-- === NAVIGASI BAWAH (MOBILE / HP) === -->
-    <div class="md:hidden fixed bottom-0 left-0 w-full bg-indigo-900 text-white h-16 z-40 flex justify-around items-center shadow-lg border-t border-indigo-850">
+    <!-- === NAVIGASI BAWAH (MOBILE / HP - AUTO HIDE ON SCROLL) === -->
+    <div class="md:hidden fixed bottom-0 left-0 w-full bg-indigo-900 text-white h-16 z-40 flex justify-around items-center shadow-lg border-t border-indigo-850 transition-transform duration-300 ease-in-out">
         <button onclick="switchTab('overview')" id="btn-overview-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg bg-indigo-800 text-white">
             <span class="text-[10px] font-medium">Ringkasan</span>
         </button>
@@ -39,40 +39,51 @@
         </button>
     </div>
 
-    <!-- === BILAH SAMPING / SIDEBAR (DESKTOP) === -->
-    <aside class="hidden md:flex fixed top-0 left-0 h-screen w-64 bg-indigo-900 text-white flex-col justify-between p-6 z-30 shadow-md">
-        <div>
-            <div class="mb-8">
-                <span class="text-2xl font-bold tracking-tight">AppSaya</span>
-                <p class="text-xs text-indigo-300">Workspace Dashboard</p>
-            </div>
-            <nav class="space-y-2">
-                <button onclick="switchTab('overview')" id="btn-overview" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg bg-indigo-800 text-white font-medium transition">
-                    <span>Ringkasan</span>
-                </button>
-                <button onclick="switchTab('tasks')" id="btn-tasks" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
-                    <span>Tugas Saya</span>
-                </button>
-                <button onclick="switchTab('files')" id="btn-files" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
-                    <span>Penyimpanan File</span>
-                </button>
-                <button onclick="switchTab('profile')" id="btn-profile" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
-                    <span>Profil Saya</span>
-                </button>
-            </nav>
+    <!-- === BILAH SAMPING / SIDEBAR (DESKTOP - AUTO HIDE & FLOAT) === -->
+    <aside class="hidden md:flex fixed top-0 left-0 h-screen w-64 bg-indigo-900 text-white flex-col justify-between p-6 z-35 shadow-md transition-all duration-300 ease-in-out -translate-x-[224px] hover:translate-x-0 group">
+        
+        <!-- Indikator Panah Saat Tersembunyi -->
+        <div class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none transition-all duration-300 group-hover:opacity-0 group-hover:translate-x-2">
+            <svg class="w-4 h-4 text-indigo-300 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
         </div>
-        <div class="pt-6 border-t border-indigo-800">
-            <button onclick="logout()" class="w-full text-left flex items-center px-4 py-2 text-red-300 hover:text-red-100 transition">
-                <span>Keluar Sesi</span>
-            </button>
+
+        <!-- Konten Sidebar (Memudar Masuk Saat Di-hover) -->
+        <div class="transition-opacity duration-200 opacity-0 group-hover:opacity-100 flex flex-col justify-between h-full w-full">
+            <div>
+                <div class="mb-8">
+                    <!-- Judul Tebal dengan Gradasi & Drop Shadow -->
+                    <span class="text-2xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-indigo-200 bold-shadow-title">AppSaya</span>
+                    <p class="text-[10px] text-indigo-300 uppercase tracking-widest mt-1">Workspace Dashboard</p>
+                </div>
+                <nav class="space-y-2">
+                    <button onclick="switchTab('overview')" id="btn-overview" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg bg-indigo-800 text-white font-medium transition">
+                        <span>Ringkasan</span>
+                    </button>
+                    <button onclick="switchTab('tasks')" id="btn-tasks" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
+                        <span>Tugas Saya</span>
+                    </button>
+                    <button onclick="switchTab('files')" id="btn-files" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
+                        <span>Penyimpanan File</span>
+                    </button>
+                    <button onclick="switchTab('profile')" id="btn-profile" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
+                        <span>Profil Saya</span>
+                    </button>
+                </nav>
+            </div>
+            <div class="pt-6 border-t border-indigo-800">
+                <button onclick="logout()" class="w-full text-left flex items-center px-4 py-2 text-red-300 hover:text-red-100 transition">
+                    <span>Keluar Sesi</span>
+                </button>
+            </div>
         </div>
     </aside>
 
-    <!-- === PANEL KONTEN UTAMA === -->
-    <div class="md:pl-64 flex flex-col min-h-screen pb-20 md:pb-0">
-        <!-- Header Atas -->
-        <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 md:px-8 shadow-sm">
-            <h2 id="page-title" class="text-xl font-bold text-gray-800">Ringkasan</h2>
+    <!-- === PANEL KONTEN UTAMA (pl-10 disesuaikan agar sisa sidebar muat) === -->
+    <div class="md:pl-10 flex flex-col min-h-screen pb-20 md:pb-0 transition-[padding] duration-300">
+        <!-- Header Atas (AUTO HIDE ON SCROLL) -->
+        <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-end px-6 md:px-8 shadow-sm sticky top-0 z-20 transition-transform duration-300 ease-in-out">
             <div class="flex items-center space-x-3">
                 <span id="user-display-name" class="text-sm font-medium text-gray-600">Memuat...</span>
                 <img id="user-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-8 h-8 rounded-full border border-gray-200 object-cover">
