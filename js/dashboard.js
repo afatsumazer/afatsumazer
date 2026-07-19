@@ -39,6 +39,17 @@ onAuthStateChanged(auth, (user) => {
 
     if (user) {
         userUID = user.uid;
+
+      if (user) {
+        userUID = user.uid;
+        
+        // SISIPAN: Mengarahkan klik header ke profil pribadi
+        const headerProfileBtn = document.getElementById('header-profile-btn');
+        if (headerProfileBtn) {
+            headerProfileBtn.onclick = () => {
+                window.location.href = `profil/index.html?uid=${userUID}`;
+            };
+        }
         
         // Membaca profil dari Realtime Database secara realtime
         const profileRef = ref(database, `users/${userUID}/profile`);
