@@ -145,7 +145,7 @@ document.getElementById('profile-form').addEventListener('submit', async functio
         }
 
         alert("Profil berhasil diperbarui!");
-        window.location.href = "index.html"; 
+        window.location.href = "dashboard.html"; 
     } catch (error) {
         alert("Gagal memperbarui profil: " + error.message);
     }
