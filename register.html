@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Pendaftaran - Afatsumazer App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Registrasi Akun</h2>
+    <form id="registerForm">
+        <div class="form-group">
+            <label for="fullName">Nama Lengkap</label>
+            <input type="text" id="fullName" placeholder="Masukkan nama lengkap" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="contoh@email.com" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Minimal 6 karakter" required minlength="6">
+        </div>
+        <button type="submit" id="submitBtn">Daftar</button>
+        <div class="message" id="message"></div>
+    </form>
+</div>
+
+<!-- Firebase Modular SDK -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // Konfigurasi Firebase milik Anda
+    const firebaseConfig = {
+        apiKey: "AIzaSyDg2b6LERZ2zE86mTiYvUO1Uj--lAtpmgM",
+        authDomain: "afatsumazer-app.firebaseapp.com",
+        databaseURL: "https://afatsumazer-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "afatsumazer-app",
+        storageBucket: "afatsumazer-app.firebasestorage.app",
+        messagingSenderId: "16280759060",
+        appId: "1:16280759060:web:fd4deacafdf5cadd777001",
+        measurementId: "G-WB9YW9D726"
+    };
+
+    // Inisialisasi Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // Menghubungkan elemen HTML
+    const registerForm = document.getElementById('registerForm');
+    const messageDiv = document.getElementById('message');
+
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const fullName = document.getElementById('fullName').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        messageDiv.style.color = "blue";
+        messageDiv.textContent = "Sedang mendaftarkan...";
+
+        try {
+            // 1. Daftarkan pengguna baru di Firebase Authentication
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // 2. Perbarui data nama profil pengguna di Firebase Auth
+            await updateProfile(user, {
+                displayName: fullName
+            });
+
+            // 3. Simpan data tambahan ke Firebase Realtime Database Anda
+            await set(ref(db, 'users/' + user.uid), {
+                uid: user.uid,
+                name: fullName,
+                email: email,
+                createdAt: new Date().toISOString()
+            });
+
+            messageDiv.style.color = "green";
+            messageDiv.textContent = "Registrasi berhasil!";
+            registerForm.reset();
+
+        } catch (error) {
+            console.error("Registrasi gagal:", error);
+            messageDiv.style.color = "red";
+            
+            // Penanganan error sederhana untuk pengguna
+            if (error.code === 'auth/email-already-in-use') {
+                messageDiv.textContent = "Email ini sudah terdaftar.";
+            } else if (error.code === 'auth/weak-password') {
+                messageDiv.textContent = "Password terlalu lemah (min. 6 karakter).";
+            } else if (error.code === 'auth/invalid-email') {
+                messageDiv.textContent = "Format email salah.";
+            } else {
+                messageDiv.textContent = "Error: " + error.message;
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
