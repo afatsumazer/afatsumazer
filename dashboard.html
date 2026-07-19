@@ -24,7 +24,6 @@
     </div>
 
     <!-- === NAVIGASI BAWAH (MOBILE / HP - AUTO HIDE ON SCROLL) === -->
-    <!-- Grid disesuaikan ke flex-1 untuk memuat 5 tombol secara rapi -->
     <div class="md:hidden fixed bottom-0 left-0 w-full bg-indigo-900 text-white h-16 z-40 flex justify-around items-center shadow-lg border-t border-indigo-850 transition-transform duration-300 ease-in-out">
         <button onclick="switchTab('overview')" id="btn-overview-mobile" class="flex flex-col items-center justify-center flex-1 h-12 rounded-lg bg-indigo-800 text-white">
             <span class="text-[10px] font-medium">Ringkasan</span>
@@ -32,7 +31,6 @@
         <button onclick="switchTab('tasks')" id="btn-tasks-mobile" class="flex flex-col items-center justify-center flex-1 h-12 rounded-lg text-indigo-200">
             <span class="text-[10px] font-medium">Tugas</span>
         </button>
-        <!-- SISIPAN BARU: Tombol Beranda Publik Mobile -->
         <button onclick="switchTab('public')" id="btn-public-mobile" class="flex flex-col items-center justify-center flex-1 h-12 rounded-lg text-indigo-200">
             <span class="text-[10px] font-medium">Publik</span>
         </button>
@@ -69,7 +67,6 @@
                     <button onclick="switchTab('tasks')" id="btn-tasks" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
                         <span>Tugas Saya</span>
                     </button>
-                    <!-- SISIPAN BARU: Menu Beranda Publik Desktop -->
                     <button onclick="switchTab('public')" id="btn-public" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
                         <span>Beranda Publik</span>
                     </button>
@@ -134,13 +131,12 @@
                         <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Tambah</button>
                     </form>
                     
-                    <!-- SISIPAN BARU: Info Petunjuk Kolaborasi -->
                     <div class="mb-4 p-3 bg-indigo-50 rounded-lg border border-indigo-100 text-xs text-indigo-900 font-medium">
                         💡 Klik penanggung jawab tugas (@user) untuk melihat profil publik mereka.
                     </div>
 
                     <ul id="task-list" class="space-y-3">
-                        <!-- Contoh Tugas Kolaboratif dari Pengguna Lain -->
+                        <!-- Contoh Tugas Kolaboratif -->
                         <li class="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition">
                             <span class="text-sm text-gray-700 font-medium">Revisi Arsitektur Sistem Informasi</span>
                             <button onclick="openOtherProfile('Budi Santoso', 'budi_santoso', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', 'System Architect', 'budi@appsaya.com')" class="text-xs text-indigo-600 font-semibold hover:underline bg-white px-2 py-1 rounded border border-gray-200 transition">
@@ -153,7 +149,6 @@
 
             <!-- TAB 3: PENYIMPANAN FILE -->
             <div id="tab-files" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Sisi Kiri: Daftar Folder -->
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
                     <div class="flex justify-between items-center">
                         <h4 class="text-sm font-bold text-gray-700 uppercase">Folder Saya</h4>
@@ -164,14 +159,12 @@
                     </ul>
                 </div>
 
-                <!-- Sisi Kanan: Area Upload & Daftar File -->
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm md:col-span-2 space-y-6">
                     <div>
                         <h3 class="text-lg font-bold">Penyimpanan File Aman</h3>
                         <p class="text-xs text-gray-500">Folder Aktif: <span id="active-folder-name" class="font-bold text-indigo-600">Utama</span></p>
                     </div>
 
-                    <!-- Input Upload File -->
                     <div class="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-indigo-400 transition">
                         <input type="file" id="file-selector" class="hidden" onchange="updateFileLabel()">
                         <label for="file-selector" class="cursor-pointer block">
@@ -183,7 +176,6 @@
                         </button>
                     </div>
 
-                    <!-- Tabel File -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 text-sm">
                             <thead class="bg-gray-50">
@@ -205,7 +197,6 @@
             <!-- TAB 4: PROFIL SAYA -->
             <div id="tab-profile" class="hidden space-y-6">
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-md text-center mx-auto">
-                    <!-- ONE-CLICK EDIT: Klik Foto atau Nama Langsung Buka Edit Profil -->
                     <div onclick="window.location.href='edit-profile.html'" class="group cursor-pointer">
                         <div class="relative inline-block">
                             <img id="profile-card-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-24 h-24 rounded-full border border-gray-200 mx-auto mb-4 object-cover group-hover:opacity-85 transition">
@@ -220,7 +211,6 @@
 
                     <p id="profile-card-email" class="text-sm text-gray-500 mt-1">user@email.com</p>
                     
-                    <!-- Tombol edit opsional di bawah -->
                     <div class="mt-4">
                         <a href="edit-profile.html" class="inline-block bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-4 py-2 rounded-lg text-xs font-semibold transition">
                             Ubah Detail Profil
@@ -234,7 +224,7 @@
                 </div>
             </div>
 
-            <!-- === TAB 5: BERANDA FILE PUBLIK (BARU) === -->
+            <!-- === TAB 5: BERANDA FILE PUBLIK === -->
             <div id="tab-public" class="hidden space-y-6">
                 <div>
                     <h3 class="text-lg font-bold">Beranda File Publik</h3>
@@ -246,7 +236,6 @@
                     <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                         <div>
                             <div class="flex items-center justify-between mb-4">
-                                <!-- Klik profil pengunggah -->
                                 <div onclick="openOtherProfile('Budi Santoso', 'budi_santoso', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', 'System Architect', 'budi@appsaya.com')" class="flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition">
                                     <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full object-cover border border-gray-200">
                                     <div>
@@ -297,13 +286,15 @@
                 </div>
             </div>
 
-            <!-- === TAB 6: PROFIL PENGGUNA LAIN (BARU - DINAMIS) === -->
+            <!-- === TAB 6: PROFIL PENGGUNA LAIN === -->
             <div id="tab-other-profile" class="hidden space-y-6">
-                <!-- Tombol kembali ke halaman sebelumnya -->
-                <button onclick="switchTab('tasks')" class="inline-flex items-center gap-2 text-xs text-indigo-600 font-semibold hover:underline">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <!-- Tautan kembali langsung ke berkas index.html -->
+                <a href="index.html" class="inline-flex items-center gap-2 text-xs text-indigo-600 font-semibold hover:underline">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
                     Kembali ke Daftar Tugas
-                </button>
+                </a>
 
                 <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden max-w-xl mx-auto">
                     <!-- Banner Minimalis -->
@@ -344,17 +335,17 @@
                     </div>
                 </div>
 
-                <!-- Bagian Berkas Milik Pengguna Ini -->
+                <!-- Berkas Milik Pengguna Ini -->
                 <div class="max-w-xl mx-auto">
                     <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">Berkas yang Dibagikan</h4>
-                    <div id="other-profile-shared-files" class="bg-white rounded-xl border border-gray-200 shadow-sm divide-y divide-gray-150">
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm divide-y divide-gray-150">
                         <div class="p-4 flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
                                 </div>
                                 <div>
-                                    <p id="other-profile-file-name" class="text-xs font-bold text-gray-800">Berkas_Pribadi_Publik.zip</p>
+                                    <p id="other-profile-file-name" class="text-xs font-bold text-gray-800 font-semibold text-gray-800">Berkas_Pribadi_Publik.zip</p>
                                     <p class="text-[10px] text-gray-400">Bagikan pekan ini • 1.2 MB</p>
                                 </div>
                             </div>
@@ -369,43 +360,81 @@
         </div>
     </div>
 
-    <!-- Script Pendukung Logika Interaksi Tab & Profil -->
+    <!-- === KODE JAVASCRIPT NAVIGASI & INTERAKSI === -->
     <script>
-        // Membuka Tampilan Profil Pengguna Lain secara Dinamis
+        const allTabs = ['overview', 'tasks', 'files', 'profile', 'public', 'other-profile'];
+
+        // Fungsi berpindah tab yang mendukung seluruh modul
+        function switchTab(tabId) {
+            allTabs.forEach(id => {
+                const element = document.getElementById(`tab-${id}`);
+                if (element) {
+                    element.classList.add('hidden');
+                }
+            });
+
+            const activeElement = document.getElementById(`tab-${tabId}`);
+            if (activeElement) {
+                activeElement.classList.remove('hidden');
+            }
+
+            // Ganti status kelas CSS pada tombol aktif & tidak aktif
+            const buttons = ['overview', 'tasks', 'files', 'profile', 'public'];
+            buttons.forEach(btn => {
+                const dBtn = document.getElementById(`btn-${btn}`);
+                const mBtn = document.getElementById(`btn-${btn}-mobile`);
+                
+                if (dBtn) {
+                    dBtn.className = "w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition";
+                }
+                if (mBtn) {
+                    mBtn.className = "flex flex-col items-center justify-center flex-1 h-12 rounded-lg text-indigo-200";
+                }
+            });
+
+            if (tabId !== 'other-profile') {
+                const activeDesktopBtn = document.getElementById(`btn-${tabId}`);
+                const activeMobileBtn = document.getElementById(`btn-${tabId}-mobile`);
+                
+                if (activeDesktopBtn) {
+                    activeDesktopBtn.className = "w-full text-left flex items-center px-4 py-2.5 rounded-lg bg-indigo-800 text-white font-medium transition";
+                }
+                if (activeMobileBtn) {
+                    activeMobileBtn.className = "flex flex-col items-center justify-center flex-1 h-12 rounded-lg bg-indigo-800 text-white";
+                }
+            }
+        }
+
+        // Buka detail profil dinamis pengguna lain
         function openOtherProfile(name, username, avatar, role, email) {
-            // Sembunyikan semua tab aktif saat ini
-            const tabs = ['overview', 'tasks', 'files', 'profile', 'public'];
-            tabs.forEach(tab => {
+            allTabs.forEach(tab => {
                 const el = document.getElementById('tab-' + tab);
                 if (el) el.classList.add('hidden');
             });
             
-            // Tampilkan tab profil pengguna lain
             document.getElementById('tab-other-profile').classList.remove('hidden');
 
-            // Isi informasi dinamis sesuai pengguna yang diklik
             document.getElementById('other-profile-avatar').src = avatar;
             document.getElementById('other-profile-name').innerText = name;
             document.getElementById('other-profile-username').innerText = '@' + username;
             document.getElementById('other-profile-role').innerText = role;
             document.getElementById('other-profile-email').innerText = email;
-            document.getElementById('other-profile-file-name').innerText = `Dokumen_Kerja_${name.replace(/\s+/g, '_')}.pdf`;
+            document.getElementById('other-profile-file-name').innerText = `Panduan_${name.replace(/\s+/g, '_')}_Shared.pdf`;
         }
 
-        // Toggle Mengikuti (Follow) & Batal Mengikuti (Unfollow)
+        // Fungsi Ikuti / Batal Mengikuti
         function toggleFollowUser(btn) {
             if (btn.innerText.trim() === "Ikuti") {
                 btn.innerText = "Mengikuti";
-                btn.className = "text-xs px-3 py-1.5 bg-indigo-100 text-indigo-800 font-semibold rounded-full hover:bg-indigo-200 transition";
+                btn.className = "text-xs px-2.5 py-1.5 bg-indigo-100 text-indigo-800 font-semibold rounded-full hover:bg-indigo-200 transition";
             } else {
                 btn.innerText = "Ikuti";
-                btn.className = "text-xs px-3 py-1 border border-indigo-600 text-indigo-600 font-semibold rounded-full hover:bg-indigo-50 transition";
+                btn.className = "text-xs px-2.5 py-1 border border-indigo-600 text-indigo-600 font-semibold rounded-full hover:bg-indigo-50 transition";
             }
         }
 
-        // Trigger Simulasi Pengunduhan Berkas Publik
+        // Tampilkan modal unduh bawaan Anda
         function triggerFileDownload(fileName) {
-            // Menampilkan modal bawaan Anda
             const modal = document.getElementById('share-modal');
             const modalFileName = document.getElementById('share-file-name');
             if (modal && modalFileName) {
@@ -413,9 +442,11 @@
                 modal.classList.remove('hidden');
             }
         }
+
+        window.switchTab = switchTab;
     </script>
 
-    <!-- Hubungkan ke JS eksternal -->
+    <!-- Hubungkan ke JS eksternal Anda untuk database & fungsionalitas core -->
     <script type="module" src="js/dashboard.js"></script>
 </body>
 </html>
