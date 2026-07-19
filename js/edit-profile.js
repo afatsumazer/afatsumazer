@@ -76,7 +76,7 @@ onAuthStateChanged(auth, (user) => {
         }).catch((error) => console.error("Gagal mengambil data profil:", error));
 
     } else {
-        window.location.href = "index.html"; 
+        window.location.href = "dashboard.html"; 
     }
 });
 
