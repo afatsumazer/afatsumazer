@@ -7,7 +7,7 @@
     <!-- Menggunakan Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Hubungkan ke file CSS di folder terpisah -->
-  <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
 
@@ -25,17 +25,23 @@
 
     <!-- === NAVIGASI BAWAH (MOBILE / HP - AUTO HIDE ON SCROLL) === -->
     <div class="md:hidden fixed bottom-0 left-0 w-full bg-indigo-900 text-white h-16 z-40 flex justify-around items-center shadow-lg border-t border-indigo-850 transition-transform duration-300 ease-in-out">
-        <button onclick="switchTab('overview')" id="btn-overview-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg bg-indigo-800 text-white">
-            <span class="text-[10px] font-medium">Ringkasan</span>
+        <button onclick="switchTab('overview')" id="btn-overview-mobile" class="flex flex-col items-center justify-center flex-1 py-1 rounded-lg bg-indigo-800 text-white">
+            <span class="text-[9px] font-medium">Ringkasan</span>
         </button>
-        <button onclick="switchTab('tasks')" id="btn-tasks-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg text-indigo-200">
-            <span class="text-[10px] font-medium">Tugas</span>
+        <button onclick="switchTab('tasks')" id="btn-tasks-mobile" class="flex flex-col items-center justify-center flex-1 py-1 text-indigo-200">
+            <span class="text-[9px] font-medium">Tugas</span>
         </button>
-        <button onclick="switchTab('files')" id="btn-files-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg text-indigo-200">
-            <span class="text-[10px] font-medium">Berkas</span>
+        <button onclick="switchTab('files')" id="btn-files-mobile" class="flex flex-col items-center justify-center flex-1 py-1 text-indigo-200">
+            <span class="text-[9px] font-medium">Berkas</span>
         </button>
-        <button onclick="switchTab('profile')" id="btn-profile-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg text-indigo-200">
-            <span class="text-[10px] font-medium">Profil</span>
+        <button onclick="switchTab('public-files')" id="btn-public-files-mobile" class="flex flex-col items-center justify-center flex-1 py-1 text-indigo-200">
+            <span class="text-[9px] font-medium">Publik</span>
+        </button>
+        <button onclick="switchTab('social')" id="btn-social-mobile" class="flex flex-col items-center justify-center flex-1 py-1 text-indigo-200">
+            <span class="text-[9px] font-medium">Sosial</span>
+        </button>
+        <button onclick="switchTab('profile')" id="btn-profile-mobile" class="flex flex-col items-center justify-center flex-1 py-1 text-indigo-200">
+            <span class="text-[9px] font-medium">Profil</span>
         </button>
     </div>
 
@@ -66,6 +72,12 @@
                     </button>
                     <button onclick="switchTab('files')" id="btn-files" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
                         <span>Penyimpanan File</span>
+                    </button>
+                    <button onclick="switchTab('public-files')" id="btn-public-files" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
+                        <span>File Publik</span>
+                    </button>
+                    <button onclick="switchTab('social')" id="btn-social" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
+                        <span>Sosial & Teman</span>
                     </button>
                     <button onclick="switchTab('profile')" id="btn-profile" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
                         <span>Profil Saya</span>
@@ -128,7 +140,7 @@
                 </div>
             </div>
 
-            <!-- TAB 3: PENYIMPANAN FILE -->
+            <!-- TAB 3: PENYIMPANAN FILE (DENGAN TOMBOL SHARE PUBLIK) -->
             <div id="tab-files" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 <!-- Sisi Kiri: Daftar Folder -->
@@ -167,12 +179,13 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left font-semibold text-gray-500">Nama File</th>
+                                    <th class="px-6 py-3 text-center font-semibold text-gray-500">Akses</th>
                                     <th class="px-6 py-3 text-right font-semibold text-gray-500">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="file-table-body" class="divide-y divide-gray-200">
                                 <tr>
-                                    <td colspan="2" class="px-6 py-4 text-center text-gray-400">Pilih folder di sebelah kiri terlebih dahulu.</td>
+                                    <td colspan="3" class="px-6 py-4 text-center text-gray-400">Pilih folder di sebelah kiri terlebih dahulu.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -180,7 +193,106 @@
                 </div>
             </div>
 
-            <!-- TAB 4: PROFIL SAYA -->
+            <!-- TAB NEW 4: EKSPLORASI FILE PUBLIK -->
+            <div id="tab-public-files" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="text-lg font-bold mb-1">Eksplorasi Berkas Publik</h3>
+                    <p class="text-xs text-gray-500 mb-6">Unduh berkas yang dibagikan secara bebas oleh pengguna lain di dalam jaringan AppSaya.</p>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left font-semibold text-gray-500">Nama File</th>
+                                    <th class="px-6 py-3 text-left font-semibold text-gray-500">Pemilik</th>
+                                    <th class="px-6 py-3 text-right font-semibold text-gray-500">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="public-file-table-body" class="divide-y divide-gray-200">
+                                <!-- Data File Publik Akan Dimuat Dinamis -->
+                                <tr>
+                                    <td colspan="3" class="px-6 py-4 text-center text-gray-400">Tidak ada file publik yang tersedia saat ini.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB NEW 5: SOSIAL & HALAMAN PROFIL DINAMIS -->
+            <div id="tab-social" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Sisi Kiri: Daftar Pengguna -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                    <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wider">Cari Pengguna</h4>
+                    <input type="text" id="search-users-input" placeholder="Masukkan nama..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <ul id="social-user-list" class="space-y-2 max-h-[350px] overflow-y-auto">
+                        <!-- Pengguna dimuat di sini -->
+                    </ul>
+                </div>
+
+                <!-- Sisi Kanan: Halaman Profil Statis & Media Sosial -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm md:col-span-2 space-y-6">
+                    <div id="empty-profile-placeholder" class="text-center py-12 text-gray-400">
+                        Pilih salah satu nama pengguna di sebelah kiri untuk berinteraksi.
+                    </div>
+
+                    <div id="social-profile-view" class="hidden space-y-6">
+                        <!-- Profil Singkat -->
+                        <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                            <img id="social-user-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-20 h-20 rounded-full border border-gray-200 object-cover">
+                            <div class="text-center sm:text-left space-y-2 flex-grow">
+                                <h3 id="social-user-name" class="text-xl font-bold text-gray-900">Nama Lengkap</h3>
+                                <p id="social-user-email" class="text-xs text-gray-500">user@email.com</p>
+                                
+                                <div class="flex flex-wrap gap-2 justify-center sm:justify-start pt-1">
+                                    <!-- Tombol Follow / Unfollow -->
+                                    <button id="btn-follow-user" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition">
+                                        Ikuti
+                                    </button>
+                                    <!-- Tombol Buka Obrolan -->
+                                    <button id="btn-open-chat" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-1.5 rounded-lg text-xs font-semibold transition">
+                                        Kirim Pesan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Pengikut & File -->
+                        <div class="grid grid-cols-3 gap-4 border-t border-b border-gray-100 py-4 text-center">
+                            <div>
+                                <span id="social-stat-followers" class="block text-lg font-bold text-gray-900">0</span>
+                                <span class="text-[10px] text-gray-400 uppercase font-semibold">Pengikut</span>
+                            </div>
+                            <div>
+                                <span id="social-stat-following" class="block text-lg font-bold text-gray-900">0</span>
+                                <span class="text-[10px] text-gray-400 uppercase font-semibold">Mengikuti</span>
+                            </div>
+                            <div>
+                                <span id="social-stat-files" class="block text-lg font-bold text-gray-900">0</span>
+                                <span class="text-[10px] text-gray-400 uppercase font-semibold">File Publik</span>
+                            </div>
+                        </div>
+
+                        <!-- Panel Chat (Private Message) -->
+                        <div id="private-chat-box" class="hidden border border-gray-200 rounded-xl overflow-hidden">
+                            <div class="bg-indigo-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+                                <span class="text-xs font-bold text-indigo-900">Pesan Pribadi ke <span id="chat-recipient-name">Pengguna</span></span>
+                                <button onclick="closeSocialChat()" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold">Tutup</button>
+                            </div>
+                            <div id="chat-messages-container" class="h-48 p-4 overflow-y-auto bg-gray-50 space-y-3 flex flex-col text-xs">
+                                <!-- Pesan Masuk & Keluar Dimuat di Sini -->
+                            </div>
+                            <form onsubmit="sendSocialMessage(event)" class="p-2 bg-white flex space-x-2 border-t border-gray-200">
+                                <input id="chat-message-input" type="text" placeholder="Tulis pesan pribadi..." required class="flex-grow px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-medium transition">Kirim</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 6: PROFIL SAYA -->
             <div id="tab-profile" class="hidden space-y-6">
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-md text-center mx-auto">
                     
