@@ -160,54 +160,96 @@
                 </div>
             </div>
 
-            <!-- TAB 3: PENYIMPANAN FILE -->
-            <div id="tab-files" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                <!-- Sisi Kiri: Daftar Folder -->
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h4 class="text-sm font-bold text-gray-700 uppercase">Folder Saya</h4>
-                        <button onclick="createFolder()" class="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-2 py-1 rounded font-semibold transition">+ Folder</button>
-                    </div>
-                    <ul id="folder-list" class="space-y-1">
-                        <!-- Dimuat otomatis -->
-                    </ul>
-                </div>
-
-                <!-- Sisi Kanan: Area Upload & Daftar File -->
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm md:col-span-2 space-y-6">
-                    <div>
-                        <h3 class="text-lg font-bold">Penyimpanan File Aman</h3>
-                        <p class="text-xs text-gray-500">Folder Aktif: <span id="active-folder-name" class="font-bold text-indigo-600">Utama</span></p>
+            <!-- TAB 3: PENYIMPANAN FILE (MODERN SINGLE DEDICATED UPLOAD VIEW) -->
+            <div id="tab-files" class="hidden max-w-xl mx-auto space-y-6">
+                <div class="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+                    <div class="text-center">
+                        <h3 class="text-xl font-bold text-gray-900">Unggah File Baru</h3>
+                        <p class="text-xs text-gray-400 mt-1">Unggah berkas Anda ke sistem penyimpanan cloud workspace</p>
                     </div>
 
-                    <!-- Input Upload File -->
-                    <div class="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-indigo-400 transition">
-                        <input type="file" id="file-selector" class="hidden" onchange="updateFileLabel()">
+                    <!-- Area Dropzone / Upload Box -->
+                    <div class="border-2 border-dashed border-indigo-200 hover:border-indigo-500 rounded-xl p-8 text-center bg-indigo-50/20 transition duration-200 relative group cursor-pointer">
+                        <input type="file" id="file-selector" class="hidden" onchange="handleFileSelectionLocal()">
                         <label for="file-selector" class="cursor-pointer block">
-                            <span id="file-label" class="text-sm text-gray-600 font-medium block">Pilih file dari komputer Anda...</span>
-                            <span class="text-xs text-gray-400 mt-1 block">Batas ukuran file disarankan maksimal 2 MB</span>
+                            <div class="mx-auto w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mb-3 group-hover:scale-105 transition duration-200">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                            </div>
+                            <span id="file-label-text" class="text-sm text-gray-700 font-medium block">Tarik & lepas berkas di sini, atau klik untuk memilih</span>
+                            <span class="text-xs text-gray-400 mt-1.5 block">Batas ukuran file disarankan maksimal 2 MB</span>
                         </label>
-                        <button onclick="uploadSelectedFile()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-                            Unggah ke Folder Ini
+                    </div>
+
+                    <!-- Detail Berkas yang Terpilih -->
+                    <div id="selected-file-container" class="hidden flex items-center justify-between p-3.5 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="flex items-center space-x-3 overflow-hidden">
+                            <svg class="w-5 h-5 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span id="selected-file-name" class="text-xs font-semibold text-gray-700 truncate">nama_file.pdf</span>
+                        </div>
+                        <button type="button" onclick="clearSelectedFileLocal()" class="text-gray-400 hover:text-red-500 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
                         </button>
                     </div>
 
-                    <!-- Tabel File -->
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 text-sm">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left font-semibold text-gray-500">Nama File</th>
-                                    <th class="px-6 py-3 text-right font-semibold text-gray-500">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="file-table-body" class="divide-y divide-gray-200">
-                                <tr>
-                                    <td colspan="2" class="px-6 py-4 text-center text-gray-400">Pilih folder di sebelah kiri terlebih dahulu.</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <!-- Bar Status Loading Progress -->
+                    <div id="upload-progress-container" class="hidden space-y-1.5">
+                        <div class="flex justify-between items-center text-xs">
+                            <span id="progress-status-label" class="text-indigo-600 font-semibold">Sedang mengunggah...</span>
+                            <span id="upload-progress-text" class="text-gray-500 font-bold">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-2">
+                            <div id="upload-progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-150" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Banner Notifikasi Selesai -->
+                    <div id="upload-notification" class="hidden flex items-center p-3.5 text-green-800 rounded-lg bg-green-50 border border-green-200 transition-all duration-300 animate-pulse" role="alert">
+                        <svg class="flex-shrink-0 w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div id="notification-message" class="text-xs font-semibold">
+                            Berhasil! Aksi unggah telah sukses dieksekusi.
+                        </div>
+                    </div>
+
+                    <!-- Baris Tombol Aksi Berlogo -->
+                    <div class="grid grid-cols-3 gap-3 pt-4 border-t border-gray-100">
+                        <!-- Tombol Bagikan -->
+                        <button onclick="executeActionWithLoading('Bagikan')" class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-200 bg-white hover:bg-indigo-50 hover:border-indigo-300 text-gray-700 hover:text-indigo-600 transition duration-200 group">
+                            <div class="p-2 rounded-lg bg-gray-50 group-hover:bg-indigo-100 text-gray-600 group-hover:text-indigo-600 transition mb-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 10.742l4.632-2.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316l4.632-2.316m-4.632 2.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684zm0-9.316a3 3 0 01-.782 1.632l-4.632 2.316m0 0a3 3 0 11-.782-4.516m0 4.516a3 3 0 00.782 1.632l4.632 2.316m0 0a3 3 0 10-.782-1.632"></path>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-semibold">Bagikan</span>
+                        </button>
+
+                        <!-- Tombol Simpan -->
+                        <button onclick="executeActionWithLoading('Simpan')" class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-200 bg-white hover:bg-indigo-50 hover:border-indigo-300 text-gray-700 hover:text-indigo-600 transition duration-200 group">
+                            <div class="p-2 rounded-lg bg-gray-50 group-hover:bg-indigo-100 text-gray-600 group-hover:text-indigo-600 transition mb-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-semibold">Simpan</span>
+                        </button>
+
+                        <!-- Tombol Posting Publik -->
+                        <button onclick="executeActionWithLoading('Posting Publik')" class="flex flex-col items-center justify-center p-3 rounded-xl border border-gray-200 bg-white hover:bg-indigo-50 hover:border-indigo-300 text-gray-700 hover:text-indigo-600 transition duration-200 group">
+                            <div class="p-2 rounded-lg bg-gray-50 group-hover:bg-indigo-100 text-gray-600 group-hover:text-indigo-600 transition mb-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.6 9h16.8M3.6 15h16.8M12 3v18"></path>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-semibold">Posting</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -250,5 +292,77 @@
 
     <!-- Hubungkan ke JS eksternal -->
     <script type="module" src="js/dashboard.js"></script>
+
+    <!-- Simulasi Fungsi Interaktif Unggah & Animasi Kemajuan -->
+    <script>
+        function handleFileSelectionLocal() {
+            const fileInput = document.getElementById('file-selector');
+            const fileContainer = document.getElementById('selected-file-container');
+            const fileNameSpan = document.getElementById('selected-file-name');
+            
+            if (fileInput.files.length > 0) {
+                fileNameSpan.textContent = fileInput.files[0].name;
+                fileContainer.classList.remove('hidden');
+                
+                // Reset status loading dan notifikasi sebelumnya jika ada file baru yang dipilih
+                document.getElementById('upload-progress-container').classList.add('hidden');
+                document.getElementById('upload-notification').classList.add('hidden');
+            }
+        }
+
+        function clearSelectedFileLocal() {
+            const fileInput = document.getElementById('file-selector');
+            fileInput.value = '';
+            document.getElementById('selected-file-container').classList.add('hidden');
+            document.getElementById('upload-progress-container').classList.add('hidden');
+            document.getElementById('upload-notification').classList.add('hidden');
+        }
+
+        function executeActionWithLoading(actionType) {
+            const fileInput = document.getElementById('file-selector');
+            
+            // Validasi apakah pengguna sudah memilih file
+            if (fileInput.files.length === 0) {
+                alert('Silakan pilih berkas terlebih dahulu sebelum melakukan aksi!');
+                return;
+            }
+
+            const progressContainer = document.getElementById('upload-progress-container');
+            const progressBar = document.getElementById('upload-progress-bar');
+            const progressText = document.getElementById('upload-progress-text');
+            const statusLabel = document.getElementById('progress-status-label');
+            const notification = document.getElementById('upload-notification');
+            const notificationMsg = document.getElementById('notification-message');
+
+            // Reset UI
+            notification.classList.add('hidden');
+            progressContainer.classList.remove('hidden');
+            statusLabel.textContent = `Sedang memproses "${actionType}"...`;
+            
+            let progressValue = 0;
+            progressBar.style.width = '0%';
+            progressText.textContent = '0%';
+
+            // Simulasi loading progress bar (0% s.d 100%)
+            const uploadInterval = setInterval(() => {
+                progressValue += 10;
+                progressBar.style.width = `${progressValue}%`;
+                progressText.textContent = `${progressValue}%`;
+
+                if (progressValue >= 100) {
+                    clearInterval(uploadInterval);
+                    
+                    // Menampilkan Notifikasi Sukses Sesuai Tombol yang Ditekan
+                    setTimeout(() => {
+                        notificationMsg.textContent = `Selesai! File "${fileInput.files[0].name}" berhasil diproses melalui aksi [${actionType}].`;
+                        notification.classList.remove('hidden');
+                        
+                        // Opsional: kosongkan input setelah proses selesai
+                        // clearSelectedFileLocal();
+                    }, 200);
+                }
+            }, 120); // Mengatur kecepatan loading bar
+        }
+    </script>
 </body>
 </html>
