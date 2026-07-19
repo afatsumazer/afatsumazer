@@ -113,6 +113,54 @@ const verifiedIcon = data.isVerified === true ? `
         window.location.href = "login.html";
     }
 });
+// 1. Definisikan daftar ID tab lengkap Anda
+const allTabs = ['overview', 'tasks', 'files', 'profile', 'public', 'other-profile'];
+
+export function switchTab(tabId) {
+    // 2. Sembunyikan seluruh tab container
+    allTabs.forEach(id => {
+        const element = document.getElementById(`tab-${id}`);
+        if (element) {
+            element.classList.add('hidden');
+        }
+    });
+
+    // 3. Tampilkan tab yang dipilih
+    const activeElement = document.getElementById(`tab-${tabId}`);
+    if (activeElement) {
+        activeElement.classList.remove('hidden');
+    }
+
+    // 4. Reset style semua tombol sidebar desktop & mobile Anda
+    const buttons = ['overview', 'tasks', 'files', 'profile', 'public'];
+    buttons.forEach(btn => {
+        const dBtn = document.getElementById(`btn-${btn}`);
+        const mBtn = document.getElementById(`btn-${btn}-mobile`);
+        
+        if (dBtn) {
+            dBtn.className = "w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition";
+        }
+        if (mBtn) {
+            mBtn.className = "flex flex-col items-center justify-center flex-1 h-12 rounded-lg text-indigo-200";
+        }
+    });
+
+    // 5. Berikan warna aktif pada tombol tab yang dipilih (jika bukan halaman profil orang lain)
+    if (tabId !== 'other-profile') {
+        const activeDesktopBtn = document.getElementById(`btn-${tabId}`);
+        const activeMobileBtn = document.getElementById(`btn-${tabId}-mobile`);
+        
+        if (activeDesktopBtn) {
+            activeDesktopBtn.className = "w-full text-left flex items-center px-4 py-2.5 rounded-lg bg-indigo-800 text-white font-medium transition";
+        }
+        if (activeMobileBtn) {
+            activeMobileBtn.className = "flex flex-col items-center justify-center flex-1 h-12 rounded-lg bg-indigo-800 text-white";
+        }
+    }
+}
+
+// Pastikan fungsi switchTab dapat dibaca oleh onclick di HTML Anda
+window.switchTab = switchTab;
 
 // ================= PENANGANAN LINK SHARE (BERBAGI FILE) =================
 function loadSharedFile(shareId) {
