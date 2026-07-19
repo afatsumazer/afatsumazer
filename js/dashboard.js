@@ -46,12 +46,20 @@ onAuthStateChanged(auth, (user) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 
-                // Siapkan icon centang biru jika isVerified === true
-                const verifiedIcon = data.isVerified === true ? `
-                    <svg class="w-5 h-5 text-blue-500 inline-block ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l5-5z" clip-rule="evenodd"></path>
-                    </svg>
-                ` : '';
+                // Siapkan icon centang biru dengan balon keterangan (Tooltip) saat disentuh/di-hover
+const verifiedIcon = data.isVerified === true ? `
+    <span class="relative group inline-flex items-center ml-1">
+        <!-- Ikon Centang Biru -->
+        <svg class="w-5 h-5 text-blue-500 cursor-help" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l5-5z" clip-rule="evenodd"></path>
+        </svg>
+        
+        <!-- Balon Keterangan (Tooltip) -->
+        <span class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-800 text-white text-[10px] font-bold px-2.5 py-1 rounded shadow-lg whitespace-nowrap z-50 pointer-events-none">
+            Akun Terverifikasi
+        </span>
+    </span>
+` : '';
 
                 // Siapkan badge Premium jika isPremium === true
                 const premiumBadge = data.isPremium === true ? `
