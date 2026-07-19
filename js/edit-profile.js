@@ -1,3 +1,4 @@
+console.log("File edit-profile.js berhasil dimuat!");
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getDatabase, ref, update, get, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
