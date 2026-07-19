@@ -45,3 +45,18 @@
 .dashboard-nav a.active {
   color: #3b82f6; 
 }
+
+/* ==========================================
+   EFEK BOLD, BAYANGAN & ANIMASI
+   ========================================== */
+
+/* Efek tebal dengan drop shadow premium */
+.bold-shadow-title {
+  font-weight: 900;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.45);
+}
+
+/* Transisi halus saat scroll menyembunyikan navigasi */
+header, .md\:hidden.fixed.bottom-0 {
+  will-change: transform;
+}
