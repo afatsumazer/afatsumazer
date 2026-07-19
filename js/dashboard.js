@@ -174,8 +174,12 @@ window.switchTab = function(tabName) {
         activeMBtn.classList.remove('text-indigo-200');
     }
 
-    const titles = { overview: 'Ringkasan', tasks: 'Tugas Saya', files: 'Penyimpanan File', profile: 'Profil Saya' };
-    document.getElementById('page-title').innerText = titles[tabName];
+    // Kode aman untuk mencegah tab macet saat elemen judul "page-title" dihapus di HTML
+    const pageTitleEl = document.getElementById('page-title');
+    if (pageTitleEl) {
+        const titles = { overview: 'Ringkasan', tasks: 'Tugas Saya', files: 'Penyimpanan File', profile: 'Profil Saya' };
+        pageTitleEl.innerText = titles[tabName];
+    }
 }
 
 // ================= LOGIKA TUGAS (TODO LIST) =================
@@ -430,3 +434,22 @@ window.logout = function() {
         alert("Gagal keluar sesi: " + error.message);
     });
 }
+
+// ================= AUTO-HIDE NAVIGASI & HEADER SAAT SCROLL (MOBILE) =================
+let lastScrollTop = 0;
+const header = document.querySelector('header');
+const mobileNav = document.querySelector('.md\\:hidden.fixed.bottom-0');
+
+window.addEventListener('scroll', () => {
+    let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    if (scrollTop > lastScrollTop && scrollTop > 60) {
+        // Scroll ke bawah -> Sembunyikan header atas & bar navigasi bawah
+        if (header) header.classList.add('-translate-y-full');
+        if (mobileNav) mobileNav.classList.add('translate-y-full');
+    } else {
+        // Scroll ke atas -> Munculkan kembali
+        if (header) header.classList.remove('-translate-y-full');
+        if (mobileNav) mobileNav.classList.remove('translate-y-full');
+    }
+    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+}, { passive: true });
