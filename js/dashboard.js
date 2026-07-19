@@ -138,7 +138,7 @@ window.downloadSharedFile = function() {
 
 window.closeShareModal = function() {
     document.getElementById('share-modal').classList.add('hidden');
-    window.location.href = "index.html";
+    window.location.href = "dashboard.html";
 }
 
 // ================= LOGIKA NAVIGASI TAB =================
