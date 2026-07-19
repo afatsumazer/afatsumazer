@@ -1,0 +1,47 @@
+/* ==========================================
+   EFEK BUBBLE UNTUK MENU DASHBOARD
+   ========================================== */
+
+/* 1. Pengaturan elemen link menu */
+.dashboard-nav a { 
+  position: relative;
+  overflow: hidden; /* Agar gelembung tidak keluar dari tombol */
+  z-index: 1;
+  display: block;
+  padding: 12px 20px;
+  text-decoration: none;
+  color: #64748b; /* Warna teks default */
+  border-radius: 8px; /* Sudut tumpul menu */
+  transition: color 0.3s ease;
+}
+
+/* 2. Gelembung tersembunyi di tengah tombol */
+.dashboard-nav a::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(59, 130, 246, 0.15); /* Warna gelembung biru transparan */
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  /* Transisi elastis agar terasa seperti gelembung membal */
+  transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: -1;
+}
+
+/* 3. Animasi gelembung saat menu di-hover atau aktif */
+.dashboard-nav a:hover::before, 
+.dashboard-nav a.active::before {
+  width: 150%;
+  height: 150%;
+  border-radius: 8px; /* Menyesuaikan dengan lekukan menu */
+}
+
+/* 4. Perubahan warna teks saat menu di-hover atau aktif */
+.dashboard-nav a:hover, 
+.dashboard-nav a.active {
+  color: #3b82f6; 
+}
