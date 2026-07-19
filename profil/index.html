@@ -1,0 +1,50 @@
+<!-- Tombol Interaksi -->
+                <div class="mt-4 flex justify-center space-x-2">
+                    <button id="btn-follow" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                        Ikuti
+                    </button>
+                    <!-- Tambahkan fungsi buka modal pesan -->
+                    <button onclick="openMessageModal()" class="border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold px-4 py-2 rounded-lg transition">
+                        Kirim Pesan
+                    </button>
+                </div>
+
+                <!-- Statistik Pengikut (Tambahkan onclick) -->
+                <div class="flex justify-center gap-8 mt-6 pt-6 border-t border-gray-100 text-xs text-gray-600">
+                    <div onclick="showFollowersList()" class="cursor-pointer hover:opacity-85 transition">
+                        <span id="other-followers-count" class="block font-bold text-gray-900 text-sm">0</span>
+                        <span>Pengikut</span>
+                    </div>
+                    <div onclick="showFollowingList()" class="cursor-pointer hover:opacity-85 transition">
+                        <span id="other-following-count" class="block font-bold text-gray-900 text-sm">0</span>
+                        <span>Diikuti</span>
+                    </div>
+                </div>
+                <!-- === MODAL DAFTAR USER (FOLLOWERS/FOLLOWING) === -->
+    <div id="relations-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-lg max-w-sm w-full overflow-hidden">
+            <div class="p-4 bg-indigo-900 text-white flex justify-between items-center">
+                <h3 id="relations-modal-title" class="text-sm font-bold">Daftar Pengguna</h3>
+                <button onclick="closeRelationsModal()" class="text-white hover:opacity-80">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="relations-modal-list" class="p-4 max-h-60 overflow-y-auto space-y-2.5 divide-y divide-gray-100">
+                <!-- Data pengguna dimuat secara dinamis -->
+            </div>
+        </div>
+    </div>
+
+    <!-- === MODAL FORMULIR KIRIM PESAN === -->
+    <div id="message-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full">
+            <h3 class="text-lg font-bold text-gray-900">Kirim Pesan</h3>
+            <p class="text-xs text-gray-500 mt-1">Kirim pesan langsung ke <span id="message-target-name" class="font-bold text-indigo-600"></span></p>
+            <textarea id="message-input" rows="3" placeholder="Tulis pesan Anda di sini..." class="w-full mt-3 p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+            <div class="mt-4 flex space-x-2 justify-end">
+                <button onclick="sendMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">Kirim</button>
+                <button onclick="closeMessageModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs font-semibold px-4 py-2 rounded-lg transition">Batal</button>
+            </div>
+        </div>
+    </div>
+</body>
