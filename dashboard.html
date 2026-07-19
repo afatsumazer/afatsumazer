@@ -7,7 +7,7 @@
     <!-- Menggunakan Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Hubungkan ke file CSS di folder terpisah -->
-  <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
 
@@ -24,17 +24,22 @@
     </div>
 
     <!-- === NAVIGASI BAWAH (MOBILE / HP - AUTO HIDE ON SCROLL) === -->
+    <!-- Grid disesuaikan ke flex-1 untuk memuat 5 tombol secara rapi -->
     <div class="md:hidden fixed bottom-0 left-0 w-full bg-indigo-900 text-white h-16 z-40 flex justify-around items-center shadow-lg border-t border-indigo-850 transition-transform duration-300 ease-in-out">
-        <button onclick="switchTab('overview')" id="btn-overview-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg bg-indigo-800 text-white">
+        <button onclick="switchTab('overview')" id="btn-overview-mobile" class="flex flex-col items-center justify-center flex-1 h-12 rounded-lg bg-indigo-800 text-white">
             <span class="text-[10px] font-medium">Ringkasan</span>
         </button>
-        <button onclick="switchTab('tasks')" id="btn-tasks-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg text-indigo-200">
+        <button onclick="switchTab('tasks')" id="btn-tasks-mobile" class="flex flex-col items-center justify-center flex-1 h-12 rounded-lg text-indigo-200">
             <span class="text-[10px] font-medium">Tugas</span>
         </button>
-        <button onclick="switchTab('files')" id="btn-files-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg text-indigo-200">
+        <!-- SISIPAN BARU: Tombol Beranda Publik Mobile -->
+        <button onclick="switchTab('public')" id="btn-public-mobile" class="flex flex-col items-center justify-center flex-1 h-12 rounded-lg text-indigo-200">
+            <span class="text-[10px] font-medium">Publik</span>
+        </button>
+        <button onclick="switchTab('files')" id="btn-files-mobile" class="flex flex-col items-center justify-center flex-1 h-12 rounded-lg text-indigo-200">
             <span class="text-[10px] font-medium">Berkas</span>
         </button>
-        <button onclick="switchTab('profile')" id="btn-profile-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg text-indigo-200">
+        <button onclick="switchTab('profile')" id="btn-profile-mobile" class="flex flex-col items-center justify-center flex-1 h-12 rounded-lg text-indigo-200">
             <span class="text-[10px] font-medium">Profil</span>
         </button>
     </div>
@@ -64,6 +69,10 @@
                     <button onclick="switchTab('tasks')" id="btn-tasks" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
                         <span>Tugas Saya</span>
                     </button>
+                    <!-- SISIPAN BARU: Menu Beranda Publik Desktop -->
+                    <button onclick="switchTab('public')" id="btn-public" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
+                        <span>Beranda Publik</span>
+                    </button>
                     <button onclick="switchTab('files')" id="btn-files" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
                         <span>Penyimpanan File</span>
                     </button>
@@ -80,7 +89,7 @@
         </div>
     </aside>
 
-    <!-- === PANEL KONTEN UTAMA (pl-10 disesuaikan agar sisa sidebar muat) === -->
+    <!-- === PANEL KONTEN UTAMA === -->
     <div class="md:pl-10 flex flex-col min-h-screen pb-20 md:pb-0 transition-[padding] duration-300">
         <!-- Header Atas (AUTO HIDE ON SCROLL) -->
         <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-end px-6 md:px-8 shadow-sm sticky top-0 z-20 transition-transform duration-300 ease-in-out">
@@ -124,13 +133,26 @@
                         <input id="task-input" type="text" placeholder="Tulis rencana tugas baru..." required class="flex-grow px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Tambah</button>
                     </form>
-                    <ul id="task-list" class="space-y-3"></ul>
+                    
+                    <!-- SISIPAN BARU: Info Petunjuk Kolaborasi -->
+                    <div class="mb-4 p-3 bg-indigo-50 rounded-lg border border-indigo-100 text-xs text-indigo-900 font-medium">
+                        💡 Klik penanggung jawab tugas (@user) untuk melihat profil publik mereka.
+                    </div>
+
+                    <ul id="task-list" class="space-y-3">
+                        <!-- Contoh Tugas Kolaboratif dari Pengguna Lain -->
+                        <li class="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition">
+                            <span class="text-sm text-gray-700 font-medium">Revisi Arsitektur Sistem Informasi</span>
+                            <button onclick="openOtherProfile('Budi Santoso', 'budi_santoso', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', 'System Architect', 'budi@appsaya.com')" class="text-xs text-indigo-600 font-semibold hover:underline bg-white px-2 py-1 rounded border border-gray-200 transition">
+                                @budi_santoso
+                            </button>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
             <!-- TAB 3: PENYIMPANAN FILE -->
             <div id="tab-files" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-                
                 <!-- Sisi Kiri: Daftar Folder -->
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
                     <div class="flex justify-between items-center">
@@ -183,7 +205,6 @@
             <!-- TAB 4: PROFIL SAYA -->
             <div id="tab-profile" class="hidden space-y-6">
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-md text-center mx-auto">
-                    
                     <!-- ONE-CLICK EDIT: Klik Foto atau Nama Langsung Buka Edit Profil -->
                     <div onclick="window.location.href='edit-profile.html'" class="group cursor-pointer">
                         <div class="relative inline-block">
@@ -213,8 +234,186 @@
                 </div>
             </div>
 
+            <!-- === TAB 5: BERANDA FILE PUBLIK (BARU) === -->
+            <div id="tab-public" class="hidden space-y-6">
+                <div>
+                    <h3 class="text-lg font-bold">Beranda File Publik</h3>
+                    <p class="text-xs text-gray-500">Unduh berkas bersama dan ikuti pengguna lain di dalam workspace ini.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Kartu File Publik 1 -->
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <!-- Klik profil pengunggah -->
+                                <div onclick="openOtherProfile('Budi Santoso', 'budi_santoso', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', 'System Architect', 'budi@appsaya.com')" class="flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full object-cover border border-gray-200">
+                                    <div>
+                                        <span class="text-xs font-bold block text-gray-800 hover:text-indigo-600">@budi_santoso</span>
+                                        <span class="text-[10px] text-gray-400 block">3 jam lalu</span>
+                                    </div>
+                                </div>
+                                <button onclick="toggleFollowUser(this)" class="text-xs px-2.5 py-1 border border-indigo-600 text-indigo-600 font-semibold rounded-full hover:bg-indigo-50 transition">
+                                    Ikuti
+                                </button>
+                            </div>
+                            <h4 class="font-bold text-gray-900 text-sm mb-1">Panduan_Arsitektur_Sistem_v2.pdf</h4>
+                            <p class="text-xs text-gray-500 mb-4 line-clamp-2">Dokumentasi arsitektur database, diagram alur sistem informasi, dan konfigurasi API gateway.</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                            <span class="text-[10px] text-gray-400"><span class="font-medium">Ukuran:</span> 8.4 MB</span>
+                            <button onclick="triggerFileDownload('Panduan_Arsitektur_Sistem_v2.pdf')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                                Unduh
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Kartu File Publik 2 -->
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div onclick="openOtherProfile('Dewi Lestari', 'dewi_lestari', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', 'Frontend Developer', 'dewi@appsaya.com')" class="flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition">
+                                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full object-cover border border-gray-200">
+                                    <div>
+                                        <span class="text-xs font-bold block text-gray-800 hover:text-indigo-600">@dewi_lestari</span>
+                                        <span class="text-[10px] text-gray-400 block">Kemarin</span>
+                                    </div>
+                                </div>
+                                <button onclick="toggleFollowUser(this)" class="text-xs px-2.5 py-1 border border-indigo-600 text-indigo-600 font-semibold rounded-full hover:bg-indigo-50 transition">
+                                    Ikuti
+                                </button>
+                            </div>
+                            <h4 class="font-bold text-gray-900 text-sm mb-1">Tailwind_Components_Library.zip</h4>
+                            <p class="text-xs text-gray-500 mb-4 line-clamp-2">Kumpulan potongan kode komponen UI interaktif siap pakai yang dibangun dengan Tailwind CSS.</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                            <span class="text-[10px] text-gray-400"><span class="font-medium">Ukuran:</span> 14.5 MB</span>
+                            <button onclick="triggerFileDownload('Tailwind_Components_Library.zip')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                                Unduh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- === TAB 6: PROFIL PENGGUNA LAIN (BARU - DINAMIS) === -->
+            <div id="tab-other-profile" class="hidden space-y-6">
+                <!-- Tombol kembali ke halaman sebelumnya -->
+                <button onclick="switchTab('tasks')" class="inline-flex items-center gap-2 text-xs text-indigo-600 font-semibold hover:underline">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Kembali ke Daftar Tugas
+                </button>
+
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden max-w-xl mx-auto">
+                    <!-- Banner Minimalis -->
+                    <div class="h-24 bg-gradient-to-r from-indigo-800 to-indigo-950"></div>
+                    
+                    <div class="p-6 relative text-center">
+                        <!-- Avatar Profil -->
+                        <div class="relative -mt-16 mb-4 flex justify-center">
+                            <img id="other-profile-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-20 h-20 rounded-full border-4 border-white object-cover shadow-md bg-white">
+                        </div>
+
+                        <h3 id="other-profile-name" class="text-lg font-bold text-gray-900">Nama Pengguna</h3>
+                        <p id="other-profile-username" class="text-xs text-gray-500 mt-0.5">@username</p>
+                        <p id="other-profile-role" class="text-xs text-indigo-700 bg-indigo-50 font-semibold inline-block px-2.5 py-0.5 rounded-full mt-2">Spesialisasi</p>
+                        <p id="other-profile-email" class="text-xs text-gray-400 mt-1">user@email.com</p>
+
+                        <!-- Tombol Interaksi -->
+                        <div class="mt-4 flex justify-center space-x-2">
+                            <button onclick="toggleFollowUser(this)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                                Ikuti
+                            </button>
+                            <button class="border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold px-4 py-2 rounded-lg transition">
+                                Kirim Pesan
+                            </button>
+                        </div>
+
+                        <!-- Data Pengikut -->
+                        <div class="flex justify-center gap-8 mt-6 pt-6 border-t border-gray-100 text-xs text-gray-600">
+                            <div>
+                                <span class="block font-bold text-gray-900 text-sm">345</span>
+                                <span>Pengikut</span>
+                            </div>
+                            <div>
+                                <span class="block font-bold text-gray-900 text-sm">189</span>
+                                <span>Diikuti</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bagian Berkas Milik Pengguna Ini -->
+                <div class="max-w-xl mx-auto">
+                    <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">Berkas yang Dibagikan</h4>
+                    <div id="other-profile-shared-files" class="bg-white rounded-xl border border-gray-200 shadow-sm divide-y divide-gray-150">
+                        <div class="p-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
+                                </div>
+                                <div>
+                                    <p id="other-profile-file-name" class="text-xs font-bold text-gray-800">Berkas_Pribadi_Publik.zip</p>
+                                    <p class="text-[10px] text-gray-400">Bagikan pekan ini • 1.2 MB</p>
+                                </div>
+                            </div>
+                            <button onclick="triggerFileDownload('Berkas_Pribadi_Publik.zip')" class="text-gray-500 hover:text-indigo-600 p-2 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
+
+    <!-- Script Pendukung Logika Interaksi Tab & Profil -->
+    <script>
+        // Membuka Tampilan Profil Pengguna Lain secara Dinamis
+        function openOtherProfile(name, username, avatar, role, email) {
+            // Sembunyikan semua tab aktif saat ini
+            const tabs = ['overview', 'tasks', 'files', 'profile', 'public'];
+            tabs.forEach(tab => {
+                const el = document.getElementById('tab-' + tab);
+                if (el) el.classList.add('hidden');
+            });
+            
+            // Tampilkan tab profil pengguna lain
+            document.getElementById('tab-other-profile').classList.remove('hidden');
+
+            // Isi informasi dinamis sesuai pengguna yang diklik
+            document.getElementById('other-profile-avatar').src = avatar;
+            document.getElementById('other-profile-name').innerText = name;
+            document.getElementById('other-profile-username').innerText = '@' + username;
+            document.getElementById('other-profile-role').innerText = role;
+            document.getElementById('other-profile-email').innerText = email;
+            document.getElementById('other-profile-file-name').innerText = `Dokumen_Kerja_${name.replace(/\s+/g, '_')}.pdf`;
+        }
+
+        // Toggle Mengikuti (Follow) & Batal Mengikuti (Unfollow)
+        function toggleFollowUser(btn) {
+            if (btn.innerText.trim() === "Ikuti") {
+                btn.innerText = "Mengikuti";
+                btn.className = "text-xs px-3 py-1.5 bg-indigo-100 text-indigo-800 font-semibold rounded-full hover:bg-indigo-200 transition";
+            } else {
+                btn.innerText = "Ikuti";
+                btn.className = "text-xs px-3 py-1 border border-indigo-600 text-indigo-600 font-semibold rounded-full hover:bg-indigo-50 transition";
+            }
+        }
+
+        // Trigger Simulasi Pengunduhan Berkas Publik
+        function triggerFileDownload(fileName) {
+            // Menampilkan modal bawaan Anda
+            const modal = document.getElementById('share-modal');
+            const modalFileName = document.getElementById('share-file-name');
+            if (modal && modalFileName) {
+                modalFileName.innerText = fileName;
+                modal.classList.remove('hidden');
+            }
+        }
+    </script>
 
     <!-- Hubungkan ke JS eksternal -->
     <script type="module" src="js/dashboard.js"></script>
