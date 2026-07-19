@@ -11,16 +11,16 @@
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
 
-    <!-- === POPUP DETAIL PROFIL PERSONAL (MODAL OVERLAY GAYA DISCORD) === -->
+    <!-- === POPUP DETAIL PROFIL PERSONAL (MODAL OVERLAY SINKRON) === -->
     <div id="profile-popup" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-        <div class="bg-indigo-950 text-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-indigo-800 animate-in fade-in zoom-in-95 duration-150">
+        <div class="bg-slate-900 text-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-800 animate-in fade-in zoom-in-95 duration-150">
             <!-- Banner Kartu -->
             <div class="h-24 bg-gradient-to-r from-indigo-600 to-indigo-800 relative"></div>
             <!-- Detail Profil -->
             <div class="px-6 pb-6 relative">
                 <!-- Avatar Bergeser ke Atas -->
                 <div class="absolute -top-12 left-6">
-                    <img id="popup-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-20 h-20 rounded-full border-4 border-indigo-950 object-cover bg-white">
+                    <img id="popup-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-20 h-20 rounded-full border-4 border-slate-900 object-cover bg-white">
                 </div>
                 <div class="pt-10 space-y-4">
                     <div class="flex justify-between items-start">
@@ -28,34 +28,34 @@
                             <h4 id="popup-name" class="text-lg font-bold">Nama Pengguna</h4>
                             <p id="popup-username" class="text-xs text-indigo-300">@username_unik</p>
                         </div>
-                        <!-- Badge Badges/Lencana Discord-like -->
+                        <!-- Badge/Lencana Akses -->
                         <div id="popup-badges" class="flex space-x-1.5">
                             <!-- Dimuat dinamis -->
                         </div>
                     </div>
-                    <hr class="border-indigo-905 opacity-20">
+                    <hr class="border-slate-800 opacity-40">
                     <div>
-                        <p class="text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Tentang Saya</p>
-                        <p id="popup-bio" class="text-xs text-gray-300 mt-1 leading-relaxed">Bio info...</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tentang Saya</p>
+                        <p id="popup-bio" class="text-xs text-slate-300 mt-1 leading-relaxed">Bio info...</p>
                     </div>
                     <!-- Statistik Pengikut -->
-                    <div class="grid grid-cols-2 gap-4 text-center py-2.5 bg-indigo-900/40 rounded-xl border border-indigo-900/40">
+                    <div class="grid grid-cols-2 gap-4 text-center py-2.5 bg-slate-800/50 rounded-xl border border-slate-800/40">
                         <div>
                             <p id="popup-followers" class="text-sm font-bold">0</p>
-                            <p class="text-[9px] text-indigo-300 uppercase tracking-widest">Pengikut</p>
+                            <p class="text-[9px] text-slate-400 uppercase tracking-widest">Pengikut</p>
                         </div>
                         <div>
                             <p id="popup-following" class="text-sm font-bold">0</p>
-                            <p class="text-[9px] text-indigo-300 uppercase tracking-widest">Mengikuti</p>
+                            <p class="text-[9px] text-slate-400 uppercase tracking-widest">Mengikuti</p>
                         </div>
                     </div>
                     <!-- Info Tambahan -->
-                    <div class="text-[10px] text-indigo-400 flex justify-between items-center">
+                    <div class="text-[10px] text-slate-400 flex justify-between items-center">
                         <span>Bergabung: <strong id="popup-joined">Juli 2026</strong></span>
-                        <span class="px-2 py-0.5 bg-indigo-900/60 rounded text-indigo-300 font-mono text-[9px]">ID Terverifikasi</span>
+                        <span class="px-2 py-0.5 bg-slate-800 rounded text-indigo-300 font-mono text-[9px]">Workspace ID</span>
                     </div>
                     <div class="pt-2">
-                        <button onclick="closeProfilePopup()" class="w-full bg-indigo-800 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-xs font-semibold transition">Tutup Profil</button>
+                        <button onclick="closeProfilePopup()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-xs font-semibold transition">Tutup Profil</button>
                     </div>
                 </div>
             </div>
@@ -163,7 +163,7 @@
         </div>
     </aside>
 
-    <!-- === PANEL KONTEN UTAMA (pl-10 disesuaikan agar sisa sidebar muat) === -->
+    <!-- === PANEL KONTEN UTAMA === -->
     <div class="md:pl-10 flex flex-col min-h-screen pb-20 md:pb-0 transition-[padding] duration-300">
         <!-- Header Atas (AUTO HIDE ON SCROLL) -->
         <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-end px-6 md:px-8 shadow-sm sticky top-0 z-20 transition-transform duration-300 ease-in-out">
@@ -177,25 +177,26 @@
         <!-- Area Konten Utama -->
         <div class="p-6 md:p-8 flex-grow">
 
-            <!-- TAB 1: OVERVIEW (DILINDUNGI OLEH GERBANG OTORISASI DISCORD) -->
+            <!-- TAB 1: OVERVIEW (DILINDUNGI OLEH GERBANG OTORISASI PROFESIONAL) -->
             <div id="tab-overview" class="space-y-6">
                 
-                <!-- GERBANG MASUK KODE UNIK GAYA DISCORD -->
-                <div id="overview-gate" class="bg-indigo-950 text-white rounded-2xl p-8 border border-indigo-800 text-center space-y-6 max-w-md mx-auto shadow-xl">
+                <!-- GERBANG MASUK KODE UNIK DENGAN LOGO PORTAL KEAMANAN -->
+                <div id="overview-gate" class="bg-slate-900 text-white rounded-2xl p-8 border border-slate-800 text-center space-y-6 max-w-md mx-auto shadow-xl">
                     <div class="mx-auto w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                        <svg class="w-9 h-9" fill="currentColor" viewBox="0 0 127.14 96.36">
-                            <path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,67.43,67.43,0,0,1-10.5-5c.88-.65,1.72-1.34,2.51-2a75.58,75.58,0,0,0,73,0c.79.71,1.63,1.4,2.51,2a67.43,67.43,0,0,1-10.5,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31-18.83C129.87,48.42,123.6,25.68,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/>
+                        <!-- Ikon Kunci Portal Keamanan -->
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                         </svg>
                     </div>
                     <div class="space-y-2">
-                        <h3 class="text-xl font-extrabold tracking-tight">Otorisasi Akun</h3>
-                        <p class="text-xs text-indigo-200">Masukkan <strong>@Kode-Unik</strong> Anda untuk mengakses Dashboard Workspace.</p>
+                        <h3 class="text-xl font-extrabold tracking-tight">Otorisasi Workspace</h3>
+                        <p class="text-xs text-slate-300">Masukkan <strong>@Kode-Unik</strong> Anda untuk mengakses Dashboard Workspace.</p>
                     </div>
                     <div class="space-y-3">
-                        <input type="text" id="gate-code-input" placeholder="@KODE-DISCORD" class="w-full px-4 py-3 bg-indigo-900 border border-indigo-700 rounded-xl text-center font-mono text-sm tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500 uppercase">
+                        <input type="text" id="gate-code-input" placeholder="@KODE-WORKSPACE" class="w-full px-4 py-3 bg-slate-850 border border-slate-700 rounded-xl text-center font-mono text-sm tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500 uppercase">
                         <button onclick="verifyGateCode()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-bold text-sm transition shadow-lg shadow-indigo-600/20">Akses Masuk</button>
                     </div>
-                    <p class="text-[10px] text-indigo-400">Gunakan kode bawaan: <code class="bg-indigo-900 px-1 py-0.5 rounded text-indigo-200">@APPSAYA</code></p>
+                    <p class="text-[10px] text-slate-400">Gunakan kode bawaan: <code class="bg-slate-800 px-1.5 py-0.5 rounded text-indigo-300 font-mono">@APPSAYA</code></p>
                 </div>
 
                 <!-- TAMPILAN DASHBOARD (HIDDEN SECARA DEFAULT SEBELUM LOGIN) -->
@@ -225,32 +226,71 @@
                 </div>
             </div>
 
-            <!-- TAB 2: LINIMASA / FEED SOSIAL -->
-            <div id="tab-tasks" class="hidden max-w-2xl mx-auto space-y-6">
-                <!-- Komposer Postingan (Tulis Post Baru) -->
-                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex space-x-4">
-                    <img id="feed-composer-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-10 h-10 rounded-full border border-gray-200 object-cover flex-shrink-0 cursor-pointer" onclick="showProfilePopup('Anda (Saya)')">
-                    <div class="flex-grow space-y-3">
-                        <textarea id="feed-composer-text" placeholder="Apa yang sedang terjadi hari ini?" rows="3" class="w-full text-sm border-0 focus:ring-0 focus:outline-none resize-none placeholder-gray-400" required></textarea>
-                        <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                            <!-- Pilihan Visibilitas -->
-                            <div class="flex items-center space-x-2">
-                                <label for="feed-composer-visibility" class="sr-only">Visibilitas</label>
-                                <select id="feed-composer-visibility" class="text-xs font-semibold text-gray-500 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg py-1 px-2.5 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
-                                    <option value="public">🌐 Publik</option>
-                                    <option value="private">🔒 Privat</option>
-                                </select>
-                            </div>
-                            <button onclick="createPostFromComposer()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-1.5 rounded-full text-xs font-bold transition">
-                                Posting
+            <!-- TAB 2: LINIMASA DAN KELOMPOK KERJA (STRUKTUR GAYA DISCORD GRUP) -->
+            <div id="tab-tasks" class="hidden space-y-6 max-w-5xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    
+                    <!-- SIDEBAR SALURAN/CHANNEL (GAYA DISCORD GRUP) -->
+                    <div class="md:col-span-1 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between text-xs font-extrabold text-gray-400 uppercase tracking-widest px-2">
+                            <span>Workspace Grup</span>
+                            <span class="text-indigo-600 hover:text-indigo-800 cursor-pointer text-sm" title="Tambah Saluran">+</span>
+                        </div>
+                        <div class="space-y-1" id="discord-channel-list">
+                            <!-- Tombol Saluran Pengumuman -->
+                            <button onclick="switchChannel('pengumuman')" id="chan-pengumuman" class="w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm bg-indigo-50 text-indigo-700 font-bold transition">
+                                <span class="mr-2 text-indigo-400 font-mono font-bold">#</span> pengumuman
+                            </button>
+                            <!-- Tombol Saluran Daftar Pekerjaan -->
+                            <button onclick="switchChannel('daftar-tugas')" id="chan-daftar-tugas" class="w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                                <span class="mr-2 text-gray-400 font-mono">#</span> daftar-tugas
+                            </button>
+                            <!-- Tombol Saluran Link Penting -->
+                            <button onclick="switchChannel('link-penting')" id="chan-link-penting" class="w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                                <span class="mr-2 text-gray-400 font-mono">#</span> link-penting
                             </button>
                         </div>
                     </div>
-                </div>
 
-                <!-- Kontainer Feed Linimasa (Daftar Postingan) -->
-                <div id="feed-container" class="space-y-4">
-                    <!-- Postingan dimuat dinamis -->
+                    <!-- AREA UTAMA POSTINGAN & KOMPOSER (GAYA TWITTER/DISCORD CHAT) -->
+                    <div class="md:col-span-3 space-y-4">
+                        
+                        <!-- Header Saluran Aktif -->
+                        <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex items-center space-x-3">
+                            <span class="text-2xl text-gray-400 font-bold font-mono">#</span>
+                            <div>
+                                <h3 id="active-channel-title" class="text-base font-extrabold text-gray-900 leading-tight">pengumuman</h3>
+                                <p id="active-channel-desc" class="text-[11px] text-gray-500 mt-0.5">Ruang informasi resmi dan pengumuman umum workspace.</p>
+                            </div>
+                        </div>
+
+                        <!-- Komposer Postingan (Tulis Post Baru) -->
+                        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex space-x-4">
+                            <img id="feed-composer-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-10 h-10 rounded-full border border-gray-200 object-cover flex-shrink-0 cursor-pointer" onclick="showProfilePopup('Anda (Saya)')">
+                            <div class="flex-grow space-y-3">
+                                <textarea id="feed-composer-text" placeholder="Bagikan pengumuman atau selipkan tautan pekerjaan baru di sini..." rows="3" class="w-full text-sm border-0 focus:ring-0 focus:outline-none resize-none placeholder-gray-400" required></textarea>
+                                <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                                    <!-- Pilihan Visibilitas -->
+                                    <div class="flex items-center space-x-2">
+                                        <label for="feed-composer-visibility" class="sr-only">Visibilitas</label>
+                                        <select id="feed-composer-visibility" class="text-xs font-semibold text-gray-500 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg py-1 px-2.5 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition cursor-pointer">
+                                            <option value="public">🌐 Publik</option>
+                                            <option value="private">🔒 Privat</option>
+                                        </select>
+                                    </div>
+                                    <button onclick="createPostFromComposer()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-1.5 rounded-full text-xs font-bold transition">
+                                        Posting
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kontainer Feed Linimasa (Daftar Postingan yang Terfilter) -->
+                        <div id="feed-container" class="space-y-4">
+                            <!-- Postingan dimuat dinamis -->
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -348,16 +388,16 @@
                 </div>
             </div>
 
-            <!-- TAB 4: PROFIL SAYA -->
+            <!-- TAB 4: PROFIL SAYA (MENU UBHA DETAIL PROFIL TETAP DIPERTAHANKAN) -->
             <div id="tab-profile" class="hidden space-y-6">
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-md text-center mx-auto">
                     
-                    <!-- ONE-CLICK VIEW DISCORD CARD: Klik Langsung Membuka Popup Profil -->
-                    <div onclick="showProfilePopup('Anda (Saya)')" class="group cursor-pointer">
+                    <!-- EDIT DETAIL PROFIL: Klik Gambar Buka Halaman Edit -->
+                    <div onclick="window.location.href='edit-profile.html'" class="group cursor-pointer">
                         <div class="relative inline-block">
                             <img id="profile-card-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-24 h-24 rounded-full border border-gray-200 mx-auto mb-4 object-cover group-hover:opacity-85 transition">
-                            <div class="absolute bottom-4 right-0 bg-indigo-600 text-white p-1 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition duration-200">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <div class="absolute bottom-4 right-0 bg-indigo-600 text-white p-1.5 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition duration-200">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                                 </svg>
                             </div>
@@ -367,10 +407,13 @@
 
                     <p id="profile-card-username-display" class="text-sm text-indigo-600 mt-1 font-mono">@username</p>
                     
-                    <!-- Tombol intip kartu profil -->
-                    <div class="mt-4">
+                    <!-- Tombol Edit Profil dan Kartu Profil -->
+                    <div class="mt-5 flex items-center justify-center space-x-2">
+                        <a href="edit-profile.html" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">
+                            Ubah Detail Profil
+                        </a>
                         <button onclick="showProfilePopup('Anda (Saya)')" class="inline-block bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-4 py-2 rounded-lg text-xs font-semibold transition">
-                            Intip Kartu Discord
+                            Intip Kartu Profil
                         </button>
                     </div>
 
@@ -388,9 +431,9 @@
     <!-- Hubungkan ke JS eksternal -->
     <script type="module" src="js/dashboard.js"></script>
 
-    <!-- Script Utama untuk Integrasi Upload, Postingan, Otorisasi, dan Fitur Sosial Twitter-Like -->
+    <!-- Script Utama Integrasi Sosial & Persistensi Data -->
     <script>
-        // Database Profil Pengguna yang Sinkron (Email tidak ditampilkan demi privasi)
+        // Database Profil Pengguna Sinkron
         let usersDatabase = {
             "Anda (Saya)": {
                 username: localStorage.getItem('user_discord_username') || "@anda_saya",
@@ -424,7 +467,26 @@
             }
         };
 
-        // Inisialisasi Database Postingan Awal
+        // Saluran Aktif saat ini
+        let activeChannel = 'pengumuman';
+
+        // Deskripsi Saluran
+        const channelDetails = {
+            'pengumuman': {
+                title: 'pengumuman',
+                desc: 'Ruang informasi resmi dan pengumuman umum grup.'
+            },
+            'daftar-tugas': {
+                title: 'daftar-tugas',
+                desc: 'Daftar rincian pekerjaan, tugas harian, dan pembaruan tugas.'
+            },
+            'link-penting': {
+                title: 'link-penting',
+                desc: 'Kumpulan tautan proyek, link eksternal, dan dokumen penting.'
+            }
+        };
+
+        // Postingan Bawaan dengan kategori Saluran
         let defaultPosts = [
             {
                 id: 1,
@@ -433,6 +495,7 @@
                 time: "2 jam yang lalu",
                 content: "Baru saja menyelesaikan draf desain UI untuk proyek AppSaya! Bagaimana menurut kalian? 🚀",
                 fileAttached: { name: "UI-Draft-v2.jpg", type: "image", url: "https://images.unsplash.com/photo-1541462608141-27b2c7452167?auto=format&fit=crop&w=600&q=80" },
+                channel: "pengumuman",
                 isPublic: true,
                 likes: 42,
                 liked: false,
@@ -445,8 +508,9 @@
                 author: "Budi Santoso",
                 avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
                 time: "5 jam yang lalu",
-                content: "Catatan internal mengenai pembaruan keamanan database bulan depan. Jangan disebarluaskan ya.",
-                fileAttached: { name: "Security-Notes.pdf", type: "document" },
+                content: "Berikut link dokumen backup keamanan database internal. Tolong ditinjau kembali ya: https://drive.google.com/drive/folders/test",
+                fileAttached: null,
+                channel: "link-penting",
                 isPublic: false,
                 likes: 8,
                 liked: false,
@@ -459,7 +523,6 @@
         let appPosts = [];
         let currentSelectedFile = null;
 
-        // Inisialisasi saat pertama kali halaman dimuat
         document.addEventListener('DOMContentLoaded', () => {
             loadGateState();
             loadPostsFromLocalStorage();
@@ -467,7 +530,7 @@
             renderFeed();
         });
 
-        // === FITUR OTORISASI DISCORD-LIKE GATEWAY ===
+        // === OTORISASI GATEWAY ===
 
         function loadGateState() {
             const isVerified = localStorage.getItem('discord_code_verified') === 'true';
@@ -492,11 +555,9 @@
                 return;
             }
 
-            // Simpan kode unik tersebut sebagai identitas Discord pengguna
             localStorage.setItem('discord_code_verified', 'true');
             localStorage.setItem('user_discord_username', code.toLowerCase());
             
-            // Perbarui username pengguna utama di database
             usersDatabase["Anda (Saya)"].username = code.toLowerCase();
 
             loadGateState();
@@ -511,7 +572,7 @@
             loadGateState();
         }
 
-        // === FITUR PERSISTENSI POSTINGAN LOCALSTORAGE ===
+        // === PERSISTENSI LOCALSTORAGE ===
 
         function loadPostsFromLocalStorage() {
             const localData = localStorage.getItem('appPosts_data');
@@ -527,13 +588,39 @@
             localStorage.setItem('appPosts_data', JSON.stringify(appPosts));
         }
 
-        // === FITUR POPUP PROFIL SINKRON (TANPA EMAIL) ===
+        // === PERPINDAHAN SALURAN GAYA DISCORD ===
+
+        function switchChannel(channelId) {
+            activeChannel = channelId;
+
+            // Reset status aktif tombol sidebar
+            const channels = ['pengumuman', 'daftar-tugas', 'link-penting'];
+            channels.forEach(ch => {
+                const btn = document.getElementById(`chan-${ch}`);
+                if (ch === channelId) {
+                    btn.className = "w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm bg-indigo-50 text-indigo-700 font-bold transition";
+                    btn.querySelector('span').className = "mr-2 text-indigo-400 font-mono font-bold";
+                } else {
+                    btn.className = "w-full text-left flex items-center px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition";
+                    btn.querySelector('span').className = "mr-2 text-gray-400 font-mono";
+                }
+            });
+
+            // Update Header Saluran
+            document.getElementById('active-channel-title').textContent = channelDetails[channelId].title;
+            document.getElementById('active-channel-desc').textContent = channelDetails[channelId].desc;
+
+            // Update Placeholder Input Komposer
+            document.getElementById('feed-composer-text').placeholder = `Tulis pesan atau letakkan link baru di #${channelDetails[channelId].title}...`;
+
+            renderFeed();
+        }
+
+        // === POPUP PROFIL SINKRON ===
 
         function showProfilePopup(authorName) {
-            // Selesaikan fallback jika nama author tidak dikenal
             let user = usersDatabase[authorName];
             if (!user) {
-                // Jika author baru dari user lain dibuat dinamis
                 user = {
                     username: "@" + authorName.toLowerCase().replace(/\s+/g, '_'),
                     name: authorName,
@@ -546,7 +633,6 @@
                 };
             }
 
-            // Atur properti di dalam modal kartu Discord
             document.getElementById('popup-avatar').src = user.avatar;
             document.getElementById('popup-name').textContent = user.name;
             document.getElementById('popup-username').textContent = user.username;
@@ -555,7 +641,6 @@
             document.getElementById('popup-following').textContent = user.following;
             document.getElementById('popup-joined').textContent = user.joined;
 
-            // Render Badges
             const badgeContainer = document.getElementById('popup-badges');
             badgeContainer.innerHTML = '';
             user.badges.forEach(badge => {
@@ -565,7 +650,6 @@
                 badgeContainer.appendChild(badgeEl);
             });
 
-            // Tampilkan Modal Popup
             document.getElementById('profile-popup').classList.remove('hidden');
         }
 
@@ -573,7 +657,7 @@
             document.getElementById('profile-popup').classList.add('hidden');
         }
 
-        // === FITUR DAN ALUR INTERAKSI FEED LINIMASA ===
+        // === LOGIKA RENDER FEED LINIMASA ===
 
         function syncComposerAvatar() {
             const mainAvatar = document.getElementById('user-avatar');
@@ -583,7 +667,6 @@
             const cardUsername = document.getElementById('profile-card-username-display');
             const headerName = document.getElementById('user-display-name');
 
-            // Set username dynamic
             const savedUsername = localStorage.getItem('user_discord_username') || "@anda_saya";
             usersDatabase["Anda (Saya)"].username = savedUsername;
 
@@ -603,10 +686,21 @@
             
             feedContainer.innerHTML = '';
 
-            appPosts.forEach(post => {
+            // Filter postingan yang hanya milik Saluran aktif saat ini
+            const filteredPosts = appPosts.filter(p => (p.channel || 'pengumuman') === activeChannel);
+
+            if (filteredPosts.length === 0) {
+                feedContainer.innerHTML = `
+                    <div class="bg-white p-8 text-center rounded-2xl border border-gray-150 text-gray-400 text-sm">
+                        Belum ada postingan di saluran <strong class="text-indigo-600">#${activeChannel}</strong>. Jadilah yang pertama memposting!
+                    </div>
+                `;
+                return;
+            }
+
+            filteredPosts.forEach(post => {
                 const isSelf = post.author === "Anda (Saya)";
                 
-                // Cari profil actual dari database atau fallback untuk merender nama/avatar yang sinkron
                 let profileInfo = usersDatabase[post.author] || {
                     username: "@" + post.author.toLowerCase().replace(/\s+/g, '_'),
                     avatar: post.avatar || "https://via.placeholder.com/150"
@@ -618,17 +712,17 @@
                 
                 const visibilityText = post.isPublic ? 'Publik' : 'Privat';
 
-                // Tampilan lampiran berkas
+                // Tampilan lampiran berkas anti-patah (object-contain di dalam bingkai terkontrol)
                 let attachmentHTML = '';
                 if (post.fileAttached) {
                     if (post.fileAttached.type === 'image') {
                         attachmentHTML = `
-                            <div class="mt-3 rounded-xl overflow-hidden border border-gray-100 max-h-80 bg-gray-50">
-                                <img src="${post.fileAttached.url}" alt="Attachment" class="w-full h-full object-cover">
+                            <div class="mt-3 rounded-xl overflow-hidden border border-gray-150 max-h-72 bg-gray-100 flex items-center justify-center max-w-full">
+                                <img src="${post.fileAttached.url}" alt="Attachment" class="max-w-full h-auto max-h-72 object-contain rounded-xl">
                             </div>
                             <div class="mt-1 flex items-center space-x-1.5 text-xs text-indigo-600 font-semibold bg-indigo-50/50 p-2.5 rounded-lg border border-indigo-100">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                                <span>${post.fileAttached.name}</span>
+                                <span class="truncate">${post.fileAttached.name}</span>
                             </div>
                         `;
                     } else {
@@ -644,7 +738,6 @@
                     }
                 }
 
-                // Tombol Follow
                 const followButtonHTML = isSelf ? '' : `
                     <button onclick="toggleFollow(${post.id})" class="text-xs font-bold px-3 py-1 rounded-full border transition duration-200 ${post.isFollowing ? 'bg-gray-100 hover:bg-gray-200 border-gray-300 text-gray-700' : 'bg-indigo-600 hover:bg-indigo-700 border-indigo-600 text-white'}">
                         ${post.isFollowing ? 'Mengikuti' : 'Ikuti'}
@@ -654,9 +747,11 @@
                 const likeColor = post.liked ? 'text-red-500 fill-red-500' : 'text-gray-400 group-hover:text-red-500';
                 const repostColor = post.reposted ? 'text-green-500' : 'text-gray-400 group-hover:text-green-500';
 
+                // Mengubah URL text mentah di dalam postingan menjadi link aktif secara otomatis
+                const linkedContent = post.content.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-indigo-600 hover:underline font-semibold">$1</a>');
+
                 const postHTML = `
                     <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex space-x-4 relative hover:border-gray-200 transition">
-                        <!-- Foto profil dapat diklik untuk memicu popup detail profil -->
                         <img src="${profileInfo.avatar}" alt="Avatar" onclick="showProfilePopup('${post.author}')" class="w-10 h-10 rounded-full border border-gray-100 object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition duration-150">
                         <div class="flex-grow space-y-2">
                             <div class="flex items-center justify-between">
@@ -670,7 +765,7 @@
                                 </div>
                                 ${followButtonHTML}
                             </div>
-                            <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">${post.content}</p>
+                            <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">${linkedContent}</p>
                             
                             ${attachmentHTML}
 
@@ -700,7 +795,6 @@
             if (statPosts) statPosts.textContent = appPosts.length;
         }
 
-        // Fitur Like
         function toggleLike(postId) {
             const post = appPosts.find(p => p.id === postId);
             if (post) {
@@ -711,7 +805,6 @@
             }
         }
 
-        // Fitur Repost
         function toggleRepost(postId) {
             const post = appPosts.find(p => p.id === postId);
             if (post) {
@@ -722,7 +815,6 @@
             }
         }
 
-        // Fitur Follow
         function toggleFollow(postId) {
             const post = appPosts.find(p => p.id === postId);
             if (post) {
@@ -737,14 +829,13 @@
             }
         }
 
-        // Tulis & Tambah Postingan Baru lewat Komposer Feed
         function createPostFromComposer() {
             const textarea = document.getElementById('feed-composer-text');
             const visibilitySelect = document.getElementById('feed-composer-visibility');
             const mainAvatar = document.getElementById('user-avatar');
 
             if (!textarea.value.trim()) {
-                alert('Tulis sesuatu terlebih dahulu sebelum memposting!');
+                alert('Tulis pesan terlebih dahulu sebelum memposting!');
                 return;
             }
 
@@ -755,6 +846,7 @@
                 time: "Baru saja",
                 content: textarea.value,
                 fileAttached: null,
+                channel: activeChannel, // Otomatis mengelompokkan ke saluran yang sedang dibuka
                 isPublic: visibilitySelect.value === 'public',
                 likes: 0,
                 liked: false,
@@ -770,7 +862,7 @@
             renderFeed();
         }
 
-        // === FUNGSI LOGIKA UNGGAL FILE (TAB 3) ===
+        // === KONTROL UNGGAL FILE (TAB 3) ===
 
         function handleFileSelectionLocal() {
             const fileInput = document.getElementById('file-selector');
@@ -849,12 +941,17 @@
             const isPublic = (actionType === 'Bagikan' || actionType === 'Posting');
             
             let contentText = "";
+            let targetChannel = 'pengumuman'; // Default channel pengumuman
+
             if (actionType === 'Bagikan') {
-                contentText = `Membagikan berkas baru secara publik kepada semua pengguna.`;
+                contentText = `Membagikan berkas baru secara publik. Unduh berkas di bawah ini.`;
+                targetChannel = 'link-penting'; // Berkas bagikan otomatis masuk saluran link-penting
             } else if (actionType === 'Simpan') {
-                contentText = `Menyimpan arsip dokumen baru secara privat di cloud.`;
+                contentText = `Menyimpan arsip berkas pekerjaan baru di cloud.`;
+                targetChannel = 'daftar-tugas'; // Simpan privat masuk saluran daftar-tugas
             } else {
-                contentText = `Memposting dokumen kerja terbaru di ruang publik.`;
+                contentText = `Memposting dokumen kerja terbaru di saluran pengumuman.`;
+                targetChannel = 'pengumuman';
             }
 
             const newPost = {
@@ -864,6 +961,7 @@
                 time: "Baru saja",
                 content: contentText,
                 fileAttached: currentSelectedFile ? { ...currentSelectedFile } : null,
+                channel: targetChannel,
                 isPublic: isPublic,
                 likes: 0,
                 liked: false,
@@ -874,7 +972,6 @@
 
             appPosts.unshift(newPost);
             
-            // Perbarui stat di dashboard
             const fileStat = document.getElementById('stat-files-count');
             if (fileStat) {
                 let count = parseInt(fileStat.textContent) || 0;
@@ -885,10 +982,11 @@
             savePostsToLocalStorage();
             renderFeed();
 
-            // Pindahkan halaman ke Tab Linimasa secara otomatis
+            // Pindah tab ke Linimasa dan set saluran yang dituju secara otomatis
             setTimeout(() => {
                 if (typeof switchTab === "function") {
                     switchTab('tasks');
+                    switchChannel(targetChannel);
                 }
             }, 1000);
         }
