@@ -6,7 +6,7 @@
     <title>Edit Profil - AppSaya</title>
     <!-- Menggunakan Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Google Inter untuk tampilan modern & clean -->
+    <!-- Font Google Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -20,7 +20,7 @@
 
     <div class="bg-white rounded-2xl border border-slate-100 shadow-xl shadow-slate-100/50 max-w-md w-full overflow-hidden">
         
-        <!-- Header Halaman dengan Gradasi Halus -->
+        <!-- Header Halaman -->
         <div class="p-6 pb-4 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
             <div>
                 <h2 class="text-lg font-bold text-slate-900">Ubah Profil</h2>
@@ -50,7 +50,7 @@
                 <!-- Area Tampilan Nama + Lencana -->
                 <div class="flex items-center justify-center mt-3 space-x-1">
                     <span id="preview-name" class="font-bold text-slate-800 text-sm">Memuat nama...</span>
-                    <!-- Centang Biru (Disembunyikan default, muncul via JS) -->
+                    <!-- Centang Biru -->
                     <span id="badge-verified" class="hidden text-blue-500">
                         <svg class="w-4 h-4 inline-block" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l5-5z" clip-rule="evenodd"></path>
@@ -60,7 +60,7 @@
                 
                 <p id="preview-username" class="text-xs text-slate-400 font-medium mt-0.5">@username</p>
                 
-                <!-- Label Premium (Disembunyikan default, muncul via JS) -->
+                <!-- Label Premium -->
                 <div id="badge-premium" class="hidden mt-2.5">
                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-100">
                         ⭐ MEMBER PREMIUM
@@ -69,7 +69,7 @@
             </div>
 
             <!-- Form Input Data -->
-            <form id="profile-form" class="space-y-4" onsubmit="event.preventDefault();">
+            <form id="profile-form" class="space-y-4">
                 <!-- Nama Lengkap -->
                 <div class="space-y-1">
                     <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Nama Lengkap</label>
@@ -94,7 +94,7 @@
 
                 <!-- Tombol Simpan -->
                 <div class="pt-2">
-                    <button type="button" id="btn-save-profile" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl text-sm font-semibold shadow-md shadow-indigo-100 transition duration-200">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl text-sm font-semibold shadow-md shadow-indigo-100 transition duration-200">
                         Simpan Perubahan
                     </button>
                 </div>
