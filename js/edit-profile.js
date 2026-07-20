@@ -28,7 +28,7 @@ const uploadPicInput = document.getElementById('upload-pic');
 const inputName = document.getElementById('input-name');
 const inputUsername = document.getElementById('input-username');
 const inputBio = document.getElementById('input-bio');
-const btnSaveProfile = document.getElementById('btn-save-profile');
+const profileForm = document.getElementById('profile-form');
 
 // Elemen Preview Card
 const previewName = document.getElementById('preview-name');
@@ -39,14 +39,14 @@ const badgePremium = document.getElementById('badge-premium');
 onAuthStateChanged(auth, (user) => {
     if (user) {
         userUID = user.uid;
-        console.log("Sesi aktif terdeteksi untuk UID:", userUID);
+        console.log("Pemeriksaan Auth: Sesi aktif terdeteksi untuk UID:", userUID);
         
         const profileRef = ref(database, `users/${userUID}/profile`);
         get(profileRef).then((snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
+                console.log("Database: Data profil lama ditemukan:", data);
                 
-                // Set data ke input form secara aman jika elemennya ada
                 if (inputName) inputName.value = data.name || user.displayName || "";
                 if (inputUsername) {
                     inputUsername.value = data.username ? data.username.replace('@', '') : "";
@@ -54,11 +54,9 @@ onAuthStateChanged(auth, (user) => {
                 }
                 if (inputBio) inputBio.value = data.bio || "";
                 
-                // Sinkronisasi data ke Preview Card
                 if (previewName) previewName.innerText = data.name || user.displayName || "Pengguna";
                 if (previewUsername) previewUsername.innerText = data.username || "@username";
                 
-                // Menampilkan Lencana Centang Biru secara dinamis
                 if (badgeVerified) {
                     if (data.isVerified === true) {
                         badgeVerified.classList.remove('hidden');
@@ -67,7 +65,6 @@ onAuthStateChanged(auth, (user) => {
                     }
                 }
                 
-                // Menampilkan Label Premium secara dinamis
                 if (badgePremium) {
                     if (data.isPremium === true) {
                         badgePremium.classList.remove('hidden');
@@ -83,30 +80,29 @@ onAuthStateChanged(auth, (user) => {
                     if (profilePreview) profilePreview.src = user.photoURL || "https://via.placeholder.com/150";
                 }
             } else {
-                // Untuk user baru tanpa data profil di database
+                console.log("Database: Belum ada profil tersimpan untuk UID ini. Menampilkan data default Auth.");
                 if (inputName) inputName.value = user.displayName || "";
                 if (previewName) previewName.innerText = user.displayName || "Pengguna";
                 if (profilePreview) profilePreview.src = user.photoURL || "https://via.placeholder.com/150";
             }
-        }).catch((error) => console.error("Gagal mengambil data profil:", error));
+        }).catch((error) => console.error("Database: Gagal mengambil data profil:", error));
 
     } else {
-        console.log("Sesi tidak ditemukan. Mengalihkan ke dashboard...");
+        console.log("Pemeriksaan Auth: Sesi tidak aktif. Mengalihkan ke dashboard...");
         window.location.href = "dashboard.html"; 
     }
 });
 
-// Otomatis ubah live-preview nama saat diketik
+// Live-preview nama
 if (inputName && previewName) {
     inputName.addEventListener('input', function() {
         previewName.innerText = this.value || "Pengguna";
     });
 }
 
-// Otomatis ubah live-preview username saat diketik
+// Live-preview username
 if (inputUsername && previewUsername) {
     inputUsername.addEventListener('input', function() {
-        // Hanya izinkan karakter a-z, 0-9, dan underscore (_)
         this.value = this.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
         previewUsername.innerText = this.value ? "@" + this.value : "@username";
     });
@@ -117,7 +113,6 @@ if (uploadPicInput) {
     uploadPicInput.addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (file) {
-            // Membatasi ukuran berkas maksimal 1.5 MB untuk kestabilan konversi Base64
             if (file.size > 1.5 * 1024 * 1024) {
                 alert("Ukuran foto profil terlalu besar. Harap unggah foto di bawah 1.5 MB.");
                 return;
@@ -132,43 +127,52 @@ if (uploadPicInput) {
     });
 }
 
-// Menyimpan data profil menggunakan metode Event Click pada tombol simpan
-if (btnSaveProfile) {
-    btnSaveProfile.addEventListener('click', async function() {
-        console.log("Memulai proses penyimpanan profil ke Firebase...");
+// === PENYELAMAT FORM SUBMIT (Menghentikan reload halaman) ===
+if (profileForm) {
+    profileForm.addEventListener('submit', async function(event) {
+        event.preventDefault(); // Mencegah browser me-reload halaman!
+        console.log("Event submit ditangkap! Memulai proses penyimpanan data...");
         
         const newUsername = inputUsername ? inputUsername.value.trim() : "";
         const newName = inputName ? inputName.value.trim() : "";
         const newBio = inputBio ? inputBio.value.trim() : "";
+
+        console.log("Data yang akan dikirim:", { newName, newUsername, newBio });
 
         if (!userUID) {
             alert("Sesi pengguna belum terbaca sepenuhnya. Silakan muat ulang halaman.");
             return;
         }
 
+        // Validasi Sederhana
         if (newName === "") {
             alert("Kolom nama lengkap wajib diisi.");
             return;
         }
-
         if (newUsername === "") {
             alert("Kolom ID unik/username wajib diisi.");
             return;
         }
 
-        // Jika mengubah username, periksa ketersediaan di database
+        // Periksa ketersediaan username jika berubah
         if (newUsername !== oldUsername) {
-            const usernameCheckRef = ref(database, `taken_usernames/${newUsername}`);
-            const snapshot = await get(usernameCheckRef);
-            
-            if (snapshot.exists()) {
-                alert("Username @" + newUsername + " sudah digunakan oleh pengguna lain.");
-                return;
+            console.log(`Memeriksa ketersediaan username: @${newUsername}`);
+            try {
+                const usernameCheckRef = ref(database, `taken_usernames/${newUsername}`);
+                const snapshot = await get(usernameCheckRef);
+                
+                if (snapshot.exists()) {
+                    alert("Username @" + newUsername + " sudah digunakan oleh pengguna lain.");
+                    return;
+                }
+            } catch (err) {
+                console.error("Gagal memeriksa ketersediaan username:", err);
             }
         }
 
         try {
-            // Menggunakan metode update agar properti isVerified atau isPremium tidak tertimpa/hilang
+            console.log("Mengirim data profil ke database...");
+            // Melakukan update profil pengguna
             await update(ref(database, `users/${userUID}/profile`), {
                 name: newName,
                 username: "@" + newUsername,
@@ -176,21 +180,23 @@ if (btnSaveProfile) {
                 photo: base64Photo || (profilePreview ? profilePreview.src : "https://via.placeholder.com/150")
             });
 
-            // Perbarui entri pada folder taken_usernames jika ada pergantian username
+            // Perbarui data folder taken_usernames jika username berubah
             if (newUsername !== oldUsername) {
+                console.log("Mendaftarkan username baru dan menghapus username lama...");
                 await set(ref(database, `taken_usernames/${newUsername}`), userUID);
                 if (oldUsername) {
                     await remove(ref(database, `taken_usernames/${oldUsername}`));
                 }
             }
 
+            console.log("Penyimpanan selesai dengan sukses!");
             alert("Profil berhasil diperbarui!");
             window.location.href = "dashboard.html"; 
         } catch (error) {
-            console.error("Detail Error saat proses update:", error);
+            console.error("Detail Error saat proses pengiriman database:", error);
             alert("Gagal memperbarui profil: " + error.message);
         }
     });
 } else {
-    console.warn("Elemen tombol '#btn-save-profile' tidak ditemukan.");
+    console.warn("Elemen form '#profile-form' tidak ditemukan pada halaman HTML ini.");
 }
