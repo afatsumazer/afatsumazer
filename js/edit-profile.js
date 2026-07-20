@@ -22,13 +22,13 @@ let userUID = "";
 let oldUsername = ""; 
 let base64Photo = ""; 
 
-// Mengambil referensi elemen DOM
+// Referensi Elemen DOM
 const profilePreview = document.getElementById('profile-preview');
 const uploadPicInput = document.getElementById('upload-pic');
 const inputName = document.getElementById('input-name');
 const inputUsername = document.getElementById('input-username');
 const inputBio = document.getElementById('input-bio');
-const profileForm = document.getElementById('profile-form');
+const btnSaveProfile = document.getElementById('btn-save-profile');
 
 // Elemen Preview Card
 const previewName = document.getElementById('preview-name');
@@ -39,14 +39,14 @@ const badgePremium = document.getElementById('badge-premium');
 onAuthStateChanged(auth, (user) => {
     if (user) {
         userUID = user.uid;
-        console.log("Pengguna terdeteksi dengan UID:", userUID);
+        console.log("Sesi aktif terdeteksi untuk UID:", userUID);
         
         const profileRef = ref(database, `users/${userUID}/profile`);
         get(profileRef).then((snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 
-                // Set data ke input form secara aman (hanya jika elemen ada)
+                // Set data ke input form secara aman jika elemennya ada
                 if (inputName) inputName.value = data.name || user.displayName || "";
                 if (inputUsername) {
                     inputUsername.value = data.username ? data.username.replace('@', '') : "";
@@ -54,7 +54,7 @@ onAuthStateChanged(auth, (user) => {
                 }
                 if (inputBio) inputBio.value = data.bio || "";
                 
-                // Sinkronisasi data ke Preview Card secara aman
+                // Sinkronisasi data ke Preview Card
                 if (previewName) previewName.innerText = data.name || user.displayName || "Pengguna";
                 if (previewUsername) previewUsername.innerText = data.username || "@username";
                 
@@ -83,6 +83,7 @@ onAuthStateChanged(auth, (user) => {
                     if (profilePreview) profilePreview.src = user.photoURL || "https://via.placeholder.com/150";
                 }
             } else {
+                // Untuk user baru tanpa data profil di database
                 if (inputName) inputName.value = user.displayName || "";
                 if (previewName) previewName.innerText = user.displayName || "Pengguna";
                 if (profilePreview) profilePreview.src = user.photoURL || "https://via.placeholder.com/150";
@@ -90,31 +91,33 @@ onAuthStateChanged(auth, (user) => {
         }).catch((error) => console.error("Gagal mengambil data profil:", error));
 
     } else {
-        console.log("Tidak ada sesi pengguna aktif. Mengalihkan...");
+        console.log("Sesi tidak ditemukan. Mengalihkan ke dashboard...");
         window.location.href = "dashboard.html"; 
     }
 });
 
-// Otomatis ubah preview saat nama diketik
+// Otomatis ubah live-preview nama saat diketik
 if (inputName && previewName) {
     inputName.addEventListener('input', function() {
         previewName.innerText = this.value || "Pengguna";
     });
 }
 
-// Otomatis ubah preview saat username diketik
+// Otomatis ubah live-preview username saat diketik
 if (inputUsername && previewUsername) {
     inputUsername.addEventListener('input', function() {
+        // Hanya izinkan karakter a-z, 0-9, dan underscore (_)
         this.value = this.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
         previewUsername.innerText = this.value ? "@" + this.value : "@username";
     });
 }
 
-// Unggah Foto Profil & Preview
+// Proses unggah foto profil & live-preview lokal
 if (uploadPicInput) {
     uploadPicInput.addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (file) {
+            // Membatasi ukuran berkas maksimal 1.5 MB untuk kestabilan konversi Base64
             if (file.size > 1.5 * 1024 * 1024) {
                 alert("Ukuran foto profil terlalu besar. Harap unggah foto di bawah 1.5 MB.");
                 return;
@@ -129,22 +132,32 @@ if (uploadPicInput) {
     });
 }
 
-// Simpan Perubahan Profil
-if (profileForm) {
-    profileForm.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        console.log("Formulir dikirim, memproses pembaruan...");
+// Menyimpan data profil menggunakan metode Event Click pada tombol simpan
+if (btnSaveProfile) {
+    btnSaveProfile.addEventListener('click', async function() {
+        console.log("Memulai proses penyimpanan profil ke Firebase...");
         
         const newUsername = inputUsername ? inputUsername.value.trim() : "";
         const newName = inputName ? inputName.value.trim() : "";
         const newBio = inputBio ? inputBio.value.trim() : "";
 
         if (!userUID) {
-            alert("Sesi pengguna belum terbaca sepenuhnya. Silakan tunggu beberapa saat.");
+            alert("Sesi pengguna belum terbaca sepenuhnya. Silakan muat ulang halaman.");
             return;
         }
 
-        if (newUsername !== oldUsername && newUsername !== "") {
+        if (newName === "") {
+            alert("Kolom nama lengkap wajib diisi.");
+            return;
+        }
+
+        if (newUsername === "") {
+            alert("Kolom ID unik/username wajib diisi.");
+            return;
+        }
+
+        // Jika mengubah username, periksa ketersediaan di database
+        if (newUsername !== oldUsername) {
             const usernameCheckRef = ref(database, `taken_usernames/${newUsername}`);
             const snapshot = await get(usernameCheckRef);
             
@@ -155,15 +168,16 @@ if (profileForm) {
         }
 
         try {
-            // Menggunakan "update" agar isVerified dan isPremium tidak terhapus
+            // Menggunakan metode update agar properti isVerified atau isPremium tidak tertimpa/hilang
             await update(ref(database, `users/${userUID}/profile`), {
                 name: newName,
                 username: "@" + newUsername,
                 bio: newBio,
-                photo: base64Photo || (profilePreview ? profilePreview.src : "")
+                photo: base64Photo || (profilePreview ? profilePreview.src : "https://via.placeholder.com/150")
             });
 
-            if (newUsername !== oldUsername && newUsername !== "") {
+            // Perbarui entri pada folder taken_usernames jika ada pergantian username
+            if (newUsername !== oldUsername) {
                 await set(ref(database, `taken_usernames/${newUsername}`), userUID);
                 if (oldUsername) {
                     await remove(ref(database, `taken_usernames/${oldUsername}`));
@@ -173,10 +187,10 @@ if (profileForm) {
             alert("Profil berhasil diperbarui!");
             window.location.href = "dashboard.html"; 
         } catch (error) {
-            console.error("Detail Error:", error);
+            console.error("Detail Error saat proses update:", error);
             alert("Gagal memperbarui profil: " + error.message);
         }
     });
 } else {
-    console.warn("Elemen form '#profile-form' tidak ditemukan di halaman.");
+    console.warn("Elemen tombol '#btn-save-profile' tidak ditemukan.");
 }
