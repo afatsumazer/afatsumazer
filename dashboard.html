@@ -195,23 +195,180 @@
                 </div>
             </div>
 
-            <!-- TAB 2: TUGAS SAYA -->
+            <!-- TAB 2: DAFTAR BERKAS PENGGUNA (.DOT DLL) -->
             <div id="tab-tasks" class="hidden space-y-6">
-                <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-sm max-w-2xl mx-auto">
-                    <div class="mb-6">
-                        <h3 class="text-lg font-bold text-slate-900">Daftar Tugas Harian</h3>
-                        <p class="text-xs text-slate-400 mt-1">Kelola progres proyek freelancing Anda secara mandiri di sini.</p>
+                <!-- Tampilan Baru Berkas Berdasarkan Format (.dot, .docx, dll) -->
+                <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-sm max-w-4xl mx-auto">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900">Berkas Utama Pengguna</h3>
+                            <p class="text-xs text-slate-400 mt-1">Daftar berkas dengan format khusus, template (.dot), dan dokumen penting Anda.</p>
+                        </div>
+                        <!-- Filter Format Buttons -->
+                        <div class="flex flex-wrap gap-1 bg-slate-50 p-1 rounded-xl border border-slate-100 text-xs">
+                            <button onclick="filterUserFiles('all', this)" class="filter-btn px-3 py-1.5 rounded-lg font-semibold bg-white text-indigo-600 shadow-sm transition">Semua</button>
+                            <button onclick="filterUserFiles('dot', this)" class="filter-btn px-3 py-1.5 rounded-lg font-semibold text-slate-500 hover:text-slate-800 transition">Template (.dot)</button>
+                            <button onclick="filterUserFiles('doc', this)" class="filter-btn px-3 py-1.5 rounded-lg font-semibold text-slate-500 hover:text-slate-800 transition">Dokumen</button>
+                            <button onclick="filterUserFiles('other', this)" class="filter-btn px-3 py-1.5 rounded-lg font-semibold text-slate-500 hover:text-slate-800 transition">Format Lain</button>
+                        </div>
                     </div>
-                    
-                    <form onsubmit="addTask(event)" class="flex space-x-2 mb-6">
-                        <input id="task-input" type="text" placeholder="Tulis rencana tugas baru..." required class="flex-grow px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50/50">
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition duration-200 shadow-sm">Tambah</button>
-                    </form>
-                    
-                    <ul id="task-list" class="space-y-3">
-                        <!-- Data tugas yang akan dirender dinamis -->
-                    </ul>
+
+                    <!-- Pencarian dan Informasi Statis -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="md:col-span-2 relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </span>
+                            <input type="text" id="search-user-files" placeholder="Cari nama berkas (.dot, dll)..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div class="bg-indigo-50/40 border border-indigo-100/50 p-3 rounded-xl flex items-center justify-between">
+                            <span class="text-xs text-indigo-700 font-semibold">Total Item Berkas</span>
+                            <span class="text-sm font-extrabold text-indigo-900">4 Berkas</span>
+                        </div>
+                    </div>
+
+                    <!-- File Grid / List -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="user-files-container">
+                        <!-- File Card 1 (.dot) -->
+                        <div class="file-card-item bg-white p-4 rounded-xl border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all duration-200 flex items-start space-x-3" data-format="dot">
+                            <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl flex-shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-grow min-w-0">
+                                <h4 class="text-sm font-bold text-slate-800 truncate" title="Format_Laporan_Utama.dot">Format_Laporan_Utama.dot</h4>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Word Template • 142 KB</p>
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <span class="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded uppercase">Template</span>
+                                    <span class="text-[10px] text-slate-400">Hari ini</span>
+                                </div>
+                            </div>
+                            <button class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 flex-shrink-0 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- File Card 2 (.dot) -->
+                        <div class="file-card-item bg-white p-4 rounded-xl border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all duration-200 flex items-start space-x-3" data-format="dot">
+                            <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl flex-shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-grow min-w-0">
+                                <h4 class="text-sm font-bold text-slate-800 truncate" title="SOP_Administrasi_Freelance.dot">SOP_Administrasi_Freelance.dot</h4>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Word Template • 115 KB</p>
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <span class="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded uppercase">Template</span>
+                                    <span class="text-[10px] text-slate-400">Kemarin</span>
+                                </div>
+                            </div>
+                            <button class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 flex-shrink-0 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- File Card 3 (.docx) -->
+                        <div class="file-card-item bg-white p-4 rounded-xl border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all duration-200 flex items-start space-x-3" data-format="doc">
+                            <div class="p-3 bg-blue-50 text-blue-600 rounded-xl flex-shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-grow min-w-0">
+                                <h4 class="text-sm font-bold text-slate-800 truncate" title="Surat_Perjanjian_Klien.docx">Surat_Perjanjian_Klien.docx</h4>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Word Document • 1.1 MB</p>
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded uppercase">Dokumen</span>
+                                    <span class="text-[10px] text-slate-400">18 Jul 2026</span>
+                                </div>
+                            </div>
+                            <button class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 flex-shrink-0 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- File Card 4 (.pdf) -->
+                        <div class="file-card-item bg-white p-4 rounded-xl border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all duration-200 flex items-start space-x-3" data-format="other">
+                            <div class="p-3 bg-rose-50 text-rose-600 rounded-xl flex-shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-grow min-w-0">
+                                <h4 class="text-sm font-bold text-slate-800 truncate" title="Pedoman_Brand_Identitas.pdf">Pedoman_Brand_Identitas.pdf</h4>
+                                <p class="text-[11px] text-slate-400 mt-0.5">PDF • 3.4 MB</p>
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <span class="px-2 py-0.5 bg-rose-50 text-rose-600 text-[10px] font-bold rounded uppercase">Aset</span>
+                                    <span class="text-[10px] text-slate-400">14 Jul 2026</span>
+                                </div>
+                            </div>
+                            <button class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 flex-shrink-0 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- JAGA AGAR ELEMENT SEBELUMNYA TIDAK ERROR DI JS (DIPERSINGKAT & TERSEMBUNYI) -->
+                <div class="hidden">
+                    <form onsubmit="addTask(event)">
+                        <input id="task-input" type="text" value="Task Fallback" required>
+                    </form>
+                    <ul id="task-list"></ul>
+                </div>
+
+                <!-- SCRIPT UNTUK FITUR PENCARIAN & FILTER BERKAS -->
+                <script>
+                    function filterUserFiles(category, btnElement) {
+                        const cards = document.querySelectorAll('.file-card-item');
+                        cards.forEach(card => {
+                            if (category === 'all' || card.getAttribute('data-format') === category) {
+                                card.style.display = 'flex';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+                        
+                        // Kelola state aktif tombol filter
+                        const buttons = document.querySelectorAll('.filter-btn');
+                        buttons.forEach(btn => {
+                            btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                            btn.classList.add('text-slate-500', 'hover:text-slate-800');
+                        });
+                        btnElement.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+                        btnElement.classList.remove('text-slate-500', 'hover:text-slate-800');
+                    }
+
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const searchInput = document.getElementById('search-user-files');
+                        if (searchInput) {
+                            searchInput.addEventListener('input', (e) => {
+                                const query = e.target.value.toLowerCase();
+                                const cards = document.querySelectorAll('.file-card-item');
+                                cards.forEach(card => {
+                                    const name = card.querySelector('h4').textContent.toLowerCase();
+                                    if (name.includes(query)) {
+                                        card.style.display = 'flex';
+                                    } else {
+                                        card.style.display = 'none';
+                                    }
+                                });
+                            });
+                        }
+                    });
+                </script>
             </div>
 
             <!-- TAB 3: PENYIMPANAN FILE -->
