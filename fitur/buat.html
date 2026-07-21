@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Buat Kwitansi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .form-container {
+            width: 100%;
+            max-width: 500px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            box-sizing: border-box;
+        }
+        h2 {
+            margin-top: 0;
+            color: #1e3a8a;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #475569;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .sig-wrapper {
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            background: #f8fafc;
+            position: relative;
+        }
+        #sig-canvas {
+            width: 100%;
+            height: 150px;
+            display: block;
+            cursor: crosshair;
+        }
+        .clear-btn {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 11px;
+            cursor: pointer;
+            border-radius: 3px;
+            margin: 8px;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .submit-btn:hover {
+            background-color: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Buat Kwitansi Baru</h2>
+        
+        <form onsubmit="simpanDanCetak(event)">
+            <div class="form-group">
+                <label>Nomor Kwitansi</label>
+                <input type="text" id="nomor" required value="KW-2026-001">
+            </div>
+
+            <div class="form-group">
+                <label>Diterima Dari (Nama Pembayar)</label>
+                <input type="text" id="pembayar" required placeholder="Nama Lengkap">
+            </div>
+
+            <div class="form-group">
+                <label>Nominal (Rp)</label>
+                <input type="number" id="nominal" required placeholder="Contoh: 1500000">
+            </div>
+
+            <div class="form-group">
+                <label>Untuk Pembayaran</label>
+                <textarea id="keterangan" rows="2" required placeholder="Contoh: Pembayaran Jasa Pembuatan Website"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Nama Penerima (Kasir)</label>
+                <input type="text" id="penerima" required value="Ahmad Subarjo">
+            </div>
+
+            <div class="form-group">
+                <label>Level Pengguna</label>
+                <select id="level">
+                    <option value="premium">Member Premium (Aktifkan e-Meterai)</option>
+                    <option value="standard">Member Standar</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Tanda Tangan:</label>
+                <div class="sig-wrapper">
+                    <canvas id="sig-canvas"></canvas>
+                    <button type="button" class="clear-btn" onclick="hapusCoretan()">Hapus Tanda Tangan</button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Simpan & Cetak Kwitansi</button>
+        </form>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('sig-canvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        function inisialisasiCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#1e3a8a';
+        }
+        
+        window.addEventListener('resize', inisialisasiCanvas);
+        inisialisasiCanvas();
+
+        // Event menggambar dengan mouse
+        canvas.addEventListener('mousedown', () => drawing = true);
+        canvas.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
+        canvas.addEventListener('mousemove', menggambar);
+
+        function menggambar(e) {
+            if (!drawing) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function hapusCoretan() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Simpan data ke localStorage (Simulasi Database)
+        function simpanDanCetak(event) {
+            event.preventDefault();
+
+            // Ambil coretan tanda tangan sebagai teks Base64
+            const ttdBase64 = canvas.toDataURL('image/png');
+
+            // Susun data kwitansi
+            const kwitansiData = {
+                nomor: document.getElementById('nomor').value,
+                pembayar: document.getElementById('pembayar').value,
+                nominal: document.getElementById('nominal').value,
+                keterangan: document.getElementById('keterangan').value,
+                penerima: document.getElementById('penerima').value,
+                level: document.getElementById('level').value,
+                tanda_tangan: ttdBase64,
+                tanggal: new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })
+            };
+
+            // Simpan ke "database" lokal browser
+            localStorage.setItem('kwitansi_terbaru', JSON.stringify(kwitansiData));
+
+            // Buka halaman cetak di tab baru
+            window.open('cetak.html', '_blank');
+        }
+    </script>
+</body>
+</html>
