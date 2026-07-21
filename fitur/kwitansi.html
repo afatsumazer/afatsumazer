@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kwitansi Interaktif - Edit & Cetak Langsung</title>
+    <title>Kwitansi Resmi - Secure & Interactive</title>
     <style>
         body {
             font-family: 'Courier New', Courier, monospace;
@@ -16,7 +16,7 @@
             align-items: center;
         }
 
-        /* Menu Kontrol Atas (Sembunyi saat dicetak) */
+        /* Toolbar Kontrol Atas (Sembunyi saat diprint) */
         .toolbar {
             width: 100%;
             max-width: 800px;
@@ -33,7 +33,7 @@
         }
         .toolbar-title {
             font-family: Arial, sans-serif;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             color: #1e3a8a;
         }
@@ -49,10 +49,6 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        .btn:hover {
-            opacity: 0.9;
         }
         .btn-print { background-color: #3b82f6; color: white; }
         .btn-reset { background-color: #ef4444; color: white; }
@@ -68,19 +64,21 @@
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
             box-sizing: border-box;
             position: relative;
+            overflow: hidden; /* Menjaga meterai tidak keluar batas kertas */
         }
 
-        /* Penanda bahwa teks bisa diedit (hilang saat diprint) */
-        [contenteditable="true"] {
+        /* Gaya teks yang dapat diedit oleh user terdaftar */
+        .editable-field {
             outline: none;
             transition: background 0.2s;
             border-bottom: 1px dashed #94a3b8;
             padding: 1px 4px;
         }
-        [contenteditable="true"]:hover {
+        /* Efek hover hanya aktif jika elemen memang diizinkan untuk diedit */
+        .editable-field[contenteditable="true"]:hover {
             background-color: #f0f9ff;
         }
-        [contenteditable="true"]:focus {
+        .editable-field[contenteditable="true"]:focus {
             background-color: #e0f2fe;
             border-bottom: 1px solid #0284c7;
         }
@@ -134,7 +132,7 @@
         .amount-container {
             font-size: 20px;
             font-weight: bold;
-            font-style: italic; /* Dimiringkan sesuai permintaan Anda */
+            font-style: italic;
             border: 2px solid #1e293b;
             padding: 12px 24px;
             background-color: #f1f5f9;
@@ -142,15 +140,30 @@
             align-items: center;
         }
 
-        /* Grup Pengesahan */
-        .sig-container {
-            display: flex;
-            gap: 25px;
-            align-items: flex-end;
+        /* Area Tanda Tangan */
+        .sig-box {
+            text-align: center;
+            width: 180px;
+            position: relative;
+        }
+        .canvas-wrapper {
+            border-bottom: 1px solid #1e293b;
+            height: 70px;
+            margin-bottom: 5px;
+            position: relative;
+            touch-action: none;
+        }
+        #sig-canvas {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: crosshair;
         }
 
-        /* Mockup e-Meterai */
-        .emeterai-box {
+        /* --- FITUR PREMIUM: e-Meterai yang Bisa Digeser --- */
+        .emeterai-draggable {
             width: 110px;
             height: 110px;
             border: 2px dashed #db2777;
@@ -165,33 +178,24 @@
             text-align: center;
             box-sizing: border-box;
             border-radius: 4px;
+            
+            /* CSS absolut untuk drag-and-drop */
+            position: absolute;
+            bottom: 35px;
+            left: 35px;
+            cursor: move;
+            z-index: 10;
+            touch-action: none; /* Mencegah bentrok geser layar di ponsel */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .emeterai-qr {
             width: 45px;
             height: 45px;
             background: #111;
+            pointer-events: none; /* Mencegah gangguan klik saat drag */
         }
-
-        /* Papan Tanda Tangan Tepat di Atas Nama */
-        .sig-box {
-            text-align: center;
-            width: 180px;
-            position: relative;
-        }
-        .canvas-wrapper {
-            border-bottom: 1px solid #1e293b;
-            height: 70px;
-            margin-bottom: 5px;
-            position: relative;
-            touch-action: none; /* Lancar di HP */
-        }
-        #sig-canvas {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            cursor: crosshair;
+        .emeterai-draggable * {
+            pointer-events: none; /* Menghindari bug event drag pada teks di dalam meterai */
         }
 
         /* Cetak (Print CSS) */
@@ -207,98 +211,212 @@
                 box-shadow: none;
                 border: 2px solid #000;
             }
-            /* Hilangkan garis putus-putus tanda edit saat dicetak */
-            [contenteditable="true"] {
+            /* Menghapus border penanda input ketika dicetak */
+            .editable-field {
                 border-bottom: none !important;
                 padding: 0;
+            }
+            .emeterai-draggable {
+                box-shadow: none;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- TOOLBAR ATAS (Hanya Muncul di Layar Web) -->
-    <div class="toolbar">
-        <div class="toolbar-title">💡 Klik langsung pada teks kwitansi di bawah untuk mengedit!</div>
+    <!-- TOOLBAR KONTROL (Hanya untuk pengguna terdaftar, disembunyikan otomatis jika tamu) -->
+    <div class="toolbar" id="user-toolbar">
+        <div class="toolbar-title">🔑 Mode Editor: <span style="color: #10b981;">Aktif (User Terdaftar)</span></div>
         <div class="btn-group">
-            <button class="btn btn-toggle" onclick="toggleMeterai()">Toggle e-Meterai</button>
+            <button class="btn btn-toggle" onclick="toggleMeterai()">Pasang/Lepas e-Meterai</button>
             <button class="btn btn-reset" onclick="clearSignature()">Hapus TTD</button>
             <button class="btn btn-print" onclick="window.print()">Cetak / Simpan PDF</button>
         </div>
     </div>
 
     <!-- AREA DOKUMEN KWITANSI -->
-    <div class="receipt-box" oncontextmenu="return false;">
+    <div class="receipt-box" id="document-paper" oncontextmenu="return false;">
         
+        <!-- e-Meterai Draggable (Bisa digeser dengan mouse/sentuhan ke posisi manapun) -->
+        <div class="emeterai-draggable" id="emeterai-stamp">
+            <span style="font-weight: bold; color: #9d174d;">METERAI ELEKTRONIK</span>
+            <div class="emeterai-qr"></div>
+            <span style="font-weight: bold; color: #9d174d;">10000</span>
+            <span style="font-size: 5px; color:#475569;">SN: MET202607210989</span>
+        </div>
+
         <!-- Header -->
         <div class="receipt-header">
             <div>
-                <strong id="lblPT" style="font-size: 18px;" contenteditable="true">PT. SOLUSI DIGITAL INDO</strong><br>
-                <small id="lblAlamat" style="color: #475569;" contenteditable="true">Jl. Jenderal Sudirman No. 12, Gedung Cyber, Jakarta</small>
+                <strong class="editable-field" id="lblPT" style="font-size: 18px;">PT. SOLUSI DIGITAL INDO</strong><br>
+                <small class="editable-field" id="lblAlamat" style="color: #475569;">Jl. Jenderal Sudirman No. 12, Gedung Cyber, Jakarta</small>
             </div>
             <div style="text-align: right;">
-                <h1 contenteditable="true">KWITANSI</h1>
-                <strong>No. <span id="lblNo" contenteditable="true">KW-2026-001</span></strong>
+                <h1 class="editable-field">KWITANSI</h1>
+                <strong>No. <span class="editable-field" id="lblNo">KW-2026-001</span></strong>
             </div>
         </div>
 
-        <!-- Baris 1: Telah Diterima Dari -->
+        <!-- Baris data -->
         <div class="receipt-row">
             <span class="receipt-label">Telah Diterima Dari</span>
-            <span class="receipt-content">: <strong contenteditable="true" id="lblPembayar">Budi Santoso</strong></span>
+            <span class="receipt-content">: <strong class="editable-field" id="lblPembayar">Budi Santoso</strong></span>
         </div>
 
-        <!-- Baris 2: Uang Sejumlah (Teks Terbilang Terhitung Otomatis) -->
         <div class="receipt-row">
             <span class="receipt-label">Uang Sejumlah</span>
             <span class="receipt-content terbilang-box">: <span id="lblTerbilang">Satu Juta Lima Ratus Ribu Rupiah</span></span>
         </div>
 
-        <!-- Baris 3: Untuk Pembayaran -->
         <div class="receipt-row">
             <span class="receipt-label">Untuk Pembayaran</span>
-            <span class="receipt-content">: <span contenteditable="true" id="lblKeterangan">Pembayaran Jasa Pembuatan Website Company Profile</span></span>
+            <span class="receipt-content">: <span class="editable-field" id="lblKeterangan">Pembayaran Jasa Pembuatan Website Company Profile</span></span>
         </div>
 
         <!-- Bagian Bawah -->
         <div class="receipt-bottom">
-            <!-- Nominal Angka (Ketik angkanya saja, format otomatis terhitung) -->
             <div>
                 <div class="amount-container">
                     <span>Rp </span>
-                    <span id="lblNominal" contenteditable="true" style="border-bottom: none; font-weight: bold; min-width: 50px; display: inline-block;">1.500.000</span>
+                    <span id="lblNominal" class="editable-field" style="border-bottom: none; font-weight: bold; min-width: 50px; display: inline-block;">1.500.000</span>
                     <span>,-</span>
                 </div>
             </div>
             
             <div class="sig-container">
-                <!-- e-Meterai (Bisa dihilangkan/ditampilkan lewat tombol di atas) -->
-                <div class="emeterai-box" id="emeterai">
-                    <span style="font-weight: bold; color: #9d174d;">METERAI ELEKTRONIK</span>
-                    <div class="emeterai-qr"></div>
-                    <span style="font-weight: bold; color: #9d174d;">10000</span>
-                    <span style="font-size: 5px; color:#475569;">SN: MET202607210989</span>
-                </div>
-
-                <!-- Tanda Tangan Langsung di Kertas -->
+                <!-- Area Tanda Tangan -->
                 <div class="sig-box">
-                    <p style="margin: 0 0 5px 0;"><small contenteditable="true" id="lblTanggal">Jakarta, 21 Juli 2026</small></p>
+                    <p style="margin: 0 0 5px 0;"><small class="editable-field" id="lblTanggal">Jakarta, 21 Juli 2026</small></p>
                     
                     <div class="canvas-wrapper">
-                        <!-- Canvas gambar diletakkan di sini -->
                         <canvas id="sig-canvas"></canvas>
                     </div>
                     
-                    <p style="font-weight: bold; margin: 0; font-size: 13px;" contenteditable="true" id="lblPenerima">Ahmad Subarjo</p>
-                    <small contenteditable="true" id="lblJabatan" style="color:#475569;">Kasir Utama</small>
+                    <p style="font-weight: bold; margin: 0; font-size: 13px;" class="editable-field" id="lblPenerima">Ahmad Subarjo</p>
+                    <small class="editable-field" id="lblJabatan" style="color:#475569;">Kasir Utama</small>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT AKSI & GAMBAR -->
+    <!-- LOGIK SISTEM -->
     <script>
-        // --- 1. Logika Tanda Tangan Canvas ---
+        // ==========================================
+        // 1. SISTEM STATUS REGISTERED/LOGIN USER
+        // ==========================================
+        // Hubungkan variabel ini dengan sesi backend Anda (misal PHP, Firebase, JWT dll)
+        const isUserRegistered = true; // Ganti menjadi 'false' untuk menguji mode Tamu/Terkunci
+
+        function applyAccessControl() {
+            const fields = document.querySelectorAll('.editable-field');
+            const toolbar = document.getElementById('user-toolbar');
+            const canvasEl = document.getElementById('sig-canvas');
+            const emeteraiEl = document.getElementById('emeterai-stamp');
+
+            if (isUserRegistered) {
+                // Beri izin edit ke pengguna terdaftar
+                fields.forEach(field => field.setAttribute('contenteditable', 'true'));
+                toolbar.style.display = 'flex';
+                canvasEl.style.pointerEvents = 'auto'; // Izinkan coretan ttd
+            } else {
+                // Kunci dokumen untuk tamu / non-register
+                fields.forEach(field => {
+                    field.setAttribute('contenteditable', 'false');
+                    field.style.borderBottom = 'none'; // Sembunyikan garis putus-putus
+                });
+                toolbar.style.display = 'none';
+                canvasEl.style.pointerEvents = 'none'; // Kunci coretan ttd
+                
+                // Matikan fitur seret meterai untuk tamu
+                emeteraiEl.style.cursor = 'default';
+            }
+        }
+
+
+        // ==========================================
+        // 2. SISTEM GESER (DRAG & DROP) E-METERAI
+        // ==========================================
+        const dragItem = document.getElementById("emeterai-stamp");
+        const container = document.getElementById("document-paper");
+
+        let active = false;
+        let currentX;
+        let currentY;
+        let initialX;
+        let initialY;
+        let xOffset = 0;
+        let yOffset = 0;
+
+        // Mouse Events
+        container.addEventListener("mousedown", dragStart);
+        container.addEventListener("mousemove", drag);
+        container.addEventListener("mouseup", dragEnd);
+
+        // Mobile Touch Events
+        container.addEventListener("touchstart", dragStart, { passive: true });
+        container.addEventListener("touchmove", drag, { passive: false });
+        container.addEventListener("touchend", dragEnd);
+
+        function dragStart(e) {
+            if (!isUserRegistered) return; // Kunci geser jika bukan user terdaftar
+
+            if (e.target === dragItem) {
+                active = true;
+                if (e.type === "touchstart") {
+                    initialX = e.touches[0].clientX - xOffset;
+                    initialY = e.touches[0].clientY - yOffset;
+                } else {
+                    initialX = e.clientX - xOffset;
+                    initialY = e.clientY - yOffset;
+                }
+            }
+        }
+
+        function drag(e) {
+            if (active) {
+                e.preventDefault(); // Mencegah scrolling layar saat geser di HP
+                
+                if (e.type === "touchmove") {
+                    currentX = e.touches[0].clientX - initialX;
+                    currentY = e.touches[0].clientY - initialY;
+                } else {
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                }
+
+                xOffset = currentX;
+                yOffset = currentY;
+
+                setTranslate(currentX, currentY, dragItem);
+            }
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+        }
+
+        function dragEnd() {
+            active = false;
+        }
+
+        function toggleMeterai() {
+            const meterai = document.getElementById('emeterai-stamp');
+            // Reset posisi koordinat geser ke awal setiap kali dilepas/dipasang
+            xOffset = 0;
+            yOffset = 0;
+            dragItem.style.transform = "translate3d(0, 0, 0)";
+            
+            if (meterai.style.display === 'none') {
+                meterai.style.display = 'flex';
+            } else {
+                meterai.style.display = 'none';
+            }
+        }
+
+
+        // ==========================================
+        // 3. LOGIKA TANDA TANGAN (CANVAS)
+        // ==========================================
         const canvas = document.getElementById('sig-canvas');
         const ctx = canvas.getContext('2d');
         let drawing = false;
@@ -309,13 +427,16 @@
             canvas.height = rect.height;
             ctx.lineWidth = 2.5;
             ctx.lineCap = 'round';
-            ctx.strokeStyle = '#1e3a8a'; // Warna tinta biru tua
+            ctx.strokeStyle = '#1e3a8a';
         }
 
-        window.addEventListener('load', initCanvas);
+        window.addEventListener('load', () => {
+            initCanvas();
+            applyAccessControl(); // Jalankan proteksi dokumen saat halaman siap
+        });
         window.addEventListener('resize', initCanvas);
 
-        function getCoords(e) {
+        function getSigCoords(e) {
             const rect = canvas.getBoundingClientRect();
             if (e.touches && e.touches.length > 0) {
                 return {
@@ -329,33 +450,33 @@
             };
         }
 
-        // Mouse Events
         canvas.addEventListener('mousedown', (e) => {
+            if (!isUserRegistered) return;
             drawing = true;
-            const pos = getCoords(e);
+            const pos = getSigCoords(e);
             ctx.beginPath();
             ctx.moveTo(pos.x, pos.y);
         });
         canvas.addEventListener('mousemove', (e) => {
             if (!drawing) return;
-            const pos = getCoords(e);
+            const pos = getSigCoords(e);
             ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
         });
         canvas.addEventListener('mouseup', () => drawing = false);
         canvas.addEventListener('mouseleave', () => drawing = false);
 
-        // Mobile Touch Events
         canvas.addEventListener('touchstart', (e) => {
+            if (!isUserRegistered) return;
             drawing = true;
-            const pos = getCoords(e);
+            const pos = getSigCoords(e);
             ctx.beginPath();
             ctx.moveTo(pos.x, pos.y);
             e.preventDefault();
         }, { passive: false });
         canvas.addEventListener('touchmove', (e) => {
             if (!drawing) return;
-            const pos = getCoords(e);
+            const pos = getSigCoords(e);
             ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
             e.preventDefault();
@@ -366,17 +487,10 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        // --- 2. Logika e-Meterai Toggle ---
-        function toggleMeterai() {
-            const meterai = document.getElementById('emeterai');
-            if (meterai.style.display === 'none') {
-                meterai.style.display = 'flex';
-            } else {
-                meterai.style.display = 'none';
-            }
-        }
 
-        // --- 3. Logika Otomatis Teks Terbilang saat Angka Diedit ---
+        // ==========================================
+        // 4. LOGIKA TERBILANG NOMINAL OTOMATIS
+        // ==========================================
         function terbilang(nilai) {
             let bilangan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
             let temp = "";
@@ -404,9 +518,7 @@
 
         const nominalEl = document.getElementById('lblNominal');
         nominalEl.addEventListener('input', function() {
-            // Bersihkan teks dari titik/huruf untuk kalkulasi terbilang
             let angkaMurni = nominalEl.innerText.replace(/[^0-9]/g, '');
-            
             if (angkaMurni && !isNaN(angkaMurni)) {
                 document.getElementById('lblTerbilang').innerText = terbilang(parseInt(angkaMurni)) + " Rupiah";
             } else {
@@ -414,7 +526,6 @@
             }
         });
 
-        // Merapikan format ribuan otomatis saat pengguna selesai mengetik angka (pindah fokus)
         nominalEl.addEventListener('blur', function() {
             let angkaMurni = nominalEl.innerText.replace(/[^0-9]/g, '');
             if (angkaMurni) {
