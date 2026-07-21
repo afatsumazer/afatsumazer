@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kwitansi Interaktif - Edit & Cetak Langsung</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            color: #222;
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Menu Kontrol Atas (Sembunyi saat dicetak) */
+        .toolbar {
+            width: 100%;
+            max-width: 800px;
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+        }
+        .toolbar-title {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            font-family: Arial, sans-serif;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .btn-print { background-color: #3b82f6; color: white; }
+        .btn-reset { background-color: #ef4444; color: white; }
+        .btn-toggle { background-color: #10b981; color: white; }
+
+        /* Container Kwitansi Utama */
+        .receipt-box {
+            width: 100%;
+            max-width: 800px;
+            padding: 35px;
+            border: 2px solid #1e293b;
+            background-color: #ffffff;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Penanda bahwa teks bisa diedit (hilang saat diprint) */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            border-bottom: 1px dashed #94a3b8;
+            padding: 1px 4px;
+        }
+        [contenteditable="true"]:hover {
+            background-color: #f0f9ff;
+        }
+        [contenteditable="true"]:focus {
+            background-color: #e0f2fe;
+            border-bottom: 1px solid #0284c7;
+        }
+
+        /* Header Kwitansi */
+        .receipt-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px double #1e293b;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        .receipt-header h1 {
+            margin: 0;
+            font-size: 26px;
+            letter-spacing: 2px;
+        }
+
+        /* Baris Pengisian Data */
+        .receipt-row {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: baseline;
+        }
+        .receipt-label {
+            width: 200px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        .receipt-content {
+            flex-grow: 1;
+            font-size: 15px;
+        }
+        .terbilang-box {
+            font-style: italic;
+            background-color: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            padding: 5px 10px;
+        }
+
+        /* Bagian Bawah (Nominal & Tanda Tangan) */
+        .receipt-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 50px;
+        }
+
+        /* Kotak Nominal Rupiah */
+        .amount-container {
+            font-size: 20px;
+            font-weight: bold;
+            font-style: italic; /* Dimiringkan sesuai permintaan Anda */
+            border: 2px solid #1e293b;
+            padding: 12px 24px;
+            background-color: #f1f5f9;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        /* Grup Pengesahan */
+        .sig-container {
+            display: flex;
+            gap: 25px;
+            align-items: flex-end;
+        }
+
+        /* Mockup e-Meterai */
+        .emeterai-box {
+            width: 110px;
+            height: 110px;
+            border: 2px dashed #db2777;
+            background-color: #fdf2f8;
+            padding: 6px;
+            font-family: Arial, sans-serif;
+            font-size: 7px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+        .emeterai-qr {
+            width: 45px;
+            height: 45px;
+            background: #111;
+        }
+
+        /* Papan Tanda Tangan Tepat di Atas Nama */
+        .sig-box {
+            text-align: center;
+            width: 180px;
+            position: relative;
+        }
+        .canvas-wrapper {
+            border-bottom: 1px solid #1e293b;
+            height: 70px;
+            margin-bottom: 5px;
+            position: relative;
+            touch-action: none; /* Lancar di HP */
+        }
+        #sig-canvas {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: crosshair;
+        }
+
+        /* Cetak (Print CSS) */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .toolbar {
+                display: none !important;
+            }
+            .receipt-box {
+                box-shadow: none;
+                border: 2px solid #000;
+            }
+            /* Hilangkan garis putus-putus tanda edit saat dicetak */
+            [contenteditable="true"] {
+                border-bottom: none !important;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOOLBAR ATAS (Hanya Muncul di Layar Web) -->
+    <div class="toolbar">
+        <div class="toolbar-title">💡 Klik langsung pada teks kwitansi di bawah untuk mengedit!</div>
+        <div class="btn-group">
+            <button class="btn btn-toggle" onclick="toggleMeterai()">Toggle e-Meterai</button>
+            <button class="btn btn-reset" onclick="clearSignature()">Hapus TTD</button>
+            <button class="btn btn-print" onclick="window.print()">Cetak / Simpan PDF</button>
+        </div>
+    </div>
+
+    <!-- AREA DOKUMEN KWITANSI -->
+    <div class="receipt-box" oncontextmenu="return false;">
+        
+        <!-- Header -->
+        <div class="receipt-header">
+            <div>
+                <strong id="lblPT" style="font-size: 18px;" contenteditable="true">PT. SOLUSI DIGITAL INDO</strong><br>
+                <small id="lblAlamat" style="color: #475569;" contenteditable="true">Jl. Jenderal Sudirman No. 12, Gedung Cyber, Jakarta</small>
+            </div>
+            <div style="text-align: right;">
+                <h1 contenteditable="true">KWITANSI</h1>
+                <strong>No. <span id="lblNo" contenteditable="true">KW-2026-001</span></strong>
+            </div>
+        </div>
+
+        <!-- Baris 1: Telah Diterima Dari -->
+        <div class="receipt-row">
+            <span class="receipt-label">Telah Diterima Dari</span>
+            <span class="receipt-content">: <strong contenteditable="true" id="lblPembayar">Budi Santoso</strong></span>
+        </div>
+
+        <!-- Baris 2: Uang Sejumlah (Teks Terbilang Terhitung Otomatis) -->
+        <div class="receipt-row">
+            <span class="receipt-label">Uang Sejumlah</span>
+            <span class="receipt-content terbilang-box">: <span id="lblTerbilang">Satu Juta Lima Ratus Ribu Rupiah</span></span>
+        </div>
+
+        <!-- Baris 3: Untuk Pembayaran -->
+        <div class="receipt-row">
+            <span class="receipt-label">Untuk Pembayaran</span>
+            <span class="receipt-content">: <span contenteditable="true" id="lblKeterangan">Pembayaran Jasa Pembuatan Website Company Profile</span></span>
+        </div>
+
+        <!-- Bagian Bawah -->
+        <div class="receipt-bottom">
+            <!-- Nominal Angka (Ketik angkanya saja, format otomatis terhitung) -->
+            <div>
+                <div class="amount-container">
+                    <span>Rp </span>
+                    <span id="lblNominal" contenteditable="true" style="border-bottom: none; font-weight: bold; min-width: 50px; display: inline-block;">1.500.000</span>
+                    <span>,-</span>
+                </div>
+            </div>
+            
+            <div class="sig-container">
+                <!-- e-Meterai (Bisa dihilangkan/ditampilkan lewat tombol di atas) -->
+                <div class="emeterai-box" id="emeterai">
+                    <span style="font-weight: bold; color: #9d174d;">METERAI ELEKTRONIK</span>
+                    <div class="emeterai-qr"></div>
+                    <span style="font-weight: bold; color: #9d174d;">10000</span>
+                    <span style="font-size: 5px; color:#475569;">SN: MET202607210989</span>
+                </div>
+
+                <!-- Tanda Tangan Langsung di Kertas -->
+                <div class="sig-box">
+                    <p style="margin: 0 0 5px 0;"><small contenteditable="true" id="lblTanggal">Jakarta, 21 Juli 2026</small></p>
+                    
+                    <div class="canvas-wrapper">
+                        <!-- Canvas gambar diletakkan di sini -->
+                        <canvas id="sig-canvas"></canvas>
+                    </div>
+                    
+                    <p style="font-weight: bold; margin: 0; font-size: 13px;" contenteditable="true" id="lblPenerima">Ahmad Subarjo</p>
+                    <small contenteditable="true" id="lblJabatan" style="color:#475569;">Kasir Utama</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT AKSI & GAMBAR -->
+    <script>
+        // --- 1. Logika Tanda Tangan Canvas ---
+        const canvas = document.getElementById('sig-canvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        function initCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#1e3a8a'; // Warna tinta biru tua
+        }
+
+        window.addEventListener('load', initCanvas);
+        window.addEventListener('resize', initCanvas);
+
+        function getCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            if (e.touches && e.touches.length > 0) {
+                return {
+                    x: e.touches[0].clientX - rect.left,
+                    y: e.touches[0].clientY - rect.top
+                };
+            }
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        }
+
+        // Mouse Events
+        canvas.addEventListener('mousedown', (e) => {
+            drawing = true;
+            const pos = getCoords(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        });
+        canvas.addEventListener('mousemove', (e) => {
+            if (!drawing) return;
+            const pos = getCoords(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        });
+        canvas.addEventListener('mouseup', () => drawing = false);
+        canvas.addEventListener('mouseleave', () => drawing = false);
+
+        // Mobile Touch Events
+        canvas.addEventListener('touchstart', (e) => {
+            drawing = true;
+            const pos = getCoords(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            e.preventDefault();
+        }, { passive: false });
+        canvas.addEventListener('touchmove', (e) => {
+            if (!drawing) return;
+            const pos = getCoords(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            e.preventDefault();
+        }, { passive: false });
+        canvas.addEventListener('touchend', () => drawing = false);
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // --- 2. Logika e-Meterai Toggle ---
+        function toggleMeterai() {
+            const meterai = document.getElementById('emeterai');
+            if (meterai.style.display === 'none') {
+                meterai.style.display = 'flex';
+            } else {
+                meterai.style.display = 'none';
+            }
+        }
+
+        // --- 3. Logika Otomatis Teks Terbilang saat Angka Diedit ---
+        function terbilang(nilai) {
+            let bilangan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+            let temp = "";
+            nilai = Math.floor(nilai);
+
+            if (nilai < 12) {
+                temp = " " + bilangan[nilai];
+            } else if (nilai < 20) {
+                temp = terbilang(nilai - 10) + " Belas";
+            } else if (nilai < 100) {
+                temp = terbilang(Math.floor(nilai / 10)) + " Puluh" + terbilang(nilai % 10);
+            } else if (nilai < 200) {
+                temp = " Seratus" + terbilang(nilai - 100);
+            } else if (nilai < 1000) {
+                temp = terbilang(Math.floor(nilai / 100)) + " Ratus" + terbilang(nilai % 100);
+            } else if (nilai < 2000) {
+                temp = " Seribu" + terbilang(nilai - 1000);
+            } else if (nilai < 1000000) {
+                temp = terbilang(Math.floor(nilai / 1000)) + " Ribu" + terbilang(nilai % 1000);
+            } else if (nilai < 1000000000) {
+                temp = terbilang(Math.floor(nilai / 1000000)) + " Juta" + terbilang(nilai % 1000000);
+            }
+            return temp.trim();
+        }
+
+        const nominalEl = document.getElementById('lblNominal');
+        nominalEl.addEventListener('input', function() {
+            // Bersihkan teks dari titik/huruf untuk kalkulasi terbilang
+            let angkaMurni = nominalEl.innerText.replace(/[^0-9]/g, '');
+            
+            if (angkaMurni && !isNaN(angkaMurni)) {
+                document.getElementById('lblTerbilang').innerText = terbilang(parseInt(angkaMurni)) + " Rupiah";
+            } else {
+                document.getElementById('lblTerbilang').innerText = "Nol Rupiah";
+            }
+        });
+
+        // Merapikan format ribuan otomatis saat pengguna selesai mengetik angka (pindah fokus)
+        nominalEl.addEventListener('blur', function() {
+            let angkaMurni = nominalEl.innerText.replace(/[^0-9]/g, '');
+            if (angkaMurni) {
+                let formatted = new Intl.NumberFormat('id-ID').format(angkaMurni);
+                nominalEl.innerText = formatted;
+            }
+        });
+    </script>
+</body>
+</html>
