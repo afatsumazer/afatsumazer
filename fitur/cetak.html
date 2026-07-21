@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Kwitansi Resmi</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            color: #222;
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 30px;
+        }
+        .print-btn-container {
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            text-align: right;
+        }
+        .btn-print {
+            font-family: Arial, sans-serif;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        /* Box Dokumen Utama (Terkunci) */
+        .receipt-box {
+            max-width: 800px;
+            margin: auto;
+            padding: 30px;
+            border: 2px solid #333;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+            
+            /* Mengunci Dokumen dari Seleksi teks */
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .receipt-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px double #333;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+        .receipt-header h1 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 2px;
+        }
+        .receipt-row {
+            display: flex;
+            margin-bottom: 18px;
+            align-items: baseline;
+        }
+        .receipt-label {
+            width: 180px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        .receipt-dots {
+            flex-grow: 1;
+            border-bottom: 1px dotted #333;
+            padding-left: 10px;
+            font-size: 14px;
+        }
+        .terbilang-box {
+            font-style: italic;
+            background-color: #f8fafc;
+            padding: 5px 10px;
+            border: 1px dashed #cbd5e1;
+        }
+        .receipt-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            align-items: flex-end;
+        }
+        .amount-box {
+            border: 2px solid #333;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #f1f5f9;
+        }
+
+        /* Grup e-Meterai & Tanda Tangan */
+        .sig-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+        }
+        
+        /* e-Meterai Mockup */
+        .emeterai-box {
+            width: 110px;
+            height: 110px;
+            border: 2px dashed #db2777;
+            background-color: #fdf2f8;
+            padding: 6px;
+            font-family: Arial, sans-serif;
+            font-size: 7px;
+            display: none; /* Sembunyi default */
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+        .emeterai-qr {
+            width: 45px;
+            height: 45px;
+            background: #111;
+        }
+        
+        /* Tanda Tangan Digital */
+        .sig-box {
+            text-align: center;
+            width: 180px;
+        }
+        .sig-badge {
+            font-family: Arial, sans-serif;
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+            font-size: 9px;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none; /* Sembunyi default */
+        }
+        .sig-image-container {
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #333;
+            margin-bottom: 5px;
+        }
+        .sig-image-container img {
+            max-height: 100%;
+            max-width: 100%;
+        }
+
+        /* Aturan Cetak (Print CSS) */
+        @media print {
+            .print-btn-container {
+                display: none !important;
+            }
+            body {
+                background-color: #fff;
+                padding: 0;
+            }
+            .receipt-box {
+                box-shadow: none;
+                border: 2px solid #000;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="print-btn-container">
+        <button class="btn-print" onclick="window.print()">Cetak Kwitansi</button>
+    </div>
+
+    <!-- Dokumen Utama yang Terkunci -->
+    <div class="receipt-box" oncontextmenu="return false;">
+        <div class="receipt-header">
+            <div>
+                <strong>TOKO MANDIRI JAYA</strong><br>
+                <small>Gedung Cyber, Lt. 3, Jakarta</small>
+            </div>
+            <div style="text-align: right;">
+                <h1>KWITANSI</h1>
+                <strong>No. <span id="lblNomor">KW-XXXXXX</span></strong>
+            </div>
+        </div>
+
+        <div class="receipt-row">
+            <span class="receipt-label">Telah Diterima Dari</span>
+            <span class="receipt-dots">: <strong id="lblPembayar">...</strong></span>
+        </div>
+
+        <div class="receipt-row">
+            <span class="receipt-label">Uang Sejumlah</span>
+            <span class="receipt-dots terbilang-box">: <span id="lblTerbilang">...</span></span>
+        </div>
+
+        <div class="receipt-row">
+            <span class="receipt-label">Untuk Pembayaran</span>
+            <span class="receipt-dots">: <span id="lblKeterangan">...</span></span>
+        </div>
+
+        <div class="receipt-footer">
+            <div>
+                <div class="amount-box" id="lblNominal">
+                    Rp 0
+                </div>
+            </div>
+            
+            <div class="sig-container">
+                <!-- e-Meterai Premium -->
+                <div class="emeterai-box" id="meterai-premium">
+                    <span style="font-weight: bold; color: #9d174d;">METERAI ELEKTRONIK</span>
+                    <div class="emeterai-qr"></div>
+                    <span style="font-weight: bold; color: #9d174d;">10000</span>
+                    <span style="font-size: 5px; color:#475569;">SN: MET202607210989</span>
+                </div>
+
+                <!-- Bagian Tanda Tangan -->
+                <div class="sig-box">
+                    <p style="margin: 0 0 5px 0;"><small id="lblTanggal">Jakarta, ...</small></p>
+                    <span class="sig-badge" id="badge-premium">✓ Terverifikasi Digital</span>
+                    
+                    <div class="sig-image-container">
+                        <!-- Tanda tangan asli hasil coretan dari Canvas -->
+                        <img id="imgTtd" src="" alt="Tanda Tangan">
+                    </div>
+                    
+                    <p style="font-weight: bold; margin: 0; font-size: 11px;" id="lblPenerima">...</p>
+                    <small>Kasir</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi Otomatis Mengubah Angka ke Kalimat Terbilang
+        function terbilang(nilai) {
+            let bilangan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+            let temp = "";
+            nilai = Math.floor(nilai);
+
+            if (nilai < 12) {
+                temp = " " + bilangan[nilai];
+            } else if (nilai < 20) {
+                temp = terbilang(nilai - 10) + " Belas";
+            } else if (nilai < 100) {
+                temp = terbilang(Math.floor(nilai / 10)) + " Puluh" + terbilang(nilai % 10);
+            } else if (nilai < 200) {
+                temp = " Seratus" + terbilang(nilai - 100);
+            } else if (nilai < 1000) {
+                temp = terbilang(Math.floor(nilai / 100)) + " Ratus" + terbilang(nilai % 100);
+            } else if (nilai < 2000) {
+                temp = " Seribu" + terbilang(nilai - 1000);
+            } else if (nilai < 1000000) {
+                temp = terbilang(Math.floor(nilai / 1000)) + " Ribu" + terbilang(nilai % 1000);
+            } else if (nilai < 1000000000) {
+                temp = terbilang(Math.floor(nilai / 1000000)) + " Juta" + terbilang(nilai % 1000000);
+            }
+            return temp.trim();
+        }
+
+        // Ambil data dari "database" localStorage saat halaman dimuat
+        window.onload = function() {
+            const dataSore = localStorage.getItem('kwitansi_terbaru');
+            if (dataSore) {
+                const data = JSON.parse(dataSore);
+
+                // Sinkronisasi data ke tampilan HTML
+                document.getElementById('lblNomor').innerText = data.nomor;
+                document.getElementById('lblPembayar').innerText = data.pembayar;
+                document.getElementById('lblKeterangan').innerText = data.keterangan;
+                document.getElementById('lblPenerima').innerText = data.penerima;
+                document.getElementById('lblTanggal').innerText = `Jakarta, ${data.tanggal}`;
+                document.getElementById('imgTtd').src = data.tanda_tangan;
+
+                // Format Rupiah
+                const formattedAmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(data.nominal);
+                document.getElementById('lblNominal').innerText = formattedAmt;
+
+                // Generate Teks Terbilang
+                document.getElementById('lblTerbilang').innerText = terbilang(data.nominal) + " Rupiah";
+
+                // Logika Premium (Tampilkan e-Meterai & Badge jika user mendaftar premium)
+                if (data.level === 'premium') {
+                    document.getElementById('meterai-premium').style.display = 'flex';
+                    document.getElementById('badge-premium').style.display = 'inline-block';
+                }
+            } else {
+                alert("Data kwitansi tidak ditemukan. Silakan isi form di buat.html terlebih dahulu.");
+            }
+        };
+    </script>
+</body>
+</html>
