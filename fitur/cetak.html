@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Kwitansi Resmi</title>
-    <style>
+    <style id="dynamic-style">
+        /* Gaya dasar awal */
         body {
-            font-family: 'Courier New', Courier, monospace;
-            color: #222;
             background-color: #f1f5f9;
             margin: 0;
             padding: 30px;
@@ -27,21 +26,31 @@
             font-weight: bold;
         }
         
-        /* Box Dokumen Utama (Terkunci) */
+        /* Container Kwitansi Utama */
         .receipt-box {
-            max-width: 800px;
             margin: auto;
             padding: 30px;
-            border: 2px solid #333;
             background-color: #fff;
+            border: 2px solid #333;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             box-sizing: border-box;
-            
-            /* Mengunci Dokumen dari Seleksi teks */
             -webkit-user-select: none;
             -ms-user-select: none;
             user-select: none;
         }
+
+        /* Mode Ukuran Kertas Dinamis */
+        .size-a4 {
+            width: 210mm; /* Sesuai lebar A4 */
+            min-height: auto;
+        }
+        .size-struk {
+            width: 80mm; /* Lebar printer struk */
+            padding: 15px;
+            border: 1px dashed #333;
+        }
+
+        /* Header */
         .receipt-header {
             display: flex;
             justify-content: space-between;
@@ -49,15 +58,29 @@
             padding-bottom: 10px;
             margin-bottom: 25px;
         }
+        .size-struk .receipt-header {
+            flex-direction: column;
+            text-align: center;
+            border-bottom: 1px dashed #333;
+        }
         .receipt-header h1 {
             margin: 0;
             font-size: 24px;
             letter-spacing: 2px;
         }
+        .size-struk .receipt-header h1 {
+            font-size: 20px;
+        }
+
+        /* Konten baris */
         .receipt-row {
             display: flex;
             margin-bottom: 18px;
             align-items: baseline;
+        }
+        .size-struk .receipt-row {
+            flex-direction: column;
+            margin-bottom: 12px;
         }
         .receipt-label {
             width: 180px;
@@ -65,23 +88,44 @@
             text-transform: uppercase;
             font-size: 14px;
         }
+        .size-struk .receipt-label {
+            width: 100%;
+            font-size: 11px;
+            color: #555;
+        }
         .receipt-dots {
             flex-grow: 1;
             border-bottom: 1px dotted #333;
             padding-left: 10px;
             font-size: 14px;
         }
+        .size-struk .receipt-dots {
+            width: 100%;
+            border-bottom: none;
+            padding-left: 0;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
         .terbilang-box {
             font-style: italic;
             background-color: #f8fafc;
             padding: 5px 10px;
             border: 1px dashed #cbd5e1;
         }
+
+        /* Footer tanda tangan */
         .receipt-footer {
             display: flex;
             justify-content: space-between;
             margin-top: 40px;
             align-items: flex-end;
+        }
+        .size-struk .receipt-footer {
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 30px;
         }
         .amount-box {
             border: 2px solid #333;
@@ -90,52 +134,16 @@
             font-weight: bold;
             background-color: #f1f5f9;
         }
-
-        /* Grup e-Meterai & Tanda Tangan */
-        .sig-container {
-            display: flex;
-            gap: 20px;
-            align-items: flex-end;
-        }
-        
-        /* e-Meterai Mockup */
-        .emeterai-box {
-            width: 110px;
-            height: 110px;
-            border: 2px dashed #db2777;
-            background-color: #fdf2f8;
-            padding: 6px;
-            font-family: Arial, sans-serif;
-            font-size: 7px;
-            display: none; /* Sembunyi default */
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
+        .size-struk .amount-box {
+            width: 100%;
             text-align: center;
             box-sizing: border-box;
-            border-radius: 4px;
+            font-size: 16px;
         }
-        .emeterai-qr {
-            width: 45px;
-            height: 45px;
-            background: #111;
-        }
-        
-        /* Tanda Tangan Digital */
+
         .sig-box {
             text-align: center;
             width: 180px;
-        }
-        .sig-badge {
-            font-family: Arial, sans-serif;
-            background-color: #d1fae5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
-            font-size: 9px;
-            padding: 1px 6px;
-            border-radius: 10px;
-            font-weight: bold;
-            display: none; /* Sembunyi default */
         }
         .sig-image-container {
             height: 65px;
@@ -145,12 +153,14 @@
             border-bottom: 1px solid #333;
             margin-bottom: 5px;
         }
+        .size-struk .sig-image-container {
+            height: 50px;
+        }
         .sig-image-container img {
             max-height: 100%;
             max-width: 100%;
         }
 
-        /* Aturan Cetak (Print CSS) */
         @media print {
             .print-btn-container {
                 display: none !important;
@@ -163,6 +173,9 @@
                 box-shadow: none;
                 border: 2px solid #000;
             }
+            .size-struk .receipt-box {
+                border: none;
+            }
         }
     </style>
 </head>
@@ -172,16 +185,18 @@
         <button class="btn-print" onclick="window.print()">Cetak Kwitansi</button>
     </div>
 
-    <!-- Dokumen Utama yang Terkunci -->
-    <div class="receipt-box" oncontextmenu="return false;">
+    <!-- Container Kwitansi Utama -->
+    <div class="receipt-box" id="box-receipt" oncontextmenu="return false;">
         <div class="receipt-header">
-            <div>
-                <strong>TOKO MANDIRI JAYA</strong><br>
-                <small>Gedung Cyber, Lt. 3, Jakarta</small>
+            <!-- Info Perusahaan -->
+            <div id="comp-info-block">
+                <strong id="lblPerusahaan" style="font-size: 16px;">...</strong><br>
+                <small id="lblAlamat" style="color: #444;">...</small>
             </div>
-            <div style="text-align: right;">
+            
+            <div style="text-align: right;" id="title-block">
                 <h1>KWITANSI</h1>
-                <strong>No. <span id="lblNomor">KW-XXXXXX</span></strong>
+                <strong>No. <span id="lblNomor">...</span></strong>
             </div>
         </div>
 
@@ -195,7 +210,7 @@
             <span class="receipt-dots terbilang-box">: <span id="lblTerbilang">...</span></span>
         </div>
 
-        <div class="receipt-row">
+        <div class="receipt-row" id="row-keterangan">
             <span class="receipt-label">Untuk Pembayaran</span>
             <span class="receipt-dots">: <span id="lblKeterangan">...</span></span>
         </div>
@@ -207,34 +222,21 @@
                 </div>
             </div>
             
-            <div class="sig-container">
-                <!-- e-Meterai Premium -->
-                <div class="emeterai-box" id="meterai-premium">
-                    <span style="font-weight: bold; color: #9d174d;">METERAI ELEKTRONIK</span>
-                    <div class="emeterai-qr"></div>
-                    <span style="font-weight: bold; color: #9d174d;">10000</span>
-                    <span style="font-size: 5px; color:#475569;">SN: MET202607210989</span>
+            <!-- Area Tanda Tangan -->
+            <div class="sig-box" id="sig-area">
+                <p style="margin: 0 0 5px 0;"><small id="lblTanggal">Jakarta, ...</small></p>
+                
+                <div class="sig-image-container" id="sig-image-wrapper">
+                    <img id="imgTtd" src="" alt="Tanda Tangan">
                 </div>
-
-                <!-- Bagian Tanda Tangan -->
-                <div class="sig-box">
-                    <p style="margin: 0 0 5px 0;"><small id="lblTanggal">Jakarta, ...</small></p>
-                    <span class="sig-badge" id="badge-premium">✓ Terverifikasi Digital</span>
-                    
-                    <div class="sig-image-container">
-                        <!-- Tanda tangan asli hasil coretan dari Canvas -->
-                        <img id="imgTtd" src="" alt="Tanda Tangan">
-                    </div>
-                    
-                    <p style="font-weight: bold; margin: 0; font-size: 11px;" id="lblPenerima">...</p>
-                    <small>Kasir</small>
-                </div>
+                
+                <p style="font-weight: bold; margin: 0; font-size: 12px;" id="lblPenerima">...</p>
+                <small id="lblJabatan">...</small>
             </div>
         </div>
     </div>
 
     <script>
-        // Fungsi Otomatis Mengubah Angka ke Kalimat Terbilang
         function terbilang(nilai) {
             let bilangan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
             let temp = "";
@@ -260,34 +262,82 @@
             return temp.trim();
         }
 
-        // Ambil data dari "database" localStorage saat halaman dimuat
         window.onload = function() {
-            const dataSore = localStorage.getItem('kwitansi_terbaru');
-            if (dataSore) {
-                const data = JSON.parse(dataSore);
+            const storedData = localStorage.getItem('kwitansi_terbaru');
+            if (storedData) {
+                const data = JSON.parse(storedData);
 
-                // Sinkronisasi data ke tampilan HTML
+                // 1. Terapkan Layout Ukuran & Font Dinamis
+                const box = document.getElementById('box-receipt');
+                box.className = 'receipt-box'; // reset
+                
+                if (data.kertas === 'struk') {
+                    box.classList.add('size-struk');
+                } else {
+                    box.classList.add('size-a4');
+                }
+
+                // Terapkan Font dan Warna Tema Pilihan
+                box.style.fontFamily = data.font;
+                box.style.borderColor = data.tema;
+
+                // 2. Terapkan teks / kosongkan jika input kosong
+                if (data.perusahaan) {
+                    document.getElementById('lblPerusahaan').innerText = data.perusahaan;
+                    document.getElementById('lblPerusahaan').style.color = data.tema;
+                } else {
+                    document.getElementById('lblPerusahaan').style.display = 'none';
+                }
+
+                if (data.alamat) {
+                    document.getElementById('lblAlamat').innerText = data.alamat;
+                } else {
+                    document.getElementById('lblAlamat').style.display = 'none';
+                }
+
+                // Hapus blok info perusahaan jika keduanya kosong
+                if (!data.perusahaan && !data.alamat) {
+                    document.getElementById('comp-info-block').style.display = 'none';
+                }
+
+                // Pengisian Detail Transaksi
                 document.getElementById('lblNomor').innerText = data.nomor;
                 document.getElementById('lblPembayar').innerText = data.pembayar;
                 document.getElementById('lblKeterangan').innerText = data.keterangan;
-                document.getElementById('lblPenerima').innerText = data.penerima;
                 document.getElementById('lblTanggal').innerText = `Jakarta, ${data.tanggal}`;
-                document.getElementById('imgTtd').src = data.tanda_tangan;
 
-                // Format Rupiah
+                // Pengisian Jabatan / Penerima
+                if (data.penerima) {
+                    document.getElementById('lblPenerima').innerText = data.penerima;
+                } else {
+                    document.getElementById('lblPenerima').style.display = 'none';
+                }
+
+                if (data.jabatan) {
+                    document.getElementById('lblJabatan').innerText = data.jabatan;
+                } else {
+                    document.getElementById('lblJabatan').style.display = 'none';
+                }
+
+                // Hilangkan area teks tanda tangan jika nama dan jabatan kosong
+                if (!data.penerima && !data.jabatan && !data.tanda_tangan) {
+                    document.getElementById('sig-area').style.display = 'none';
+                }
+
+                // Handle Tanda Tangan Gambar (Dikosongkan jika tidak menggambar)
+                if (data.tanda_tangan) {
+                    document.getElementById('imgTtd').src = data.tanda_tangan;
+                } else {
+                    // Sembunyikan garis/kotak gambar agar tampak rapi jika kosong
+                    document.getElementById('sig-image-wrapper').style.borderBottom = 'none';
+                    document.getElementById('imgTtd').style.display = 'none';
+                }
+
+                // Format Nominal Angka & Kalimat Terbilang
                 const formattedAmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(data.nominal);
                 document.getElementById('lblNominal').innerText = formattedAmt;
-
-                // Generate Teks Terbilang
+                document.getElementById('lblNominal').style.color = data.tema;
                 document.getElementById('lblTerbilang').innerText = terbilang(data.nominal) + " Rupiah";
-
-                // Logika Premium (Tampilkan e-Meterai & Badge jika user mendaftar premium)
-                if (data.level === 'premium') {
-                    document.getElementById('meterai-premium').style.display = 'flex';
-                    document.getElementById('badge-premium').style.display = 'inline-block';
-                }
-            } else {
-                alert("Data kwitansi tidak ditemukan. Silakan isi form di buat.html terlebih dahulu.");
             }
         };
     </script>
