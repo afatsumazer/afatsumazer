@@ -172,7 +172,7 @@
             margin-bottom: 20px;
             font-size: 13px;
             color: #b45309;
-            display: none; /* Muncul hanya saat mode pratinjau */
+            display: none; 
         }
 
         /* --- DESAIN KERTAS KWITANSI --- */
@@ -210,12 +210,35 @@
             align-items: center;
         }
 
-        /* Tanda Tangan */
-        .sig-container { display: flex; gap: 25px; align-items: flex-end; }
-        .sig-box { text-align: center; width: 180px; position: relative; }
+        /* ========================================================== */
+        /* --- ZONA PENGESAHAN DENGAN DRAG METERAI TERBATAS (ANTI MENIMPA) --- */
+        /* ========================================================== */
+        .signing-zone {
+            position: relative;
+            width: 320px; /* Area gabungan meterai dan ttd */
+            height: 150px;
+            border: 1.5px dashed #cbd5e1; /* Garis bantu batas geser meterai */
+            border-radius: 8px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: flex-end; /* TTD tetap rapat kanan */
+            align-items: flex-end;
+            padding: 10px;
+        }
+        .preview-mode .signing-zone {
+            border: none; /* Hilangkan garis bantu saat dicetak/pratinjau */
+        }
+
+        /* Area Tanda Tangan */
+        .sig-box {
+            text-align: center;
+            width: 160px;
+            position: relative;
+            z-index: 2; /* Di bawah kontrol drag, namun mandiri */
+        }
         .canvas-wrapper {
             border-bottom: 1px solid #1e293b;
-            height: 90px;
+            height: 70px;
             margin-bottom: 5px;
             position: relative;
             background-color: transparent;
@@ -226,35 +249,78 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 5; /* Di atas meterai */
+            z-index: 5;
             background: transparent;
             cursor: crosshair;
         }
 
-        /* e-Meterai di Sisi Kiri (Static & Overlaid) */
-        .emeterai-background {
-            width: 85px;
-            height: 85px;
-            border: 1.5px dashed #db2777;
-            background-color: #fdf2f8;
+        /* --- DESAIN E-METERAI STANDAR RESMI RI --- */
+        .emeterai-draggable {
+            width: 105px;
+            height: 105px;
+            border: 1px solid #c2185b;
+            background-color: #fce4ec; /* Pink muda khas e-meterai */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 4px;
             padding: 4px;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
             text-align: center;
-            box-sizing: border-box;
-            border-radius: 4px;
             
+            /* Posisi awal di dalam Signing Zone (Samping Kiri TTD) */
             position: absolute;
-            top: 50%;
-            left: 10px;                  /* Digeser rapat ke sisi kiri area TTD */
-            transform: translateY(-50%); /* Menjaga vertikal di tengah */
-            z-index: 1;                  /* Di bawah coretan pena */
-            opacity: 0.85;
-            display: none;
+            top: 15px;
+            left: 15px;
+            z-index: 10;
+            cursor: move;
+            touch-action: none; /* Lancar di HP */
+            user-select: none;
         }
-        .emeterai-qr { width: 30px; height: 30px; background: #111; }
+        .emeterai-header {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 6px;
+            font-weight: bold;
+            color: #880e4f;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            line-height: 7px;
+        }
+        .emeterai-middle {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            width: 100%;
+            gap: 4px;
+        }
+        /* Logo Garuda Mockup */
+        .emeterai-garuda {
+            font-size: 14px;
+            color: #b71c1c;
+            font-weight: bold;
+        }
+        .emeterai-qr-box {
+            width: 32px;
+            height: 32px;
+            background-image: repeating-linear-gradient(45deg, #333 0px, #333 1px, #fff 1px, #fff 3px);
+            border: 1px solid #880e4f;
+        }
+        .emeterai-value {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 7px;
+            font-weight: 800;
+            color: #880e4f;
+            line-height: 8px;
+        }
+        .emeterai-sn-text {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 4.5px;
+            color: #2c3e50;
+            font-weight: bold;
+            word-break: break-all;
+        }
 
         /* Elemen Input */
         .editable-field {
@@ -416,25 +482,35 @@
                         </div>
                     </div>
                     
-                    <div class="sig-container">
+                    <!-- ZONA PENGESAHAN DENGAN DRAG TERBATAS -->
+                    <div class="signing-zone" id="signing-zone">
+                        
+                        <!-- e-Meterai Desain Standar Resmi RI (Bisa digeser terbatas tanpa menimpa) -->
+                        <div class="emeterai-draggable" id="emeterai-stamp">
+                            <span class="emeterai-header">METERAI<br>ELEKTRONIK</span>
+                            <div class="emeterai-middle">
+                                <span class="emeterai-garuda">🦅</span> <!-- Garuda Mockup -->
+                                <div class="emeterai-qr-box"></div>
+                            </div>
+                            <div class="emeterai-value">
+                                <span style="font-size: 8px;">10000</span><br>
+                                <span style="font-size: 4.5px; letter-spacing: -0.1px;">SEPULUH RIBU RUPIAH</span>
+                            </div>
+                            <span class="emeterai-sn-text">SN:2107261651401293847562</span>
+                        </div>
+
+                        <!-- Area Tanda Tangan -->
                         <div class="sig-box">
                             <p style="margin: 0 0 5px 0;"><small class="editable-field" id="lblTanggal">Jakarta, 21 Juli 2026</small></p>
                             
                             <div class="canvas-wrapper">
-                                <!-- 1. Meterai diletakkan statis di belakang canvas -->
-                                <div class="emeterai-background" id="emeterai-stamp">
-                                    <span style="font-weight: bold; color: #9d174d; font-size: 5px;">METERAI ELEKTRONIK</span>
-                                    <div class="emeterai-qr"></div>
-                                    <span style="font-weight: bold; color: #9d174d; font-size: 6px;">10000</span>
-                                </div>
-                                
-                                <!-- 2. Canvas Tanda Tangan diletakkan di atas meterai -->
                                 <canvas id="sig-canvas"></canvas>
                             </div>
                             
                             <p style="font-weight: bold; margin: 0; font-size: 13px;" class="editable-field" id="lblPenerima">Ahmad Subarjo</p>
                             <small class="editable-field" id="lblJabatan" style="color:#475569;">Kasir Utama</small>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -464,7 +540,7 @@
                 databaseKwitansi = JSON.parse(data);
             } else {
                 databaseKwitansi = [
-                    { id: 1, nomor: "KW-2026-001", tanggal: "21 Juli 2026", pembayar: "Budi Santoso", nominal: "1500000", keterangan: "Website Dev", penerima: "Ahmad Subarjo", jabatan: "Kasir", ttd: "", showMeterai: false }
+                    { id: 1, nomor: "KW-2026-001", tanggal: "21 Juli 2026", pembayar: "Budi Santoso", nominal: "1500000", keterangan: "Website Dev", penerima: "Ahmad Subarjo", jabatan: "Kasir", ttd: "", showMeterai: false, meteraiTranslate: {x: 0, y: 0} }
                 ];
                 simpanDatabase();
             }
@@ -482,7 +558,6 @@
             document.getElementById('editor-view').style.display = 'none';
             document.getElementById('folder-explorer-view').style.display = 'block';
             
-            // Atur ulang Breadcrumb Path
             document.getElementById('path-file').style.display = 'none';
             document.getElementById('path-separator').style.display = 'none';
 
@@ -495,12 +570,10 @@
             
             const nomorBaru = "KW-" + Math.floor(Math.random() * 90000 + 10000);
             
-            // Set Breadcrumb Path ke file baru
             document.getElementById('path-file').innerText = nomorBaru + ".html";
             document.getElementById('path-file').style.display = 'inline';
             document.getElementById('path-separator').style.display = 'inline';
 
-            // Set Form Default
             document.getElementById('lblNo').innerText = nomorBaru;
             document.getElementById('lblPembayar').innerText = "Nama Pelanggan";
             document.getElementById('lblNominal').innerText = "1.000.000";
@@ -509,6 +582,11 @@
             document.getElementById('lblTanggal').innerText = `Jakarta, ${new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}`;
             
             document.getElementById('emeterai-stamp').style.display = 'none'; 
+            
+            // Reset posisi koordinat drag meterai
+            xOffset = 0; yOffset = 0;
+            setTranslate(0, 0, dragItem);
+
             clearSignature();
             masukModeEdit();
             initCanvas(); 
@@ -520,7 +598,6 @@
                 document.getElementById('folder-explorer-view').style.display = 'none';
                 document.getElementById('editor-view').style.display = 'block';
                 
-                // Set Breadcrumb
                 document.getElementById('path-file').innerText = item.nomor + ".html";
                 document.getElementById('path-file').style.display = 'inline';
                 document.getElementById('path-separator').style.display = 'inline';
@@ -536,6 +613,16 @@
 
                 const stamp = document.getElementById('emeterai-stamp');
                 stamp.style.display = item.showMeterai ? 'flex' : 'none';
+
+                // Terapkan koordinat drag e-meterai yang tersimpan sebelumnya
+                if (item.meteraiTranslate) {
+                    xOffset = item.meteraiTranslate.x || 0;
+                    yOffset = item.meteraiTranslate.y || 0;
+                    setTranslate(xOffset, yOffset, stamp);
+                } else {
+                    xOffset = 0; yOffset = 0;
+                    setTranslate(0, 0, stamp);
+                }
 
                 clearSignature();
                 initCanvas();
@@ -645,6 +732,7 @@
                 penerima: document.getElementById('lblPenerima').innerText,
                 jabatan: document.getElementById('lblJabatan').innerText,
                 showMeterai: isMeteraiShown,
+                meteraiTranslate: { x: xOffset, y: yOffset }, // Simpan koordinat geser
                 ttd: canvas.toDataURL('image/png')
             };
 
@@ -661,11 +749,80 @@
         }
 
         // ==========================================
-        // MANAJEMEN E-METERAI & TTD
+        // SISTEM GESER (DRAG) METERAI SECARA TERBATAS
         // ==========================================
+        const dragItem = document.getElementById("emeterai-stamp");
+        const dragContainer = document.getElementById("signing-zone");
+
+        let active = false;
+        let currentX, currentY, initialX, initialY;
+        let xOffset = 0;
+        let yOffset = 0;
+
+        dragContainer.addEventListener("mousedown", dragStart);
+        dragContainer.addEventListener("mousemove", drag);
+        dragContainer.addEventListener("mouseup", dragEnd);
+
+        dragContainer.addEventListener("touchstart", dragStart, { passive: true });
+        dragContainer.addEventListener("touchmove", drag, { passive: false });
+        dragContainer.addEventListener("touchend", dragEnd);
+
+        function dragStart(e) {
+            if (!isUserRegistered || !isEditableState) return; 
+
+            if (e.target === dragItem || dragItem.contains(e.target)) {
+                active = true;
+                if (e.type === "touchstart") {
+                    initialX = e.touches[0].clientX - xOffset;
+                    initialY = e.touches[0].clientY - yOffset;
+                } else {
+                    initialX = e.clientX - xOffset;
+                    initialY = e.clientY - yOffset;
+                }
+            }
+        }
+
+        function drag(e) {
+            if (active) {
+                e.preventDefault(); 
+                
+                let clientX = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
+                let clientY = e.type === "touchmove" ? e.touches[0].clientY : e.clientY;
+
+                let tempX = clientX - initialX;
+                let tempY = clientY - initialY;
+
+                // --- LOGIKA BATASAN AREA GESER (BOUNDARY RESTRICTION) ---
+                const containerRect = dragContainer.getBoundingClientRect();
+                const itemRect = dragItem.getBoundingClientRect();
+
+                // Batas geser kiri/kanan. Posisi awal left adalah 15px.
+                const minX = -15; // Batas mentok kiri
+                // Batas mentok kanan: tidak boleh menabrak tanda tangan (sig-box lebar 160px di kanan)
+                const maxX = containerRect.width - itemRect.width - 160 - 15; 
+
+                // Batas geser atas/bawah. Posisi awal top adalah 15px.
+                const minY = -15; // Batas mentok atas
+                const maxY = containerRect.height - itemRect.height - 15; // Batas mentok bawah
+
+                // Kurung pergeseran di dalam koordinat batas aman
+                xOffset = Math.min(Math.max(tempX, minX), maxX);
+                yOffset = Math.min(Math.max(tempY, minY), maxY);
+
+                setTranslate(xOffset, yOffset, dragItem);
+            }
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+        }
+        function dragEnd() { active = false; }
+
         function toggleMeterai() {
             if (!isEditableState) return;
             const meterai = document.getElementById('emeterai-stamp');
+            xOffset = 0; yOffset = 0;
+            setTranslate(0, 0, dragItem);
             meterai.style.display = (meterai.style.display === 'none') ? 'flex' : 'none';
         }
 
@@ -678,7 +835,7 @@
             const file = event.target.files[0];
             if (file) {
                 if (!file.type.startsWith('image/')) {
-                    alert("Harap pilih gambar file e-meterai resmi Anda.");
+                    alert("Harap pilih gambar file e-meterai resmi.");
                     return;
                 }
                 const reader = new FileReader();
