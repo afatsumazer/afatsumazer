@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Manajemen Kwitansi</title>
+    <title>Sistem Manajemen Kwitansi Aman</title>
     <style>
         /* --- GAYA GLOBAL --- */
         body {
@@ -41,23 +41,17 @@
         .btn-warning { background-color: #f59e0b; color: white; }
         .btn-secondary { background-color: #64748b; color: white; }
 
-        /* --- 1. TAMPILAN DASHBOARD (MENU UTAMA) --- */
+        /* --- 1. TAMPILAN DASHBOARD --- */
         #dashboard-view {
             display: block; /* Aktif pertama kali */
         }
-        
         .db-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
         }
-        .db-header h2 {
-            margin: 0;
-            color: #1e3a8a;
-        }
-
-        /* Kartu Statistik */
+        .db-header h2 { margin: 0; color: #1e3a8a; }
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -71,20 +65,8 @@
             border: 1px solid #e2e8f0;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
         }
-        .stat-card h4 {
-            margin: 0 0 10px 0;
-            color: #64748b;
-            font-size: 13px;
-            text-transform: uppercase;
-        }
-        .stat-card p {
-            margin: 0;
-            font-size: 24px;
-            font-weight: bold;
-            color: #0f172a;
-        }
-
-        /* Tabel Riwayat Transaksi */
+        .stat-card h4 { margin: 0 0 10px 0; color: #64748b; font-size: 13px; text-transform: uppercase; }
+        .stat-card p { margin: 0; font-size: 24px; font-weight: bold; color: #0f172a; }
         .table-card {
             background-color: #ffffff;
             border-radius: 8px;
@@ -92,38 +74,18 @@
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
             overflow: hidden;
         }
-        .table-title {
-            padding: 20px;
-            font-weight: bold;
-            font-size: 16px;
-            border-bottom: 1px solid #e2e8f0;
-            color: #1e3a8a;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 14px;
-        }
-        th {
-            background-color: #f8fafc;
-            padding: 12px 20px;
-            color: #64748b;
-            font-weight: 600;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        td {
-            padding: 14px 20px;
-            border-bottom: 1px solid #e2e8f0;
-        }
+        .table-title { padding: 20px; font-weight: bold; font-size: 16px; border-bottom: 1px solid #e2e8f0; color: #1e3a8a; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        th { background-color: #f8fafc; padding: 12px 20px; color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 14px 20px; border-bottom: 1px solid #e2e8f0; }
         tr:hover { background-color: #f8fafc; }
 
-        /* --- 2. TAMPILAN EDITOR DOKUMEN --- */
+        /* --- 2. TAMPILAN EDITOR --- */
         #editor-view {
-            display: none; /* Sembunyi sampai tombol buat baru diklik */
+            display: none;
         }
 
-        /* Toolbar Editor */
+        /* Toolbar Dinamis */
         .toolbar {
             background-color: #ffffff;
             border: 1px solid #cbd5e1;
@@ -136,17 +98,22 @@
             box-sizing: border-box;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
         }
-        .toolbar-title {
+        .btn-group { display: flex; gap: 10px; }
+
+        /* Peringatan Pratinjau Meterai */
+        .preview-alert {
+            display: none; /* Sembunyi secara default */
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+            border-left: 5px solid #d97706;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
             font-size: 13px;
-            font-weight: bold;
-            color: #1e3a8a;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
+            color: #b45309;
         }
 
-        /* Gaya Dokumen Kwitansi (Sama seperti versi sebelumnya) */
+        /* --- DESAIN KWITANSI --- */
         .receipt-box {
             font-family: 'Courier New', Courier, monospace;
             background-color: #ffffff;
@@ -170,22 +137,48 @@
         .receipt-content { flex-grow: 1; font-size: 15px; }
         .terbilang-box { font-style: italic; background-color: #f8fafc; border: 1px dashed #cbd5e1; padding: 5px 10px; }
         .receipt-bottom { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 50px; }
-        .amount-container { font-size: 20px; font-weight: bold; font-style: italic; border: 2px solid #1e293b; padding: 12px 24px; background-color: #f1f5f9; display: inline-flex; align-items: center; }
         
+        /* Nominal rupiah dimiringkan & diakhiri ,- */
+        .amount-container {
+            font-size: 20px;
+            font-weight: bold;
+            font-style: italic; /* Dimiringkan */
+            border: 2px solid #1e293b;
+            padding: 12px 24px;
+            background-color: #f1f5f9;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        /* Area Tanda Tangan */
         .sig-container { display: flex; gap: 25px; align-items: flex-end; }
         .sig-box { text-align: center; width: 180px; position: relative; }
-        .canvas-wrapper { border-bottom: 1px solid #1e293b; height: 70px; margin-bottom: 5px; position: relative; touch-action: none; }
-        #sig-canvas { width: 100%; height: 100%; position: absolute; top: 0; left: 0; cursor: crosshair; }
+        
+        .canvas-wrapper {
+            border-bottom: 1px solid #1e293b;
+            height: 90px;
+            margin-bottom: 5px;
+            position: relative;
+            background-color: transparent;
+        }
+        #sig-canvas {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 5; /* Gambar ttd berada di atas meterai */
+            background: transparent;
+            cursor: crosshair;
+        }
 
-        /* e-Meterai Draggable */
-        .emeterai-draggable {
-            width: 110px;
-            height: 110px;
-            border: 2px dashed #db2777;
+        /* e-Meterai Statis di Belakang Tanda Tangan */
+        .emeterai-background {
+            width: 85px;
+            height: 85px;
+            border: 1.5px dashed #db2777;
             background-color: #fdf2f8;
-            padding: 6px;
-            font-family: Arial, sans-serif;
-            font-size: 7px;
+            padding: 4px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -194,15 +187,14 @@
             box-sizing: border-box;
             border-radius: 4px;
             position: absolute;
-            bottom: 35px;
-            left: 35px;
-            cursor: move;
-            z-index: 10;
-            touch-action: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1; /* Berada di bawah coretan ttd */
+            opacity: 0.85;
+            display: none; /* Sembunyi default, dipicu oleh tombol */
         }
-        .emeterai-qr { width: 45px; height: 45px; background: #111; pointer-events: none; }
-        .emeterai-draggable * { pointer-events: none; }
+        .emeterai-qr { width: 30px; height: 30px; background: #111; }
 
         /* Input Teks dapat Diedit oleh User Login */
         .editable-field {
@@ -211,17 +203,23 @@
             border-bottom: 1px dashed #94a3b8;
             padding: 1px 4px;
         }
-        .editable-field[contenteditable="true"]:hover { background-color: #f0f9ff; }
-        .editable-field[contenteditable="true"]:focus { background-color: #e0f2fe; border-bottom: 1px solid #0284c7; }
+        
+        /* Mode Pratinjau (Sembunyikan semua border edit) */
+        .preview-mode .editable-field {
+            border-bottom: none !important;
+            padding: 0;
+        }
+        .preview-mode [contenteditable="true"] {
+            background-color: transparent !important;
+        }
 
         /* --- PRINT MEDIA --- */
         @media print {
             body { background: none; padding: 0; }
-            #dashboard-view, .toolbar { display: none !important; }
+            #dashboard-view, .toolbar, .preview-alert { display: none !important; }
             #editor-view { display: block !important; }
             .receipt-box { box-shadow: none; border: 2px solid #000; }
             .editable-field { border-bottom: none !important; padding: 0; }
-            .emeterai-draggable { box-shadow: none; }
         }
     </style>
 </head>
@@ -264,25 +262,43 @@
                         </tr>
                     </thead>
                     <tbody id="table-body">
-                        <!-- Baris diisi dinamis oleh JS -->
+                        <!-- Diisi dinamis oleh JS -->
                     </tbody>
                 </table>
             </div>
         </div>
 
         <!-- ================================================== -->
-        <!-- 2. EDITOR VIEW (DOKUMEN INTERAKTIF) -->
+        <!-- 2. EDITOR VIEW (DOKUMEN AMAN & VERIFIKASI) -->
         <!-- ================================================== -->
         <div id="editor-view">
+            
+            <!-- Kotak Peringatan Pratinjau e-Meterai -->
+            <div class="preview-alert" id="preview-alert-box">
+                <strong>⚠️ PERINGATAN PENTING (PRATINJAU DOKUMEN):</strong><br>
+                Harap teliti kembali seluruh data di bawah ini (Nama, Nominal, dan Terbilang) sebelum dicetak atau disimpan. 
+                e-Meterai adalah dokumen berharga sekali pakai [4]. Jika ada kesalahan ketik setelah dokumen dicetak, meterai Anda akan hangus dan tidak bisa digunakan kembali [4].
+            </div>
+
             <!-- Toolbar Editor -->
             <div class="toolbar">
-                <button class="btn btn-secondary" onclick="kembaliKeDashboard()">🡠 Kembali ke Dashboard</button>
-                <div class="btn-group">
-                    <button class="btn btn-upload" onclick="triggerMeteraiUpload()">Upload e-Meterai</button>
-                    <button class="btn btn-toggle" onclick="toggleMeterai()">Sembunyikan Meterai</button>
-                    <button class="btn btn-reset" onclick="clearSignature()">Hapus TTD</button>
-                    <button class="btn btn-success" onclick="simpanKwitansiKeDB()">✔ Simpan ke Database</button>
-                    <button class="btn btn-print" onclick="window.print()">🖨 Cetak / PDF</button>
+                <!-- SISI KIRI: Navigasi & Kontrol Edit -->
+                <div id="toolbar-left-group">
+                    <button class="btn btn-secondary" id="btn-back-dashboard" onclick="kembaliKeDashboard()">🡠 Kembali ke Dashboard</button>
+                    <button class="btn btn-warning" id="btn-edit-back" onclick="masukModeEdit()" style="display: none;">✍ Edit Kembali (Ada Typo)</button>
+                </div>
+
+                <!-- SISI KANAN: Manajemen & Finalisasi -->
+                <div class="btn-group" id="toolbar-right-group">
+                    <!-- Tombol khusus saat Mode Edit aktif -->
+                    <button class="btn btn-upload edit-control" onclick="triggerMeteraiUpload()">Upload e-Meterai</button>
+                    <button class="btn btn-toggle edit-control" onclick="toggleMeterai()">Pasang/Lepas Meterai</button>
+                    <button class="btn btn-reset edit-control" onclick="clearSignature()">Hapus TTD</button>
+                    <button class="btn btn-primary edit-control" onclick="masukModePratinjau()">👁 Kunci & Pratinjau</button>
+
+                    <!-- Tombol khusus saat Mode Pratinjau aktif -->
+                    <button class="btn btn-success preview-control" id="btn-save-db" onclick="simpanKwitansiKeDB()" style="display: none;">✔ Konfirmasi & Simpan ke DB</button>
+                    <button class="btn btn-print preview-control" id="btn-print-final" onclick="window.print()" style="display: none;">🖨 Konfirmasi & Cetak Resmi</button>
                 </div>
             </div>
 
@@ -292,14 +308,6 @@
             <!-- Kertas Kwitansi Utama -->
             <div class="receipt-box" id="document-paper" oncontextmenu="return false;">
                 
-                <!-- e-Meterai Draggable -->
-                <div class="emeterai-draggable" id="emeterai-stamp">
-                    <span style="font-weight: bold; color: #9d174d;">METERAI ELEKTRONIK</span>
-                    <div class="emeterai-qr"></div>
-                    <span style="font-weight: bold; color: #9d174d;">10000</span>
-                    <span style="font-size: 5px; color:#475569;">SN: MET202607210989</span>
-                </div>
-
                 <!-- Header Dokumen -->
                 <div class="receipt-header">
                     <div>
@@ -333,6 +341,7 @@
                     <div>
                         <div class="amount-container">
                             <span>Rp </span>
+                            <!-- Angka nominal diatur miring & diakhiri ,- -->
                             <span id="lblNominal" class="editable-field" style="border-bottom: none; font-weight: bold; min-width: 50px; display: inline-block;">1.500.000</span>
                             <span>,-</span>
                         </div>
@@ -341,9 +350,19 @@
                     <div class="sig-container">
                         <div class="sig-box">
                             <p style="margin: 0 0 5px 0;"><small class="editable-field" id="lblTanggal">Jakarta, 21 Juli 2026</small></p>
+                            
                             <div class="canvas-wrapper">
+                                <!-- 1. Meterai diletakkan statis di belakang canvas -->
+                                <div class="emeterai-background" id="emeterai-stamp">
+                                    <span style="font-weight: bold; color: #9d174d; font-size: 5px;">METERAI ELEKTRONIK</span>
+                                    <div class="emeterai-qr"></div>
+                                    <span style="font-weight: bold; color: #9d174d; font-size: 6px;">10000</span>
+                                </div>
+                                
+                                <!-- 2. Canvas Tanda Tangan diletakkan di atas meterai -->
                                 <canvas id="sig-canvas"></canvas>
                             </div>
+                            
                             <p style="font-weight: bold; margin: 0; font-size: 13px;" class="editable-field" id="lblPenerima">Ahmad Subarjo</p>
                             <small class="editable-field" id="lblJabatan" style="color:#475569;">Kasir Utama</small>
                         </div>
@@ -354,21 +373,16 @@
 
     </div>
 
-    <!-- LOGIK JAVASCRIPT INTEGRAL -->
+    <!-- LOGIK JAVASCRIPT AMAN -->
     <script>
-        // ==========================================
-        // Otorisasi Sesi (Simulasi)
-        // ==========================================
         const isUserRegistered = true; 
-
-        // Database array lokal disimpan dalam localStorage
         let databaseKwitansi = [];
+        let isEditableState = true; // Menyimpan status apakah dokumen sedang dalam mode edit
 
-        // Muat database pertama kali saat halaman dibuka
         window.addEventListener('load', () => {
             initCanvas();
             muatDataDariDatabase();
-            applyAccessControl();
+            masukModeEdit(); // Mulai dengan mode edit saat membuat baru
         });
 
         function muatDataDariDatabase() {
@@ -376,9 +390,8 @@
             if (dataTerdaftar) {
                 databaseKwitansi = JSON.parse(dataTerdaftar);
             } else {
-                // Sediakan data dummy awal jika kosong
                 databaseKwitansi = [
-                    { id: 1, nomor: "KW-2026-001", tanggal: "21 Juli 2026", pembayar: "Budi Santoso", nominal: "1500000", keterangan: "Website Dev", penerima: "Ahmad Subarjo", jabatan: "Kasir", ttd: "" }
+                    { id: 1, nomor: "KW-2026-001", tanggal: "21 Juli 2026", pembayar: "Budi Santoso", nominal: "1500000", keterangan: "Website Dev", penerima: "Ahmad Subarjo", jabatan: "Kasir", ttd: "", showMeterai: false }
                 ];
                 simpanKeLocalStorage();
             }
@@ -390,7 +403,7 @@
         }
 
         // ==========================================
-        // Navigasi Antar Halaman (SPA)
+        // SISTEM NAVIGASI (SPA)
         // ==========================================
         function kembaliKeDashboard() {
             document.getElementById('editor-view').style.display = 'none';
@@ -402,7 +415,6 @@
             document.getElementById('dashboard-view').style.display = 'none';
             document.getElementById('editor-view').style.display = 'block';
             
-            // Atur ulang nilai form default kwitansi baru
             document.getElementById('lblNo').innerText = "KW-" + Math.floor(Math.random() * 90000 + 10000);
             document.getElementById('lblPembayar').innerText = "Nama Pelanggan";
             document.getElementById('lblNominal').innerText = "1.000.000";
@@ -410,8 +422,10 @@
             document.getElementById('lblKeterangan').innerText = "Keterangan Pembayaran";
             document.getElementById('lblTanggal').innerText = `Jakarta, ${new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}`;
             
+            document.getElementById('emeterai-stamp').style.display = 'none'; // reset meterai
             clearSignature();
-            initCanvas(); // set ulang ukuran canvas setelah terlihat di layar
+            masukModeEdit();
+            initCanvas(); 
         }
 
         function bukaEditorEdit(id) {
@@ -429,6 +443,14 @@
                 document.getElementById('lblPenerima').innerText = item.penerima;
                 document.getElementById('lblJabatan').innerText = item.jabatan;
 
+                // Tampilkan e-meterai sesuai kondisi data tersimpan
+                const stamp = document.getElementById('emeterai-stamp');
+                if (item.showMeterai) {
+                    stamp.style.display = 'flex';
+                } else {
+                    stamp.style.display = 'none';
+                }
+
                 clearSignature();
                 initCanvas();
 
@@ -437,11 +459,67 @@
                     img.onload = () => ctx.drawImage(img, 0, 0);
                     img.src = item.ttd;
                 }
+                masukModeEdit();
             }
         }
 
         // ==========================================
-        // Render Tampilan Dashboard Utama
+        // SISTEM KONTROL MODAL PRATINJAU (ANTI-SALAH)
+        // ==========================================
+        function masukModeEdit() {
+            isEditableState = true;
+            document.getElementById('document-paper').classList.remove('preview-mode');
+            
+            // Atur Visibilitas Kontrol Toolbar
+            document.querySelectorAll('.edit-control').forEach(el => el.style.display = 'inline-flex');
+            document.querySelectorAll('.preview-control').forEach(el => el.style.display = 'none');
+            
+            document.getElementById('btn-back-dashboard').style.display = 'inline-flex';
+            document.getElementById('btn-edit-back').style.display = 'none';
+            document.getElementById('preview-alert-box').style.display = 'none';
+
+            applyAccessControl();
+        }
+
+        function masukModePratinjau() {
+            // Periksa apakah angka nominal valid
+            const nominalMurni = document.getElementById('lblNominal').innerText.replace(/[^0-9]/g, '');
+            if (!nominalMurni || isNaN(nominalMurni) || parseInt(nominalMurni) <= 0) {
+                alert("Harap masukkan nilai nominal angka yang valid sebelum mengunci dokumen.");
+                return;
+            }
+
+            isEditableState = false;
+            document.getElementById('document-paper').classList.add('preview-mode');
+            
+            // Atur Visibilitas Kontrol Toolbar
+            document.querySelectorAll('.edit-control').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.preview-control').forEach(el => el.style.display = 'inline-flex');
+            
+            document.getElementById('btn-back-dashboard').style.display = 'none';
+            document.getElementById('btn-edit-back').style.display = 'inline-flex';
+            document.getElementById('preview-alert-box').style.display = 'block';
+
+            applyAccessControl();
+        }
+
+        function applyAccessControl() {
+            const fields = document.querySelectorAll('.editable-field');
+            const canvasEl = document.getElementById('sig-canvas');
+
+            if (isUserRegistered && isEditableState) {
+                // Diizinkan Edit
+                fields.forEach(field => field.setAttribute('contenteditable', 'true'));
+                canvasEl.style.pointerEvents = 'auto'; 
+            } else {
+                // Dikunci (Mode Pratinjau / Tamu)
+                fields.forEach(field => field.setAttribute('contenteditable', 'false'));
+                canvasEl.style.pointerEvents = 'none'; 
+            }
+        }
+
+        // ==========================================
+        // DATABASE & STATISTIK
         // ==========================================
         function renderDashboard() {
             const tbody = document.getElementById('table-body');
@@ -462,7 +540,7 @@
                     <td>${item.pembayar}</td>
                     <td>${formattedNominal}</td>
                     <td style="text-align: center;">
-                        <button class="btn btn-warning" style="padding: 5px 10px; font-size: 11px;" onclick="bukaEditorEdit(${item.id})">Edit / Cetak</button>
+                        <button class="btn btn-warning" style="padding: 5px 10px; font-size: 11px;" onclick="bukaEditorEdit(${item.id})">Pratinjau / Edit / Cetak</button>
                         <button class="btn btn-danger" style="padding: 5px 10px; font-size: 11px;" onclick="hapusTransaksi(${item.id})">Hapus</button>
                     </td>
                 `;
@@ -474,22 +552,21 @@
         }
 
         function hapusTransaksi(id) {
-            if (confirm("Apakah Anda yakin ingin menghapus kwitansi ini dari riwayat database?")) {
+            if (confirm("Apakah Anda yakin ingin menghapus kwitansi ini dari database?")) {
                 databaseKwitansi = databaseKwitansi.filter(k => k.id !== id);
                 simpanKeLocalStorage();
                 renderDashboard();
             }
         }
 
-        // ==========================================
-        // Simpan Kwitansi yang Sedang Diedit Ke DB
-        // ==========================================
         function simpanKwitansiKeDB() {
             const nominalMurni = document.getElementById('lblNominal').innerText.replace(/[^0-9]/g, '');
             const nomorKwitansi = document.getElementById('lblNo').innerText;
+            const stamp = document.getElementById('emeterai-stamp');
+            const isMeteraiShown = (stamp.style.display === 'flex');
 
             const dataBaru = {
-                id: Date.now(), // Generate ID Unik
+                id: Date.now(),
                 nomor: nomorKwitansi,
                 tanggal: document.getElementById('lblTanggal').innerText,
                 pembayar: document.getElementById('lblPembayar').innerText,
@@ -497,103 +574,33 @@
                 keterangan: document.getElementById('lblKeterangan').innerText,
                 penerima: document.getElementById('lblPenerima').innerText,
                 jabatan: document.getElementById('lblJabatan').innerText,
+                showMeterai: isMeteraiShown,
                 ttd: canvas.toDataURL('image/png')
             };
 
-            // Cari apakah nomor kwitansi sudah ada (untuk fungsi update)
             const index = databaseKwitansi.findIndex(k => k.nomor === nomorKwitansi);
             if (index !== -1) {
-                databaseKwitansi[index] = dataBaru; // Update data lama
+                databaseKwitansi[index] = dataBaru;
             } else {
-                databaseKwitansi.push(dataBaru); // Tambahkan data baru
+                databaseKwitansi.push(dataBaru);
             }
 
             simpanKeLocalStorage();
-            alert("Kwitansi Berhasil Disimpan ke Database WebApp Anda.");
+            alert("Data Berhasil Disimpan ke Database.");
             kembaliKeDashboard();
         }
 
         // ==========================================
-        // Hak Akses Edit (contenteditable)
+        // MANAJEMEN E-METERAI
         // ==========================================
-        function applyAccessControl() {
-            const fields = document.querySelectorAll('.editable-field');
-            const canvasEl = document.getElementById('sig-canvas');
-            const emeteraiEl = document.getElementById('emeterai-stamp');
-
-            if (isUserRegistered) {
-                fields.forEach(field => field.setAttribute('contenteditable', 'true'));
-                canvasEl.style.pointerEvents = 'auto'; 
-            } else {
-                fields.forEach(field => {
-                    field.setAttribute('contenteditable', 'false');
-                    field.style.borderBottom = 'none'; 
-                });
-                canvasEl.style.pointerEvents = 'none'; 
-                emeteraiEl.style.cursor = 'default';
-            }
-        }
-
-        // ==========================================
-        // Logika Drag e-Meterai
-        // ==========================================
-        const dragItem = document.getElementById("emeterai-stamp");
-        const container = document.getElementById("document-paper");
-
-        let active = false;
-        let currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
-
-        container.addEventListener("mousedown", dragStart);
-        container.addEventListener("mousemove", drag);
-        container.addEventListener("mouseup", dragEnd);
-        container.addEventListener("touchstart", dragStart, { passive: true });
-        container.addEventListener("touchmove", drag, { passive: false });
-        container.addEventListener("touchend", dragEnd);
-
-        function dragStart(e) {
-            if (!isUserRegistered) return; 
-            if (e.target === dragItem || dragItem.contains(e.target)) {
-                active = true;
-                if (e.type === "touchstart") {
-                    initialX = e.touches[0].clientX - xOffset;
-                    initialY = e.touches[0].clientY - yOffset;
-                } else {
-                    initialX = e.clientX - xOffset;
-                    initialY = e.clientY - yOffset;
-                }
-            }
-        }
-
-        function drag(e) {
-            if (active) {
-                e.preventDefault(); 
-                if (e.type === "touchmove") {
-                    currentX = e.touches[0].clientX - initialX;
-                    currentY = e.touches[0].clientY - initialY;
-                } else {
-                    currentX = e.clientX - initialX;
-                    currentY = e.clientY - initialY;
-                }
-                xOffset = currentX;
-                yOffset = currentY;
-                setTranslate(currentX, currentY, dragItem);
-            }
-        }
-
-        function setTranslate(xPos, yPos, el) {
-            el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
-        }
-        function dragEnd() { active = false; }
-
         function toggleMeterai() {
+            if (!isEditableState) return;
             const meterai = document.getElementById('emeterai-stamp');
-            xOffset = 0; yOffset = 0;
-            dragItem.style.transform = "translate3d(0, 0, 0)";
             meterai.style.display = (meterai.style.display === 'none') ? 'flex' : 'none';
         }
 
         function triggerMeteraiUpload() {
-            if (!isUserRegistered) return;
+            if (!isUserRegistered || !isEditableState) return;
             document.getElementById('meterai-file-input').click();
         }
 
@@ -601,7 +608,7 @@
             const file = event.target.files[0];
             if (file) {
                 if (!file.type.startsWith('image/')) {
-                    alert("Harap pilih file gambar e-meterai resmi.");
+                    alert("Harap pilih gambar e-meterai resmi Anda.");
                     return;
                 }
                 const reader = new FileReader();
@@ -619,7 +626,7 @@
         }
 
         // ==========================================
-        // Logika Tanda Tangan Canvas
+        // TANDA TANGAN CANVAS
         // ==========================================
         const canvas = document.getElementById('sig-canvas');
         const ctx = canvas.getContext('2d');
@@ -643,7 +650,7 @@
         }
 
         canvas.addEventListener('mousedown', (e) => {
-            if (!isUserRegistered) return;
+            if (!isUserRegistered || !isEditableState) return;
             drawing = true;
             const pos = getSigCoords(e);
             ctx.beginPath();
@@ -659,7 +666,7 @@
         canvas.addEventListener('mouseleave', () => drawing = false);
 
         canvas.addEventListener('touchstart', (e) => {
-            if (!isUserRegistered) return;
+            if (!isUserRegistered || !isEditableState) return;
             drawing = true;
             const pos = getSigCoords(e);
             ctx.beginPath();
@@ -680,7 +687,7 @@
         }
 
         // ==========================================
-        // Otomatisasi Terbilang Nominal
+        // OTOMATISASI TERBILANG
         // ==========================================
         function terbilang(nilai) {
             let bilangan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
