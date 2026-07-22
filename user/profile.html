@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Publik Pengguna</title>
+    <style>
+        /* CSS Dasar & Layout (Tetap Estetik & Responsif) */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f8f9fa; color: #212529; padding: 0; }
+        .container { max-width: 935px; margin: 0 auto; padding: 20px; }
+        
+        /* Header Profil */
+        .profile-header { background: white; border: 1px solid #dbdbdb; border-radius: 16px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .cover-photo { height: 180px; background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); width: 100%; background-size: cover; background-position: center; }
+        .profile-info-wrapper { padding: 0 30px 30px 30px; position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .avatar { width: 120px; height: 120px; border-radius: 50%; border: 5px solid white; object-fit: cover; margin-top: -60px; background-color: #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .user-name { font-size: 1.6rem; font-weight: 700; margin-top: 15px; color: #1a1a1a; }
+        .user-username { font-size: 0.95rem; color: #737373; margin-bottom: 12px; }
+        .user-bio { font-size: 0.95rem; max-width: 500px; line-height: 1.5; color: #4a4a4a; margin-bottom: 20px; }
+        .btn-share { padding: 8px 24px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; text-decoration: none; cursor: pointer; background-color: #0095f6; color: white; border: none; transition: background 0.2s; }
+        .btn-share:hover { background-color: #1877f2; }
+
+        /* Grid Konten */
+        .content-title-bar { border-top: 1px solid #dbdbdb; padding-top: 20px; margin-bottom: 20px; font-size: 1.1rem; font-weight: 700; color: #262626; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: white; border: 1px solid #e6e6e6; border-radius: 12px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.06); }
+        .card-image { width: 100%; height: 180px; object-fit: cover; }
+        .card-body { padding: 16px; display: flex; flex-direction: column; flex-grow: 1; }
+        .badge { align-self: flex-start; padding: 4px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
+        .badge-postcard { background-color: #e8f4fd; color: #1d9bf0; }
+        .badge-public { background-color: #eaf7ed; color: #1b5e20; }
+        .card-title { font-size: 1.1rem; margin-bottom: 8px; color: #262626; font-weight: 600; }
+        .card-text { font-size: 0.9rem; color: #536471; line-height: 1.4; margin-bottom: 15px; flex-grow: 1; }
+        .card-footer { font-size: 0.75rem; color: #8e8e8e; border-top: 1px solid #f2f2f2; padding-top: 12px; }
+        
+        /* Status Loading */
+        .loading { text-align: center; padding: 40px; font-size: 1.2rem; color: #666; }
+        @media (max-width: 500px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Struktur Profil Atas -->
+        <div class="profile-header">
+            <div class="cover-photo" id="user-cover"></div>
+            <div class="profile-info-wrapper">
+                <img src="" alt="Avatar" class="avatar" id="user-avatar" style="display:none;">
+                <h1 class="user-name" id="user-name">Memuat profil...</h1>
+                <p class="user-username" id="user-username"></p>
+                <p class="user-bio" id="user-bio"></p>
+                <button class="btn btn-share" onclick="salinLink()">Bagikan Profil</button>
+            </div>
+        </div>
+
+        <div class="content-title-bar">📌 Kiriman Publik & Postcard</div>
+        
+        <!-- Wadah Grid untuk menampung Postcard dari Firebase -->
+        <div class="grid" id="posts-grid">
+            <div class="loading" id="loading-status">Sedang mengambil data konten...</div>
+        </div>
+    </div>
+
+    <!-- ================= INSTALASI FIREBASE SDK (v10) ================= -->
+    <script type="module">
+        import { initializeApp } from "https://gstatic.com";
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://gstatic.com";
+
+        // 1. ISI DENGAN KONFIGURASI FIREBASE PROYEK ANDA
+        const firebaseConfig = {
+            apiKey: "AIzaSyYOUR_API_KEY_HERE",
+            authDomain: "://firebaseapp.com",
+            projectId: "your-app-id",
+            storageBucket: "://appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:12345:web:abcdef"
+        };
+
+        // Inisialisasi Firebase & Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 2. MENGAMBIL USER ID DARI URL (Contoh akses: index.html?id=user123)
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('id') || '?id='; // Default ke 'user123' jika parameter kosong
+
+        // 3. AMBIL DATA PROFIL DARI FIRESTORE
+        async function muatProfil() {
+            try {
+                const userDocRef = doc(db, "users", userId);
+                const userSnapshot = await getDoc(userDocRef);
+
+                if (userSnapshot.exists()) {
+                    const userData = userSnapshot.data();
+                    
+                    // Pasang data ke HTML
+                    document.getElementById('user-name').innerText = userData.name;
+                    document.getElementById('user-username').innerText = `@${userData.username}`;
+                    document.getElementById('user-bio').innerText = userData.bio;
+                    
+                    const avatarImg = document.getElementById('user-avatar');
+                    avatarImg.src = userData.avatar || 'https://placeholder.com';
+                    avatarImg.style.display = 'block';
+
+                    if(userData.cover) {
+                        document.getElementById('user-cover').style.backgroundImage = `url('${userData.cover}')`;
+                    }
+                    
+                    // Setelah profil selesai diambil, muat data kirimannya
+                    muatKiriman();
+                } else {
+                    document.getElementById('user-name').innerText = "Pengguna Tidak Ditemukan";
+                }
+            } catch (error) {
+                console.error("Gagal mengambil profil:", error);
+            }
+        }
+
+        // 4. AMBIL DATA POSTCARD & PUBLIK DARI FIRESTORE
+        async function muatKiriman() {
+            const gridContainer = document.getElementById('posts-grid');
+            
+            try {
+                const postsRef = collection(db, "posts");
+                // Filter kiriman yang hanya miliki userId ini saja
+                const q = query(postsRef, where("userId", "==", userId));
+                const querySnapshot = await getDocs(q);
+                
+                // Bersihkan tulisan loading
+                gridContainer.innerHTML = '';
+
+                if (querySnapshot.empty) {
+                    gridContainer.innerHTML = '<div class="loading">Belum ada kiriman publik dari pengguna ini.</div>';
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const post = doc.data();
+                    
+                    // Tentukan style berdasarkan tipe (postcard / public)
+                    const isPostcard = post.type === 'postcard';
+                    const badgeClass = isPostcard ? 'badge-postcard' : 'badge-public';
+                    const badgeLabel = isPostcard ? 'Postcard' : 'Publik';
+
+                    // Buat elemen kartu HTML baru
+                    const cardHtml = `
+                        <div class="card">
+                            <img src="${post.image || 'https://placeholder.com'}" alt="Gambar Konten" class="card-image">
+                            <div class="card-body">
+                                <span class="badge ${badgeClass}">${badgeLabel}</span>
+                                <h2 class="card-title">${post.title}</h2>
+                                <p class="card-text">${post.text}</p>
+                                <div class="card-footer">Dipublikasikan pada: ${post.date}</div>
+                            </div>
+                        </div>
+                    `;
+                    gridContainer.insertAdjacentHTML('beforeend', cardHtml);
+                });
+
+            } catch (error) {
+                console.error("Gagal mengambil kiriman:", error);
+                gridContainer.innerHTML = '<div class="loading">Terjadi kesalahan saat memuat konten.</div>';
+            }
+        }
+
+        // Jalankan fungsi saat halaman dibuka
+        window.onload = muatProfil();
+    </script>
+
+    <script>
+        // Fitur menyalin link agar siap dibagikan ke platform lain
+        function salinLink() {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Link profil berhasil disalin! Kirimkan tautan ini ke orang lain agar mereka bisa melihat halaman Anda.");
+        }
+    </script>
+</body>
+</html>
