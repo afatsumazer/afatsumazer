@@ -10,6 +10,58 @@
 </head>
 <body class="bg-gray-50">
 
+    <!-- === MODAL POPUP PORTOFOLIO & PROFIL PENGGUNA (BARU) === -->
+    <div id="portfolio-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 relative overflow-hidden">
+            <!-- Tombol Close -->
+            <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center font-bold transition z-10">✕</button>
+
+            <!-- Header Profil -->
+            <div class="text-center pt-2 pb-4 border-b border-gray-100">
+                <div class="relative inline-block">
+                    <img id="popup-user-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-20 h-20 rounded-full border-2 border-indigo-500 shadow-md object-cover mx-auto">
+                    <span class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full" title="Aktif"></span>
+                </div>
+                <h3 id="popup-user-name" class="text-xl font-bold text-gray-900 mt-2">Nama Pengguna</h3>
+                <p id="popup-user-email" class="text-xs text-gray-500">user@email.com</p>
+                <span class="inline-block mt-2 bg-indigo-50 text-indigo-600 text-[11px] font-semibold px-3 py-0.5 rounded-full border border-indigo-100">
+                    Anggota Pro Workspace
+                </span>
+            </div>
+
+            <!-- Detail Portofolio Ringkas -->
+            <div class="py-4 space-y-3">
+                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Portofolio & Proyek Aktif</h4>
+                
+                <div id="popup-portfolio-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <!-- Item Portofolio Contoh -->
+                    <div class="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-bold text-gray-800">Sistem Manajemen Berkas</h5>
+                                <p class="text-[10px] text-gray-500">Aplikasi Web Utama</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-200">Selesai</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="pt-3 border-t border-gray-100 flex justify-end space-x-2">
+                <a href="edit-profile.html" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow-sm flex items-center space-x-1">
+                    <span>Kelola Profil Lengkap</span>
+                </a>
+                <button onclick="closeProfileModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold px-4 py-2 rounded-xl transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- === MODAL OVERLAY UNDUH TAUTAN BAGI === -->
     <div id="share-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full text-center">
@@ -23,13 +75,11 @@
         </div>
     </div>
 
-    <!-- === MODAL DETAIL PROFIL & FORMAT BERKAS (BARU) === -->
+    <!-- === MODAL DETAIL PROFIL & FORMAT BERKAS === -->
     <div id="file-detail-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 relative">
-            <!-- Tombol Close -->
             <button onclick="closeFileDetailModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center font-bold transition">✕</button>
 
-            <!-- Profil Pengunggah -->
             <div class="flex items-center space-x-3 pb-4 border-b border-gray-100">
                 <div class="w-12 h-12 bg-indigo-600 text-white font-bold text-lg rounded-full flex items-center justify-center shrink-0 shadow-sm" id="modal-user-avatar">
                     U
@@ -40,7 +90,6 @@
                 </div>
             </div>
 
-            <!-- Detail Berkas -->
             <div class="py-5 space-y-3">
                 <div>
                     <span class="text-xs text-gray-400 font-medium">Nama Berkas</span>
@@ -66,7 +115,6 @@
                 </div>
             </div>
 
-            <!-- Tombol Aksi Unduh -->
             <div class="flex space-x-3 pt-2">
                 <a id="modal-download-btn" href="#" download class="flex-1 text-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm">
                     Unduh Berkas Ini
@@ -81,15 +129,19 @@
     <!-- === NAVIGASI BAWAH (MOBILE) === -->
     <div class="md:hidden fixed bottom-0 left-0 w-full bg-indigo-900 text-white h-16 z-40 flex justify-around items-center shadow-lg border-t border-indigo-850">
         <button onclick="switchTab('overview')" id="btn-overview-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg bg-indigo-800 text-white">
+            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
             <span class="text-[10px] font-medium">Ringkasan</span>
         </button>
         <button onclick="switchTab('tasks')" id="btn-tasks-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg text-indigo-200">
+            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
             <span class="text-[10px] font-medium">Tugas</span>
         </button>
         <button onclick="switchTab('files')" id="btn-files-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg text-indigo-200">
+            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
             <span class="text-[10px] font-medium">Berkas</span>
         </button>
         <button onclick="switchTab('profile')" id="btn-profile-mobile" class="flex flex-col items-center justify-center w-16 h-12 rounded-lg text-indigo-200">
+            <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
             <span class="text-[10px] font-medium">Profil</span>
         </button>
     </div>
@@ -104,28 +156,57 @@
 
         <div class="transition-opacity duration-200 opacity-0 group-hover:opacity-100 flex flex-col justify-between h-full w-full">
             <div>
-                <div class="mb-8">
-                    <span class="text-2xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-indigo-200 font-bold">AppSaya</span>
-                    <p class="text-[10px] text-indigo-300 uppercase tracking-widest mt-1">Workspace Dashboard</p>
+                <!-- LOGO PRO REPLACEMENT (DIPERBARUI) -->
+                <div class="mb-8 flex items-center space-x-3 px-2">
+                    <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 ring-2 ring-indigo-400/30 shrink-0">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-xl font-black tracking-tight text-white block leading-none">NEXUS</span>
+                        <span class="text-[9px] font-bold text-indigo-300 uppercase tracking-widest block mt-1">Workspace Pro</span>
+                    </div>
                 </div>
-                <nav class="space-y-2">
-                    <button onclick="switchTab('overview')" id="btn-overview" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg bg-indigo-800 text-white font-medium transition">
-                        <span>Ringkasan</span>
+
+                <!-- NAVIGASI DENGAN IKON MENU PRO -->
+                <nav class="space-y-1.5">
+                    <button onclick="switchTab('overview')" id="btn-overview" class="w-full text-left flex items-center space-x-3 px-4 py-2.5 rounded-xl bg-indigo-800 text-white font-medium transition shadow-sm">
+                        <svg class="w-5 h-5 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                        </svg>
+                        <span class="text-sm">Ringkasan</span>
                     </button>
-                    <button onclick="switchTab('tasks')" id="btn-tasks" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
-                        <span>Tugas Saya</span>
+
+                    <button onclick="switchTab('tasks')" id="btn-tasks" class="w-full text-left flex items-center space-x-3 px-4 py-2.5 rounded-xl text-indigo-200 hover:bg-indigo-800 hover:text-white transition">
+                        <svg class="w-5 h-5 text-indigo-300 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                        <span class="text-sm">Tugas Saya</span>
                     </button>
-                    <button onclick="switchTab('files')" id="btn-files" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
-                        <span>Penyimpanan File</span>
+
+                    <button onclick="switchTab('files')" id="btn-files" class="w-full text-left flex items-center space-x-3 px-4 py-2.5 rounded-xl text-indigo-200 hover:bg-indigo-800 hover:text-white transition">
+                        <svg class="w-5 h-5 text-indigo-300 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                        </svg>
+                        <span class="text-sm">Penyimpanan File</span>
                     </button>
-                    <button onclick="switchTab('profile')" id="btn-profile" class="w-full text-left flex items-center px-4 py-2.5 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
-                        <span>Profil Saya</span>
+
+                    <button onclick="switchTab('profile')" id="btn-profile" class="w-full text-left flex items-center space-x-3 px-4 py-2.5 rounded-xl text-indigo-200 hover:bg-indigo-800 hover:text-white transition">
+                        <svg class="w-5 h-5 text-indigo-300 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        <span class="text-sm">Profil Saya</span>
                     </button>
                 </nav>
             </div>
-            <div class="pt-6 border-t border-indigo-800">
-                <button onclick="logout()" class="w-full text-left flex items-center px-4 py-2 text-red-300 hover:text-red-100 transition">
-                    <span>Keluar Sesi</span>
+
+            <div class="pt-6 border-t border-indigo-800/60">
+                <button onclick="logout()" class="w-full text-left flex items-center space-x-3 px-4 py-2 rounded-xl text-red-300 hover:bg-red-500/10 hover:text-red-200 transition">
+                    <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    <span class="text-sm font-medium">Keluar Sesi</span>
                 </button>
             </div>
         </div>
@@ -136,9 +217,13 @@
         <!-- Header Atas -->
         <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between md:justify-end px-6 md:px-8 shadow-sm sticky top-0 z-20 transition-transform duration-300 ease-in-out">
             <h1 id="page-title" class="md:hidden font-bold text-gray-800 text-lg">Ringkasan</h1>
+            
+            <!-- LINK NAMA PENGGUNA UNTUK POPUP PORTOFOLIO PROFIL -->
             <div class="flex items-center space-x-3">
-                <span id="user-display-name" class="text-sm font-medium text-gray-600">Memuat...</span>
-                <img id="user-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-8 h-8 rounded-full border border-gray-200 object-cover">
+                <button onclick="openProfileModal()" class="flex items-center space-x-2.5 py-1 px-2.5 rounded-full hover:bg-gray-100 transition group focus:outline-none">
+                    <span id="user-display-name" class="text-sm font-semibold text-gray-700 group-hover:text-indigo-600 transition">Memuat...</span>
+                    <img id="user-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-8 h-8 rounded-full border border-indigo-200 object-cover ring-2 ring-transparent group-hover:ring-indigo-500 transition">
+                </button>
                 <button onclick="logout()" class="md:hidden text-xs font-semibold text-red-600 hover:text-red-800 transition">Keluar</button>
             </div>
         </header>
@@ -177,7 +262,7 @@
                     </div>
                     <p class="text-xs text-gray-500 mb-5 pl-4">Klik nama berkas untuk melihat detail profil pengunggah & format file.</p>
 
-                    <!-- GRID KARTU TUGAS (DIMUAT DARI JS) -->
+                    <!-- GRID KARTU TUGAS -->
                     <div id="collaboration-files-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="col-span-2 py-8 text-center text-gray-400 text-sm">Memuat berkas tugas...</div>
                     </div>
@@ -274,8 +359,23 @@
         </div>
     </div>
 
-    <!-- === SCRIPT POPUP MODAL BARU (DETAIL PROFIL & FORMAT BERKAS) === -->
+    <!-- === SCRIPT POPUP MODAL CONTROL === -->
     <script>
+        // Modal Profil & Portofolio (Memunculkan popup dari header)
+        function openProfileModal() {
+            const userName = document.getElementById('user-display-name')?.innerText || 'Pengguna';
+            const userAvatar = document.getElementById('user-avatar')?.src || 'https://via.placeholder.com/150';
+
+            document.getElementById('popup-user-name').innerText = userName;
+            document.getElementById('popup-user-avatar').src = userAvatar;
+            document.getElementById('portfolio-modal').classList.remove('hidden');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('portfolio-modal').classList.add('hidden');
+        }
+
+        // Modal Detail Berkas
         function openFileDetailModal(fileName, uploaderName, fileFormat, fileSize, dateString, fileData) {
             document.getElementById('modal-file-name').innerText = fileName;
             document.getElementById('modal-user-name').innerText = uploaderName;
@@ -283,11 +383,9 @@
             document.getElementById('modal-file-size').innerText = fileSize;
             document.getElementById('modal-file-date').innerText = dateString;
 
-            // Inisial Nama untuk Avatar Modal
             const firstChar = uploaderName ? uploaderName.charAt(0).toUpperCase() : 'U';
             document.getElementById('modal-user-avatar').innerText = firstChar;
 
-            // Tombol Unduh
             const downloadBtn = document.getElementById('modal-download-btn');
             if (fileData) {
                 downloadBtn.href = fileData;
