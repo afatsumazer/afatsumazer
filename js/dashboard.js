@@ -632,3 +632,104 @@ window.logout = function() {
         });
     }
 };
+
+// =================================================================
+// TAMBAHAN KODE FIX UID & PORTOFOLIO (PASTE DI BARIS PALING BAWAH)
+// =================================================================
+
+// 1. Perbaikan Tambah Portofolio (Otomatis deteksi UID dari Auth jika variabel belum siap)
+window.addPortfolioItem = function() {
+    const activeUID = userUID || (auth && auth.currentUser ? auth.currentUser.uid : null);
+
+    if (!activeUID) {
+        alert("Sesi login belum siap. Silakan muat ulang (refresh) halaman dan coba lagi.");
+        return;
+    }
+
+    const title = prompt("Masukkan Judul Portofolio/Projek:");
+    if (!title) return;
+
+    const description = prompt("Masukkan Deskripsi Singkat:") || "";
+    const link = prompt("Masukkan Link Projek/Sertifikat (opsional):") || "";
+
+    const portfolioRef = ref(database, `users/${activeUID}/portfolio`);
+    const newItemRef = push(portfolioRef);
+
+    set(newItemRef, {
+        id: newItemRef.key,
+        title: title,
+        description: description,
+        link: link,
+        createdAt: Date.now()
+    }).then(() => {
+        alert("Portofolio berhasil ditambahkan!");
+    }).catch(err => alert("Gagal menyimpan portofolio: " + err.message));
+};
+
+// 2. Perbaikan Modal Portofolio Pengguna (Proteksi jika UID kosong/undefined)
+window.showUserPortfolioModal = function(uploaderUID, uploaderName) {
+    // Validasi apakah UID valid
+    if (!uploaderUID || uploaderUID === 'undefined' || uploaderUID === 'null' || uploaderUID.trim() === '') {
+        alert(`Profil untuk "${uploaderName}" tidak dapat dibuka.\n\nCatatan: Berkas ini diunggah sebelum sistem UID aktif (berkas lama). Silakan unggah berkas BARU untuk menguji fitur ini!`);
+        return;
+    }
+
+    const userRef = ref(database, `users/${uploaderUID}`);
+    get(userRef).then((snapshot) => {
+        let bio = "Belum ada bio.";
+        let portfolioListHTML = `<p class="text-xs text-gray-400 italic">Pengguna ini belum menambahkan portofolio.</p>`;
+
+        if (snapshot.exists()) {
+            const userData = snapshot.val();
+            if (userData.profile && userData.profile.bio) bio = userData.profile.bio;
+
+            if (userData.portfolio) {
+                const items = Object.values(userData.portfolio);
+                if (items.length > 0) {
+                    portfolioListHTML = items.map(p => `
+                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 text-left">
+                            <h5 class="text-xs font-bold text-gray-800">${escapeHtml(p.title)}</h5>
+                            <p class="text-[11px] text-gray-600 mt-0.5">${escapeHtml(p.description) || '-'}</p>
+                            ${p.link ? `<a href="${escapeHtml(p.link)}" target="_blank" class="text-[10px] text-indigo-600 font-semibold hover:underline mt-1 inline-block">Buka Tautan Projek &rarr;</a>` : ''}
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        let modalEl = document.getElementById('user-portfolio-modal');
+        if (!modalEl) {
+            modalEl = document.createElement('div');
+            modalEl.id = 'user-portfolio-modal';
+            modalEl.className = 'fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4';
+            document.body.appendChild(modalEl);
+        }
+
+        modalEl.innerHTML = `
+            <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 relative">
+                <button onclick="document.getElementById('user-portfolio-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center font-bold">✕</button>
+                
+                <div class="text-center pb-4 border-b border-gray-100">
+                    <div class="w-16 h-16 bg-indigo-600 text-white font-bold text-2xl rounded-full flex items-center justify-center mx-auto mb-2 shadow-md">
+                        ${(uploaderName || 'P').charAt(0).toUpperCase()}
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900">${uploaderName}</h3>
+                    <p class="text-xs text-gray-500 italic mt-0.5">"${bio}"</p>
+                </div>
+
+                <div class="py-4">
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-400 mb-3">Portofolio & Projek</h4>
+                    <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                        ${portfolioListHTML}
+                    </div>
+                </div>
+
+                <button onclick="document.getElementById('user-portfolio-modal').classList.add('hidden')" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-xl text-xs font-bold transition">
+                    Tutup
+                </button>
+            </div>
+        `;
+
+        modalEl.classList.remove('hidden');
+    }).catch(err => alert("Gagal memuat profil: " + err.message));
+};
