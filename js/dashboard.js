@@ -268,6 +268,37 @@ function loadTasksTab() {
 
 // ================= 5. SINKRONISASI PORTOFOLIO USER DENGAN DATABASE =================
 
+// Tambah Portofolio Baru
+window.addPortfolioItem = function() {
+    const title = prompt("Masukkan Judul Portofolio/Projek:");
+    if (!title) return;
+
+    const description = prompt("Masukkan Deskripsi Singkat:") || "";
+    const link = prompt("Masukkan Link Projek (opsional):") || "";
+
+    const portfolioRef = ref(database, `users/${userUID}/portfolio`);
+    const newItemRef = push(portfolioRef);
+
+    set(newItemRef, {
+        id: newItemRef.key,
+        title: title,
+        description: description,
+        link: link,
+        createdAt: Date.now()
+    }).then(() => {
+        alert("Portofolio berhasil disimpan ke Database!");
+    });
+}
+
+// Hapus Portofolio
+window.deletePortfolioItem = function(portfolioKey) {
+    if (confirm("Yakin ingin menghapus item portofolio ini?")) {
+        remove(ref(database, `users/${userUID}/portfolio/${portfolioKey}`)).then(() => {
+            alert("Portofolio berhasil dihapus!");
+        });
+    }
+}
+
 // Realtime Listener Portofolio User
 function loadUserPortfolio() {
     if (!userUID) return;
