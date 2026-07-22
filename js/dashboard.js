@@ -88,8 +88,11 @@ onAuthStateChanged(auth, (user) => {
                 const displayName = data.name || user.displayName || "Pengguna";
                 const userPhoto = data.photo || user.photoURL || "https://via.placeholder.com/150";
 
-                document.getElementById('user-display-name').innerHTML = `<span class="flex items-center">${displayName} ${verifiedIcon}</span>`;
-                document.getElementById('user-avatar').src = userPhoto;
+                const userDisplayEl = document.getElementById('user-display-name');
+                if (userDisplayEl) userDisplayEl.innerHTML = `<span class="flex items-center">${displayName} ${verifiedIcon}</span>`;
+                
+                const userAvatarEl = document.getElementById('user-avatar');
+                if (userAvatarEl) userAvatarEl.src = userPhoto;
                 
                 if(document.getElementById('profile-card-name')) {
                     document.getElementById('profile-card-name').innerHTML = `<span class="flex items-center justify-center">${displayName} ${verifiedIcon}</span>`;
@@ -260,8 +263,10 @@ function loadUserFiles() {
 
         if (!snapshot.exists()) {
             if (tableBody) tableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-gray-400 text-xs">Belum ada file di folder <b>${currentFolder}</b>.</td></tr>`;
-            document.getElementById('stat-files-count').innerText = 0;
-            document.getElementById('kuota-info').innerText = `Kapasitas: 0 MB dari ${limitMB} MB`;
+            const statFiles = document.getElementById('stat-files-count');
+            if (statFiles) statFiles.innerText = 0;
+            const kuotaInfo = document.getElementById('kuota-info');
+            if (kuotaInfo) kuotaInfo.innerText = `Kapasitas: 0 MB dari ${limitMB} MB`;
             sisaKuotaCukup = true;
             return;
         }
@@ -303,8 +308,10 @@ function loadUserFiles() {
         }
 
         const totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
-        document.getElementById('kuota-info').innerText = `Terpakai: ${totalMB} MB dari ${limitMB} MB (${((totalMB/limitMB)*100).toFixed(1)}%)`;
-        document.getElementById('stat-files-count').innerText = totalFileCount;
+        const kuotaInfo = document.getElementById('kuota-info');
+        if (kuotaInfo) kuotaInfo.innerText = `Terpakai: ${totalMB} MB dari ${limitMB} MB (${((totalMB/limitMB)*100).toFixed(1)}%)`;
+        const statFiles = document.getElementById('stat-files-count');
+        if (statFiles) statFiles.innerText = totalFileCount;
         sisaKuotaCukup = totalMB < limitMB;
     });
 }
@@ -341,12 +348,10 @@ function loadTasksTab() {
                                         ${ext}
                                     </div>
                                     <div class="min-w-0">
-                                        <!-- KLIK NAMA FILE: Buka Detail Modal File -->
                                         <h4 onclick="openFileDetailModal('${escapeHtml(file.name)}', '${escapeHtml(uploaderName)}', '${ext}', '${fileSizeStr}', '${pubDateStr}', '${file.data}')" 
                                             class="text-sm font-bold text-gray-800 group-hover:text-indigo-600 cursor-pointer transition break-all line-clamp-1">
                                             ${file.name}
                                         </h4>
-                                        <!-- KLIK NAMA PENGGUNAKAN: Buka Portfolio Pengunggah -->
                                         <button onclick="showUserPortfolioModal('${uploaderUID}', '${escapeHtml(uploaderName)}')" 
                                            class="text-xs text-indigo-600 hover:underline font-semibold cursor-pointer mt-0.5 text-left">
                                            👤 ${uploaderName}
@@ -453,7 +458,6 @@ window.showUserPortfolioModal = function(uploaderUID, uploaderName) {
         return;
     }
 
-    // Ambil Profil & Portofolio Pengunggah dari Firebase RTDB
     const userRef = ref(database, `users/${uploaderUID}`);
     get(userRef).then((snapshot) => {
         let bio = "Belum ada bio.";
@@ -477,7 +481,6 @@ window.showUserPortfolioModal = function(uploaderUID, uploaderName) {
             }
         }
 
-        // Tampilkan Modal Portofolio Dinamis
         let modalEl = document.getElementById('user-portfolio-modal');
         if (!modalEl) {
             modalEl = document.createElement('div');
@@ -559,28 +562,64 @@ window.deleteFile = function(fileId) {
     }
 };
 
+// ================= 8. LOGIKA NAVIGASI & SWITCH TAB =================
 window.switchTab = function(tabName) {
     const tabs = ['overview', 'tasks', 'files', 'profile'];
+    
+    // Pemetaan Judul Halaman
+    const pageTitles = {
+        'overview': 'Ringkasan',
+        'tasks': 'Tugas',
+        'files': 'Berkas',
+        'profile': 'Profil'
+    };
+
+    // 1. UBAH JUDUL HEADER ATAS DINAMIS
+    const headerTitle = document.getElementById('page-title') || document.getElementById('header-title') || document.getElementById('ringkasan-title');
+    if (headerTitle && pageTitles[tabName]) {
+        headerTitle.innerText = pageTitles[tabName];
+    }
+
+    // 2. RESET SEMUA TAB KONTEN & EFEK TOMBOL (DESKTOP & MOBILE)
     tabs.forEach(t => {
+        // Sembunyikan Konten Tab
         const tabEl = document.getElementById(`tab-${t}`);
         if (tabEl) tabEl.classList.add('hidden');
         
+        // Reset Tombol Desktop
         const btnDesktop = document.getElementById(`btn-${t}`);
         if (btnDesktop) {
             btnDesktop.classList.remove('bg-indigo-800', 'text-white');
             btnDesktop.classList.add('text-indigo-100');
         }
+
+        // Reset Tombol Mobile Bottom Nav
+        const btnMobile = document.getElementById(`mobile-btn-${t}`);
+        if (btnMobile) {
+            btnMobile.classList.remove('bg-indigo-600', 'bg-indigo-700', 'bg-indigo-800', 'text-white', 'shadow-md');
+            btnMobile.classList.add('text-indigo-200');
+        }
     });
 
+    // 3. TAMPILKAN KONTEN TAB AKTIF
     const activeTab = document.getElementById(`tab-${tabName}`);
     if (activeTab) activeTab.classList.remove('hidden');
 
+    // 4. EFEK AKTIF PADA TOMBOL DESKTOP
     const activeBtn = document.getElementById(`btn-${tabName}`);
     if (activeBtn) {
         activeBtn.classList.add('bg-indigo-800', 'text-white');
         activeBtn.classList.remove('text-indigo-100');
     }
 
+    // 5. EFEK AKTIF PADA TOMBOL MOBILE BOTTOM NAV
+    const activeMobileBtn = document.getElementById(`mobile-btn-${tabName}`);
+    if (activeMobileBtn) {
+        activeMobileBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+        activeMobileBtn.classList.remove('text-indigo-200');
+    }
+
+    // 6. MUAT DATA SESUAI TAB
     if (tabName === 'tasks') loadTasksTab();
     if (tabName === 'files') loadUserFiles();
 };
