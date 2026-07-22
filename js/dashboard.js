@@ -21,7 +21,6 @@ const auth = getAuth(app);
 const database = getDatabase(app);
 
 let userUID = "";
-let currentUsername = ""; // Menyimpan username aktif untuk link portofolio
 let currentFolder = "Utama"; 
 let limitMB = 50;
 let sisaKuotaCukup = true;
@@ -29,7 +28,6 @@ let sharedFileToDownload = null;
 
 // 1. Pengaman Sesi & Sinkronisasi Profil Secara Realtime
 onAuthStateChanged(auth, (user) => {
-    // Cek apakah halaman dibuka melalui Link Berbagi Berkas
     const urlParams = new URLSearchParams(window.location.search);
     const shareId = urlParams.get('share');
     
@@ -41,16 +39,11 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         userUID = user.uid;
         
-        // Membaca profil dari Realtime Database secara realtime
         const profileRef = ref(database, `users/${userUID}/profile`);
         onValue(profileRef, (snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 
-                // Simpan username untuk akses portofolio
-                currentUsername = data.username || user.displayName || userUID;
-
-                // Siapkan icon centang biru (Tooltip)
                 const verifiedIcon = data.isVerified === true ? `
                     <span class="relative group inline-flex items-center ml-1">
                         <svg class="w-5 h-5 text-blue-500 cursor-help" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -62,7 +55,6 @@ onAuthStateChanged(auth, (user) => {
                     </span>
                 ` : '';
 
-                // Siapkan badge Premium
                 const premiumBadge = data.isPremium === true ? `
                     <div class="mt-2">
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">
@@ -71,104 +63,47 @@ onAuthStateChanged(auth, (user) => {
                     </div>
                 ` : '';
                 
-                // Perbarui tampilan header atas (Nama dibuat interaktif untuk portofolio)
-                const headerDisplayName = document.getElementById('user-display-name');
-                if (headerDisplayName) {
-                    headerDisplayName.innerHTML = `
-                        <button onclick="openPortfolio()" class="flex items-center hover:text-indigo-600 transition text-left" title="Klik untuk membuka Portofolio">
-                            <span>${data.name || user.displayName || "Pengguna"}</span>
-                            ${verifiedIcon}
-                        </button>
-                    `;
-                }
-
-                const userAvatarEl = document.getElementById('user-avatar');
-                if (userAvatarEl) {
-                    userAvatarEl.src = data.photo || user.photoURL || "https://via.placeholder.com/150";
-                }
+                document.getElementById('user-display-name').innerHTML = `
+                    <span class="flex items-center">
+                        ${data.name || user.displayName || "Pengguna"}
+                        ${verifiedIcon}
+                    </span>
+                `;
+                document.getElementById('user-avatar').src = data.photo || user.photoURL || "https://via.placeholder.com/150";
                 
-                // Perbarui kartu identitas di TAB PROFIL
-                const profileCardName = document.getElementById('profile-card-name');
-                if (profileCardName) {
-                    profileCardName.innerHTML = `
-                        <button onclick="openPortfolio()" class="flex items-center justify-center hover:text-indigo-600 transition" title="Klik untuk membuka Portofolio">
-                            <span>${data.name || user.displayName || "Pengguna"}</span>
-                            ${verifiedIcon}
-                        </button>
-                    `;
-                }
-
-                const profileAvatarEl = document.getElementById('profile-card-avatar');
-                if (profileAvatarEl) {
-                    profileAvatarEl.src = data.photo || user.photoURL || "https://via.placeholder.com/150";
-                }
+                document.getElementById('profile-card-name').innerHTML = `
+                    <span class="flex items-center justify-center">
+                        ${data.name || user.displayName || "Pengguna"}
+                        ${verifiedIcon}
+                    </span>
+                `;
+                document.getElementById('profile-card-avatar').src = data.photo || user.photoURL || "https://via.placeholder.com/150";
                 
-                // Tampilkan ID unik (@username), Email, Premium Badge, & Bio + Tombol Portofolio
-                const profileEmailEl = document.getElementById('profile-card-email');
-                if (profileEmailEl) {
-                    profileEmailEl.innerHTML = `
-                        <span class="text-indigo-600 font-bold block">${data.username || '@username'}</span>
-                        <span class="text-xs text-gray-500 block mb-2">${user.email}</span>
-                        ${premiumBadge}
-                        <p class="text-sm italic text-gray-600 border-t border-gray-100 pt-2 mt-2">${data.bio || 'Belum ada bio.'}</p>
-                        
-                        <!-- Tombol Akses & Salin Link Portofolio -->
-                        <div class="mt-4 pt-3 border-t border-gray-100 flex flex-col gap-2">
-                            <button onclick="openPortfolio()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
-                                🎨 Lihat Portofolio
-                            </button>
-                            <button onclick="copyPortfolioLink()" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold py-2 px-3 rounded-lg transition">
-                                🔗 Salin Link Portofolio Saya
-                            </button>
-                        </div>
-                    `;
-                }
+                document.getElementById('profile-card-email').innerHTML = `
+                    <span class="text-indigo-600 font-bold block">${data.username || '@username'}</span>
+                    <span class="text-xs text-gray-500 block mb-2">${user.email}</span>
+                    ${premiumBadge}
+                    <p class="text-sm italic text-gray-600 border-t border-gray-100 pt-2 mt-2">${data.bio || 'Belum ada bio.'}</p>
+                `;
             } else {
-                // Default jika database kosong
-                currentUsername = user.uid;
-                if (document.getElementById('user-display-name')) document.getElementById('user-display-name').innerText = user.displayName || "Pengguna";
-                if (document.getElementById('user-avatar')) document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/150";
-                if (document.getElementById('profile-card-name')) document.getElementById('profile-card-name').innerText = user.displayName || "Pengguna";
-                if (document.getElementById('profile-card-email')) document.getElementById('profile-card-email').innerText = user.email;
-                if (document.getElementById('profile-card-avatar')) document.getElementById('profile-card-avatar').src = user.photoURL || "https://via.placeholder.com/150";
+                document.getElementById('user-display-name').innerText = user.displayName || "Pengguna";
+                document.getElementById('user-avatar').src = user.photoURL || "https://via.placeholder.com/150";
+                document.getElementById('profile-card-name').innerText = user.displayName || "Pengguna";
+                document.getElementById('profile-card-email').innerText = user.email;
+                document.getElementById('profile-card-avatar').src = user.photoURL || "https://via.placeholder.com/150";
             }
         });
 
-        // Muat Database Pengguna
         loadFolders();
         loadUserFiles();
-        loadSharedFilesTab(); 
+        loadSharedFilesTab(); // Sinkronisasi realtime Tab Kolaborasi
     } else {
         localStorage.removeItem('userSession');
         window.location.href = "login.html";
     }
 });
 
-// ================= AKSI PORTOFOLIO =================
-// 1. Membuka halaman portofolio publik pengguna
-window.openPortfolio = function(targetUsername = null) {
-    const username = targetUsername || currentUsername || userUID;
-    if (!username) {
-        alert("Username portofolio belum tersedia.");
-        return;
-    }
-    // Buka halaman portfolio.html membawa parameter username di tab baru
-    window.open(`portfolio.html?user=${encodeURIComponent(username)}`, '_blank');
-}
-
-// 2. Menyalin link portofolio pengguna ke clipboard
-window.copyPortfolioLink = function() {
-    const username = currentUsername || userUID;
-    const portfolioUrl = `${window.location.origin}/portfolio.html?user=${encodeURIComponent(username)}`;
-    
-    navigator.clipboard.writeText(portfolioUrl).then(() => {
-        alert(`Link Portofolio berhasil disalin!\n${portfolioUrl}`);
-    }).catch(err => {
-        alert("Gagal menyalin link: " + err);
-    });
-}
-
-// ================= PENANGANAN LINK SHARE (BERBAGI FILE) =================
+// ================= PENANGANAN LINK SHARE =================
 function loadSharedFile(shareId) {
     const shareRef = ref(database, `shared/${shareId}`);
     get(shareRef).then((snapshot) => {
@@ -209,7 +144,7 @@ window.closeShareModal = function() {
     window.location.href = "dashboard.html";
 }
 
-// ================= LOGIKA NAVIGASI TAB (TETAP 4 TAB ASLI) =================
+// ================= LOGIKA NAVIGASI TAB =================
 window.switchTab = function(tabName) {
     const tabs = ['overview', 'tasks', 'files', 'profile'];
     tabs.forEach(t => {
@@ -229,8 +164,8 @@ window.switchTab = function(tabName) {
         }
     });
 
-    const targetTab = document.getElementById(`tab-${tabName}`);
-    if (targetTab) targetTab.classList.remove('hidden');
+    const activeTab = document.getElementById(`tab-${tabName}`);
+    if (activeTab) activeTab.classList.remove('hidden');
     
     const activeBtn = document.getElementById(`btn-${tabName}`);
     if (activeBtn) {
@@ -251,63 +186,10 @@ window.switchTab = function(tabName) {
     }
 }
 
-// ================= LOGIKA TUGAS (TODO LIST) =================
-let tasks = JSON.parse(localStorage.getItem('localTasks') || '[]');
-
-window.addTask = function(event) {
-    event.preventDefault();
-    const input = document.getElementById('task-input');
-    const newTask = { id: Date.now(), title: input.value, completed: false };
-    tasks.push(newTask);
-    input.value = '';
-    saveAndRenderTasks();
-}
-
-window.toggleTask = function(id) {
-    tasks = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
-    saveAndRenderTasks();
-}
-
-window.deleteTask = function(id) {
-    tasks = tasks.filter(t => t.id !== id);
-    saveAndRenderTasks();
-}
-
-function saveAndRenderTasks() {
-    localStorage.setItem('localTasks', JSON.stringify(tasks));
-    const list = document.getElementById('task-list');
-    if (list) {
-        list.innerHTML = '';
-        tasks.forEach(t => {
-            const li = document.createElement('li');
-            li.className = "flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-lg";
-            li.innerHTML = `
-                <div class="flex items-center space-x-3">
-                    <input type="checkbox" ${t.completed ? 'checked' : ''} onclick="toggleTask(${t.id})" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                    <span class="${t.completed ? 'line-through text-gray-400' : 'text-gray-700 font-medium'}">${t.title}</span>
-                </div>
-                <button onclick="deleteTask(${t.id})" class="text-xs font-semibold text-red-500 hover:text-red-700 transition">Hapus</button>
-            `;
-            list.appendChild(li);
-        });
-    }
-
-    let completedCount = 0;
-    let pendingCount = 0;
-    tasks.forEach(t => { if (t.completed) completedCount++; else pendingCount++; });
-
-    const pendingEl = document.getElementById('stat-tasks-pending');
-    const completedEl = document.getElementById('stat-tasks-completed');
-    if (pendingEl) pendingEl.innerText = pendingCount;
-    if (completedEl) completedEl.innerText = completedCount;
-}
-
-saveAndRenderTasks();
-
-// ================= LOGIKA PENYIMPANAN BERKAS DATABASE (MENDUKUNG FOLDER) =================
+// ================= LOGIKA PENYIMPANAN BERKAS DATABASE =================
 window.updateFileLabel = function() {
     const selector = document.getElementById('file-selector');
-    if (selector && selector.files.length > 0) {
+    if (selector.files.length > 0) {
         document.getElementById('file-label').innerText = selector.files[0].name;
     }
 }
@@ -355,9 +237,10 @@ function loadFolders() {
     });
 }
 
+// --- UNGGAH FILE & OTOMATIS TAMPIL DI KOLABORASI ---
 window.uploadSelectedFile = function() {
     const selector = document.getElementById('file-selector');
-    if (!selector || selector.files.length === 0) {
+    if (selector.files.length === 0) {
         alert("Pilih file terlebih dahulu!");
         return;
     }
@@ -370,7 +253,7 @@ window.uploadSelectedFile = function() {
     const file = selector.files[0];
 
     if (file.size > 2 * 1024 * 1024) {
-        alert("Untuk menjamin kecepatan & kestabilan database gratis, batas unggah maksimal adalah 2 MB per file.");
+        alert("Untuk menjamin kecepatan database, batas unggah maksimal adalah 2 MB per file.");
         return;
     }
 
@@ -381,25 +264,31 @@ window.uploadSelectedFile = function() {
         const base64Data = e.target.result; 
         
         const userNameEl = document.getElementById('user-display-name');
-        const activeUserName = userNameEl ? userNameEl.innerText.trim() : "Anda";
+        const activeUserName = userNameEl ? userNameEl.innerText.trim() : "Pengguna";
 
         const fileListRef = ref(database, `users/${userUID}/files`);
         const newFileRef = push(fileListRef);
+        const fileKey = newFileRef.key;
 
-        set(newFileRef, {
-            id: newFileRef.key,
+        const fileDataObject = {
+            id: fileKey,
             name: file.name,
             size: file.size,
             type: file.type,
             folder: currentFolder, 
             data: base64Data, 
             pubDate: Date.now(),
-            uploadedBy: activeUserName
-        }).then(() => {
-            alert("Berkas berhasil disimpan!");
-            if (document.getElementById('file-label')) {
-                document.getElementById('file-label').innerText = "Pilih file dari komputer Anda...";
-            }
+            uploadedBy: activeUserName,
+            sharedBy: activeUserName
+        };
+
+        // 1. Simpan ke folder pribadi pengguna
+        set(newFileRef, fileDataObject).then(() => {
+            // 2. OTOMATIS Simpan juga ke node 'shared' agar tampil di TAB KOLABORASI!
+            set(ref(database, `shared/${fileKey}`), fileDataObject);
+
+            alert("Berkas berhasil disimpan dan dapat dilihat di Tab Kolaborasi!");
+            document.getElementById('file-label').innerText = "Pilih file dari komputer Anda...";
             selector.value = "";
             loadUserFiles();
         }).catch((error) => {
@@ -417,22 +306,13 @@ function loadUserFiles() {
         const tableBody = document.getElementById('file-table-body');
         if (tableBody) tableBody.innerHTML = '';
 
-        const gridTab2 = document.getElementById('user-files-container');
-        if (gridTab2) gridTab2.innerHTML = '';
-
         let totalBytes = 0;
-        let fileCountFolder = 0; 
-        let fileCountTab2 = 0;   
+        let fileCountFolder = 0;
 
         if (!snapshot.exists()) {
             if (tableBody) tableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-gray-400">Belum ada file di folder ini.</td></tr>`;
-            if (gridTab2) gridTab2.innerHTML = `<div class="col-span-2 py-8 text-center text-slate-400 text-sm">Belum ada berkas pribadi di database.</div>`;
-            
-            if (document.getElementById('stat-files-count')) document.getElementById('stat-files-count').innerText = 0;
-            const countTab2El = document.getElementById('user-files-count');
-            if (countTab2El) countTab2El.innerText = "0 Berkas";
-            
-            if (document.getElementById('kuota-info')) document.getElementById('kuota-info').innerText = `Penyimpanan Digunakan: 0 MB dari ${limitMB} MB (Free)`;
+            document.getElementById('stat-files-count').innerText = 0;
+            document.getElementById('kuota-info').innerText = `Penyimpanan Digunakan: 0 MB dari ${limitMB} MB (Free)`;
             sisaKuotaCukup = true;
             return;
         }
@@ -459,42 +339,6 @@ function loadUserFiles() {
                     tableBody.appendChild(tr);
                 }
             }
-
-            if (gridTab2) {
-                fileCountTab2++;
-                const fileName = file.name || 'Berkas';
-                const fileSizeStr = (file.size / 1024).toFixed(1) + " KB";
-                const uploader = file.uploadedBy || "Anda";
-                
-                const fileType = fileName.endsWith('.dot') ? 'dot' : (fileName.endsWith('.docx') || fileName.endsWith('.doc') ? 'doc' : 'other');
-                const badgeText = fileType === 'dot' ? 'Template' : (fileType === 'doc' ? 'Dokumen' : 'Format Lain');
-
-                gridTab2.innerHTML += `
-                    <div class="file-card-item bg-white p-4 rounded-xl border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all duration-200 flex items-start space-x-3" data-format="${fileType}">
-                        <div class="p-3 ${fileType === 'dot' ? 'bg-indigo-50 text-indigo-600' : 'bg-blue-50 text-blue-600'} rounded-xl flex-shrink-0">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                        </div>
-                        <div class="flex-grow min-w-0">
-                            <h4 class="text-sm font-bold text-slate-800 truncate" title="${fileName}">${fileName}</h4>
-                            <p class="text-[11px] text-slate-400 mt-0.5">${fileSizeStr}</p>
-                            <p class="text-[10px] text-slate-500 mt-1 flex items-center space-x-1">
-                                <span class="font-medium">Diunggah oleh:</span>
-                                <span class="font-bold text-indigo-600">${uploader}</span>
-                            </p>
-                            <div class="flex items-center space-x-2 mt-2">
-                                <span class="px-2 py-0.5 ${fileType === 'dot' ? 'bg-indigo-50 text-indigo-600' : 'bg-blue-50 text-blue-600'} text-[10px] font-bold rounded uppercase">${badgeText}</span>
-                            </div>
-                        </div>
-                        <button onclick="downloadFile('${key}')" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 flex-shrink-0 transition" title="Unduh Berkas">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                            </svg>
-                        </button>
-                    </div>
-                `;
-            }
         });
 
         if (fileCountFolder === 0 && tableBody) {
@@ -502,19 +346,17 @@ function loadUserFiles() {
         }
 
         const totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
-        if (document.getElementById('kuota-info')) document.getElementById('kuota-info').innerText = `Penyimpanan Digunakan: ${totalMB} MB dari ${limitMB} MB (Free)`;
-        if (document.getElementById('stat-files-count')) document.getElementById('stat-files-count').innerText = Object.keys(data).length;
-
-        const countTab2El = document.getElementById('user-files-count');
-        if (countTab2El) countTab2El.innerText = `${fileCountTab2} Berkas`;
+        document.getElementById('kuota-info').innerText = `Penyimpanan Digunakan: ${totalMB} MB dari ${limitMB} MB (Free)`;
+        document.getElementById('stat-files-count').innerText = Object.keys(data).length;
 
         sisaKuotaCukup = totalMB < limitMB;
     });
 }
 
-// ================= SINCRONISASI GLOBAL BERKAS KOLABORASI =================
+// ================= SINKRONISASI REALTIME BERKAS KOLABORASI =================
 function loadSharedFilesTab() {
-    const sharedFilesContainer = document.getElementById('shared-files-container');
+    // Mendukung ID 'collaboration-files-container' (HTML baru) atau 'shared-files-container'
+    const sharedFilesContainer = document.getElementById('collaboration-files-container') || document.getElementById('shared-files-container');
     if (!sharedFilesContainer) return;
 
     const sharedRef = ref(database, 'shared');
@@ -526,38 +368,57 @@ function loadSharedFilesTab() {
             Object.keys(data).forEach((key) => {
                 const file = data[key];
                 const fileName = file.name || 'Berkas Bersama';
-                const sharedBy = file.sharedBy || 'Pengguna Lain';
+                const sharedBy = file.sharedBy || file.uploadedBy || 'Pengguna Lain';
+                const fileSizeKB = file.size ? (file.size / 1024).toFixed(1) + ' KB' : '2 MB';
+                const defaultImg = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80';
 
                 sharedFilesContainer.innerHTML += `
-                    <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100 hover:border-emerald-200 transition duration-200 flex items-start space-x-3">
-                        <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl flex-shrink-0">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="flex-grow min-w-0">
-                            <h4 class="text-sm font-bold text-slate-800 truncate" title="${fileName}">${fileName}</h4>
-                            <p class="text-[11px] text-slate-500 mt-0.5">Dibagikan oleh: <span class="font-bold text-emerald-600">${sharedBy}</span></p>
-                            <div class="flex items-center space-x-2 mt-2">
-                                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded">Shared</span>
+                    <div onclick="openPortfolioModal('${fileName}', '${sharedBy}', 'Ukuran Berkas: ${fileSizeKB}. Klik tombol di bawah untuk mengunduh.', '${defaultImg}')" 
+                         class="bg-white p-4 rounded-xl border border-gray-200 hover:border-indigo-300 shadow-sm hover:shadow-md transition cursor-pointer flex items-center justify-between group">
+                        <div class="flex items-center space-x-3.5 min-w-0">
+                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="text-sm font-bold text-gray-900 truncate group-hover:text-indigo-600 transition">${fileName}</h4>
+                                <p class="text-xs text-gray-500 mt-0.5">Dibagikan oleh: <span class="font-medium text-emerald-600">${sharedBy}</span></p>
+                                <div class="mt-2 flex items-center space-x-2">
+                                    <span class="bg-emerald-50 text-emerald-700 text-[10px] font-semibold px-2 py-0.5 rounded">Shared</span>
+                                    <span class="text-[11px] font-semibold text-indigo-600 flex items-center group-hover:underline">Lihat Profil &rarr;</span>
+                                </div>
                             </div>
                         </div>
-                        <button onclick="openShareModalTab2('${key}')" class="p-1.5 text-slate-400 hover:text-emerald-600 rounded-lg hover:bg-emerald-50 flex-shrink-0 transition" title="Unduh Berkas Bersama">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                            </svg>
+                        <button onclick="downloadSharedDirect(event, '${key}')" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition shrink-0 ml-2" title="Unduh Langsung">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         </button>
                     </div>
                 `;
             });
         } else {
-            sharedFilesContainer.innerHTML = `<div class="col-span-2 py-8 text-center text-slate-400 text-sm">Belum ada berkas kolaborasi yang dibagikan saat ini.</div>`;
+            sharedFilesContainer.innerHTML = `<div class="col-span-2 py-8 text-center text-gray-400 text-sm">Belum ada berkas kolaborasi yang dibagikan saat ini.</div>`;
         }
     });
 }
 
-window.openShareModalTab2 = function(fileId) {
-    loadSharedFile(fileId);
+// Handler unduh langsung berkas kolaborasi
+window.downloadSharedDirect = function(event, fileKey) {
+    event.stopPropagation();
+    const sharedRef = ref(database, `shared/${fileKey}`);
+    get(sharedRef).then((snapshot) => {
+        if (snapshot.exists()) {
+            const file = snapshot.val();
+            const a = document.createElement('a');
+            a.href = file.data;
+            a.download = file.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } else {
+            alert("File tidak ditemukan di server.");
+        }
+    });
 }
 
 window.downloadFile = function(fileId) {
@@ -616,7 +477,7 @@ window.logout = function() {
     });
 }
 
-// ================= AUTO-HIDE NAVIGASI & HEADER SAAT SCROLL =================
+// ================= AUTO-HIDE NAVIGASI & HEADER SAAT SCROLL (MOBILE) =================
 let lastScrollTop = 0;
 const header = document.querySelector('header');
 const mobileNav = document.querySelector('.md\\:hidden.fixed.bottom-0');
