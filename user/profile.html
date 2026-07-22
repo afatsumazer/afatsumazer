@@ -68,15 +68,17 @@
         import { initializeApp } from "https://gstatic.com";
         import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://gstatic.com";
 
-        // 1. ISI DENGAN KONFIGURASI FIREBASE PROYEK ANDA
-        const firebaseConfig = {
-            apiKey: "AIzaSyYOUR_API_KEY_HERE",
-            authDomain: "://firebaseapp.com",
-            projectId: "your-app-id",
-            storageBucket: "://appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:12345:web:abcdef"
-        };
+       // Konfigurasi Firebase Anda (Sesuai Database Aktif Anda)
+const firebaseConfig = {
+  apiKey: "AIzaSyDg2b6LERZ2zE86mTiYvUO1Uj--lAtpmgM",
+  authDomain: "afatsumazer-app.firebaseapp.com",
+  databaseURL: "https://afatsumazer-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "afatsumazer-app",
+  storageBucket: "afatsumazer-app.firebasestorage.app",
+  messagingSenderId: "16280759060",
+  appId: "1:16280759060:web:fd4deacafdf5cadd777001",
+  measurementId: "G-WB9YW9D726"
+};
 
         // Inisialisasi Firebase & Firestore
         const app = initializeApp(firebaseConfig);
