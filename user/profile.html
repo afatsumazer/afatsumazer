@@ -86,7 +86,7 @@ const firebaseConfig = {
 
         // 2. MENGAMBIL USER ID DARI URL (Contoh akses: index.html?id=user123)
         const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('id') || '?id='; // Default ke 'user123' jika parameter kosong
+        const userId = urlParams.get('id') || 'user123'; // Default ke 'user123' jika parameter kosong
 
         // 3. AMBIL DATA PROFIL DARI FIRESTORE
         async function muatProfil() {
