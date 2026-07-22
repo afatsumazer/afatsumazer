@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Pengguna Web</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f4f7f6; color: #333; padding: 40px 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        
+        header { text-align: center; margin-bottom: 40px; }
+        header h1 { font-size: 2.2rem; color: #2c3e50; margin-bottom: 10px; }
+        header p { color: #666; }
+
+        /* Desain List Pengguna */
+        .user-list { display: flex; flex-direction: column; gap: 15px; }
+        
+        /* Tag <a> diubah menjadi card yang bisa diklik */
+        .user-link { text-decoration: none; color: inherit; display: block; }
+        
+        .user-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+        
+        .user-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            border-color: #0095f6;
+        }
+
+        .user-avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; background-color: #ddd; }
+        .user-details { flex-grow: 1; }
+        .user-name { font-size: 1.1rem; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+        .user-username { font-size: 0.85rem; color: #737373; }
+        
+        .arrow-icon { color: #cbd5e1; font-size: 1.2rem; font-weight: bold; }
+        .loading { text-align: center; padding: 20px; color: #666; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Jelajahi Profil</h1>
+            <p>Pilih salah satu pengguna untuk melihat kartu pos dan kiriman publik mereka</p>
+        </header>
+
+        <!-- Tempat daftar nama pengguna akan muncul -->
+        <div class="user-list" id="users-container">
+            <div class="loading">Memuat daftar pengguna...</div>
+        </div>
+    </div>
+
+    <!-- ================= KONEKSI FIREBASE ================= -->
+    <script type="module">
+        import { initializeApp } from "https://gstatic.com";
+        import { getFirestore, collection, getDocs } from "https://gstatic.com";
+
+        // Gunakan konfigurasi Firebase Anda yang sama
+        const firebaseConfig = {
+            apiKey: "AIzaSyYOUR_API_KEY_HERE",
+            authDomain: "://firebaseapp.com",
+            projectId: "your-app-id",
+            storageBucket: "://appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:12345:web:abcdef"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function muatSemuaPengguna() {
+            const container = document.getElementById('users-container');
+            
+            try {
+                // Ambil semua dokumen dari koleksi "users"
+                const querySnapshot = await getDocs(collection(db, "users"));
+                container.innerHTML = ''; // Bersihkan tulisan loading
+
+                if (querySnapshot.empty) {
+                    container.innerHTML = '<div class="loading">Tidak ada pengguna terdaftar.</div>';
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const user = doc.data();
+                    const userId = doc.id; // Ini adalah ID dokumen (misal: user123)
+
+                    // Bungkus kartu dengan tag <a href="profil.html?id=ID_USER">
+                    const userItemHtml = `
+                        <a href="profil.html?id=${userId}" class="user-link">
+                            <div class="user-card">
+                                <img src="${user.avatar || 'https://placeholder.com'}" alt="${user.name}" class="user-avatar">
+                                <div class="user-details">
+                                    <div class="user-name">${user.name}</div>
+                                    <div class="user-username">@${user.username}</div>
+                                </div>
+                                <div class="arrow-icon">➔</div>
+                            </div>
+                        </a>
+                    `;
+                    container.insertAdjacentHTML('beforeend', userItemHtml);
+                });
+
+            } catch (error) {
+                console.error("Gagal memuat daftar pengguna:", error);
+                container.innerHTML = '<div class="loading">Gagal memuat data.</div>';
+            }
+        }
+
+        window.onload = muatSemuaPengguna();
+    </script>
+</body>
+</html>
