@@ -8,11 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 font-sans">
 
-    <!-- === MODAL POPUP PORTOFOLIO & PROFIL PENGGUNA (BARU) === -->
-    <div id="portfolio-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 transition-opacity duration-300">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 relative overflow-hidden">
+    <!-- === MODAL POPUP PORTOFOLIO & PROFIL PENGGUNA === -->
+    <div id="portfolio-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 relative overflow-hidden border border-gray-100">
             <!-- Tombol Close -->
             <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center font-bold transition z-10">✕</button>
 
@@ -20,42 +20,34 @@
             <div class="text-center pt-2 pb-4 border-b border-gray-100">
                 <div class="relative inline-block">
                     <img id="popup-user-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-20 h-20 rounded-full border-2 border-indigo-500 shadow-md object-cover mx-auto">
-                    <span class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full" title="Aktif"></span>
+                    <span class="absolute bottom-0 right-0 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full" title="Aktif"></span>
                 </div>
                 <h3 id="popup-user-name" class="text-xl font-bold text-gray-900 mt-2">Nama Pengguna</h3>
                 <p id="popup-user-email" class="text-xs text-gray-500">user@email.com</p>
                 <span class="inline-block mt-2 bg-indigo-50 text-indigo-600 text-[11px] font-semibold px-3 py-0.5 rounded-full border border-indigo-100">
-                    Anggota Pro Workspace
+                    Workspace Member
                 </span>
             </div>
 
-            <!-- Detail Portofolio Ringkas -->
+            <!-- Detail Portofolio Ringkas (Dua-Arah Tersinkronisasi dengan Database) -->
             <div class="py-4 space-y-3">
-                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Portofolio & Proyek Aktif</h4>
+                <div class="flex items-center justify-between">
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Portofolio & Proyek Aktif</h4>
+                    <span class="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">Database Live</span>
+                </div>
                 
-                <div id="popup-portfolio-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                    <!-- Item Portofolio Contoh -->
-                    <div class="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            </div>
-                            <div>
-                                <h5 class="text-xs font-bold text-gray-800">Sistem Manajemen Berkas</h5>
-                                <p class="text-[10px] text-gray-500">Aplikasi Web Utama</p>
-                            </div>
-                        </div>
-                        <span class="text-[10px] font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-200">Selesai</span>
-                    </div>
+                <!-- Konten ditarik otomatis dari tab profil lewat JS -->
+                <div id="popup-portfolio-list" class="space-y-2 max-h-52 overflow-y-auto pr-1">
+                    <p class="text-xs text-gray-400 italic text-center py-4">Memuat data portofolio...</p>
                 </div>
             </div>
 
             <!-- Footer Modal -->
             <div class="pt-3 border-t border-gray-100 flex justify-end space-x-2">
-                <a href="edit-profile.html" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow-sm flex items-center space-x-1">
-                    <span>Kelola Profil Lengkap</span>
+                <a href="edit-profile.html" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center space-x-1">
+                    <span>Pengaturan Profil</span>
                 </a>
-                <button onclick="closeProfileModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold px-4 py-2 rounded-xl transition">
+                <button onclick="closeProfileModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold px-4 py-2.5 rounded-xl transition">
                     Tutup
                 </button>
             </div>
@@ -64,13 +56,13 @@
 
     <!-- === MODAL OVERLAY UNDUH TAUTAN BAGI === -->
     <div id="share-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full text-center">
+        <div class="bg-white p-6 rounded-2xl shadow-lg max-w-sm w-full text-center">
             <h3 class="text-lg font-bold text-gray-900">Unduh Berkas Bersama</h3>
             <p id="share-file-name" class="text-sm text-gray-500 mt-2 font-medium">Memuat nama berkas...</p>
             <p id="share-file-owner" class="text-xs text-indigo-600 mt-1 font-semibold"></p>
             <div class="mt-6 flex space-x-3 justify-center">
-                <button onclick="downloadSharedFile()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Unduh Sekarang</button>
-                <button onclick="closeShareModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition">Tutup</button>
+                <button onclick="downloadSharedFile()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition">Unduh Sekarang</button>
+                <button onclick="closeShareModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-xl text-sm font-medium transition">Tutup</button>
             </div>
         </div>
     </div>
@@ -97,13 +89,13 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 pt-2">
-                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
                         <span class="text-[11px] text-gray-400 font-semibold block">Format File</span>
                         <span id="modal-file-format" class="inline-block mt-1 bg-indigo-100 text-indigo-700 text-xs font-extrabold px-2.5 py-0.5 rounded uppercase">
                             PDF
                         </span>
                     </div>
-                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
                         <span class="text-[11px] text-gray-400 font-semibold block">Ukuran File</span>
                         <span id="modal-file-size" class="text-xs font-bold text-gray-700 block mt-1">0 KB</span>
                     </div>
@@ -156,7 +148,7 @@
 
         <div class="transition-opacity duration-200 opacity-0 group-hover:opacity-100 flex flex-col justify-between h-full w-full">
             <div>
-                <!-- LOGO PRO REPLACEMENT (DIPERBARUI) -->
+                <!-- LOGO PRO REPLACEMENT -->
                 <div class="mb-8 flex items-center space-x-3 px-2">
                     <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 ring-2 ring-indigo-400/30 shrink-0">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -234,20 +226,20 @@
             <!-- TAB 1: OVERVIEW -->
             <div id="tab-overview" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                         <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Tugas Tersisa</span>
                         <h3 id="stat-tasks-pending" class="text-3xl font-extrabold text-indigo-600 mt-2">0</h3>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                         <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Tugas Selesai</span>
                         <h3 id="stat-tasks-completed" class="text-3xl font-extrabold text-green-600 mt-2">0</h3>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                         <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider">File Disimpan</span>
                         <h3 id="stat-files-count" class="text-3xl font-extrabold text-blue-600 mt-2">0</h3>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                     <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider">Status Ruang Penyimpanan</h3>
                     <p id="kuota-info" class="text-sm text-gray-500 mt-2">Menghitung kapasitas...</p>
                 </div>
@@ -255,7 +247,7 @@
 
             <!-- TAB 2: TUGAS SAYA (BERKAS PUBLIK) -->
             <div id="tab-tasks" class="hidden space-y-6">
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                     <div class="flex items-center space-x-2 mb-1">
                         <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full inline-block animate-pulse"></span>
                         <h3 class="text-sm font-extrabold tracking-wider text-gray-800 uppercase">TAB TUGAS (BERKAS PUBLIK)</h3>
@@ -269,56 +261,68 @@
                 </div>
             </div>
 
-            <!-- TAB 3: PENYIMPANAN FILE (BERKAS) -->
-            <div id="tab-files" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Folder -->
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h4 class="text-sm font-bold text-gray-700 uppercase">Folder Saya</h4>
-                        <button onclick="createFolder()" class="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-2 py-1 rounded font-semibold transition">+ Folder</button>
-                    </div>
-                    <ul id="folder-list" class="space-y-1"></ul>
-                </div>
-
-                <!-- File Area -->
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm md:col-span-2 space-y-6">
-                    <div>
-                        <h3 class="text-lg font-bold">Penyimpanan File</h3>
-                        <p class="text-xs text-gray-500">Folder Aktif: <span id="active-folder-name" class="font-bold text-indigo-600">Utama</span></p>
+            <!-- TAB 3: PENYIMPANAN FILE (MODERN KEKINIAN & TANPA FOLDER SAYA) -->
+            <div id="tab-files" class="hidden space-y-6">
+                <div class="bg-white p-6 md:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Penyimpanan File</h3>
+                            <p class="text-xs text-gray-400 mt-0.5">Kelola dan unggah dokumen Anda secara aman</p>
+                        </div>
+                        <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-full border border-indigo-100">
+                            Penyimpanan Utama
+                        </span>
                     </div>
 
-                    <!-- Upload Form -->
-                    <div class="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-indigo-400 transition">
+                    <!-- UPLOAD AREA MODERN / DRAG & DROP ZONE -->
+                    <div class="relative border-2 border-dashed border-indigo-200 hover:border-indigo-500 bg-gradient-to-b from-indigo-50/50 via-white to-white rounded-2xl p-8 text-center transition-all duration-300 group shadow-sm hover:shadow-md">
                         <input type="file" id="file-selector" class="hidden" onchange="updateFileLabel()">
-                        <label for="file-selector" class="cursor-pointer block">
-                            <span id="file-label" class="text-sm text-gray-600 font-medium block">Pilih file dari komputer Anda...</span>
-                            <span class="text-xs text-gray-400 mt-1 block">Batas ukuran file maksimal 2 MB</span>
-                        </label>
                         
-                        <div class="mt-4 flex items-center justify-center space-x-2">
+                        <label for="file-selector" class="cursor-pointer block">
+                            <!-- Icon Cloud Upload Modern -->
+                            <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shadow-inner">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 0115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                </svg>
+                            </div>
+                            
+                            <span id="file-label" class="text-base font-bold text-gray-800 block group-hover:text-indigo-600 transition">
+                                Klik untuk memilih file dari perangkat Anda
+                            </span>
+                            <span class="text-xs text-gray-400 mt-1 block font-medium">
+                                Ukuran berkas maksimal: <strong class="text-gray-600">2 MB</strong>
+                            </span>
+                        </label>
+
+                        <!-- Option Publik / Privat (Pill Switch Style) -->
+                        <div class="mt-6 inline-flex items-center space-x-2 bg-gray-50 border border-gray-200 px-4 py-2 rounded-xl shadow-inner">
                             <input type="checkbox" id="file-is-public" class="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 cursor-pointer">
                             <label for="file-is-public" class="text-xs font-semibold text-gray-700 cursor-pointer select-none">
-                                Bagikan ke Publik (Tampil di Tab Tugas)
+                                Bagikan ke Publik <span class="text-[10px] text-gray-400 font-normal">(Tampil di Tab Tugas)</span>
                             </label>
                         </div>
 
-                        <button onclick="uploadSelectedFile()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition shadow-sm">
-                            Unggah Berkas
-                        </button>
+                        <!-- Tombol Unggah Gradient -->
+                        <div class="mt-6">
+                            <button onclick="uploadSelectedFile()" class="inline-flex items-center space-x-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white px-7 py-3 rounded-xl text-sm font-bold transition-all transform active:scale-95 shadow-md hover:shadow-indigo-500/25">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                <span>Unggah Berkas Sekarang</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Tabel File Privat -->
-                    <div class="overflow-x-auto">
+                    <!-- Tabel File -->
+                    <div class="overflow-x-auto rounded-xl border border-gray-100">
                         <table class="min-w-full divide-y divide-gray-200 text-sm">
-                            <thead class="bg-gray-50">
+                            <thead class="bg-gray-50/80">
                                 <tr>
-                                    <th class="px-6 py-3 text-left font-semibold text-gray-500">Nama File</th>
-                                    <th class="px-6 py-3 text-right font-semibold text-gray-500">Aksi</th>
+                                    <th class="px-6 py-3.5 text-left font-bold text-gray-500">Nama File</th>
+                                    <th class="px-6 py-3.5 text-right font-bold text-gray-500">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="file-table-body" class="divide-y divide-gray-200">
+                            <tbody id="file-table-body" class="divide-y divide-gray-200 bg-white">
                                 <tr>
-                                    <td colspan="2" class="px-6 py-4 text-center text-gray-400">Pilih folder di sebelah kiri terlebih dahulu.</td>
+                                    <td colspan="2" class="px-6 py-6 text-center text-gray-400 italic">Memuat berkas Anda...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -328,7 +332,7 @@
 
             <!-- TAB 4: PROFIL SAYA & PORTOFOLIO -->
             <div id="tab-profile" class="hidden space-y-6">
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-lg text-center mx-auto">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm max-w-lg text-center mx-auto">
                     <div onclick="window.location.href='edit-profile.html'" class="group cursor-pointer">
                         <div class="relative inline-block">
                             <img id="profile-card-avatar" src="https://via.placeholder.com/150" alt="Avatar" class="w-24 h-24 rounded-full border border-gray-200 mx-auto mb-4 object-cover group-hover:opacity-85 transition">
@@ -337,18 +341,18 @@
                     </div>
                     <p id="profile-card-email" class="text-sm text-gray-500 mt-1">user@email.com</p>
                     <div class="mt-4">
-                        <a href="edit-profile.html" class="inline-block bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-4 py-2 rounded-lg text-xs font-semibold transition">Ubah Detail Profil</a>
+                        <a href="edit-profile.html" class="inline-block bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-4 py-2 rounded-xl text-xs font-semibold transition">Ubah Detail Profil</a>
                     </div>
                 </div>
 
-                <!-- Section Portofolio -->
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-lg mx-auto">
+                <!-- Section Portofolio (Database Sync Source) -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm max-w-lg mx-auto">
                     <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
                         <div>
                             <h3 class="text-base font-bold text-gray-900">Portofolio Saya</h3>
                             <p class="text-xs text-gray-500">Tersinkronisasi dengan Database</p>
                         </div>
-                        <button onclick="addPortfolioItem()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-sm">+ Tambah Projek</button>
+                        <button onclick="addPortfolioItem()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-sm">+ Tambah Projek</button>
                     </div>
                     <div id="portfolio-list-container" class="space-y-3">
                         <p class="text-xs text-gray-400 italic">Memuat portofolio...</p>
@@ -359,20 +363,40 @@
         </div>
     </div>
 
-    <!-- === SCRIPT POPUP MODAL CONTROL === -->
+    <!-- === SCRIPT POPUP MODAL CONTROL & DATABASE PORTFOLIO SYNC === -->
     <script>
-        // Modal Profil & Portofolio (Memunculkan popup dari header)
+        // Modal Profil & Portofolio (Memunculkan popup dari header & sinkronisasi dengan Database)
         function openProfileModal() {
             const userName = document.getElementById('user-display-name')?.innerText || 'Pengguna';
             const userAvatar = document.getElementById('user-avatar')?.src || 'https://via.placeholder.com/150';
+            const userEmail = document.getElementById('profile-card-email')?.innerText || 'user@email.com';
 
             document.getElementById('popup-user-name').innerText = userName;
             document.getElementById('popup-user-avatar').src = userAvatar;
+            document.getElementById('popup-user-email').innerText = userEmail;
+
+            // MENGAMBIL SINKRONISASI REAL PORTOFOLIO DARI DATABASE (Tab Profil)
+            const realPortfolioHTML = document.getElementById('portfolio-list-container')?.innerHTML;
+            const popupContainer = document.getElementById('popup-portfolio-list');
+
+            if (realPortfolioHTML && popupContainer) {
+                popupContainer.innerHTML = realPortfolioHTML;
+            }
+
             document.getElementById('portfolio-modal').classList.remove('hidden');
         }
 
         function closeProfileModal() {
             document.getElementById('portfolio-modal').classList.add('hidden');
+        }
+
+        // Label File Selector Dynamic Feedback
+        function updateFileLabel() {
+            const fileInput = document.getElementById('file-selector');
+            const fileLabel = document.getElementById('file-label');
+            if (fileInput && fileInput.files.length > 0) {
+                fileLabel.innerHTML = `Terpilih: <span class="text-indigo-600">${fileInput.files[0].name}</span>`;
+            }
         }
 
         // Modal Detail Berkas
