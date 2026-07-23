@@ -1,0 +1,44 @@
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: #1e293b; /* Warna gelap modern */
+  color: white;
+  display: flex;
+  flex-direction: column;
+  position: fixed; /* Tetap di kiri saat discroll */
+  left: 0;
+  top: 0;
+}
+
+.sidebar-brand {
+  padding: 20px;
+  text-align: center;
+  border-bottom: 1px solid #334155;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  padding: 15px 0;
+}
+
+.menu-item {
+  padding: 12px 24px;
+  color: #cbd5e1;
+  text-decoration: none;
+  display: block;
+  transition: all 0.3s;
+}
+
+/* Efek saat kursor diarahkan ke menu */
+.menu-item:hover {
+  background-color: #334155;
+  color: white;
+}
+
+/* Efek visual ketika menu sedang aktif/dibuka */
+.menu-item.active {
+  background-color: #3b82f6; /* Warna biru indikator */
+  color: white;
+  font-weight: bold;
+}
