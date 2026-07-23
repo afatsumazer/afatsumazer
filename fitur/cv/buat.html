@@ -46,8 +46,6 @@
             <option value="1">Pilihan 1: Teal Emerald (Melingkar & Kreatif)</option>
             <option value="2">Pilihan 2: Luxury Burgundy (Asimetris & Elegan)</option>
             <option value="3">Pilihan 3: Minimalist Charcoal (Kotak & Formal)</option>
-        <option value="4">Pilihan 4: Normal (Asln)</option>
-            
         </select>
         <button class="btn-sec" onclick="document.getElementById('fileInput').click()">📷 Ganti Foto</button>
         <button class="btn-main" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
@@ -139,7 +137,6 @@
                 .skill-badge { background-color: #f9ebec; color: #4a0e17; border-radius: 8px 20px 8px 20px; }
             `,
             3: `
-                        3: `
                 body { background-color: #f4f5f7; color: #2d3748; }
                 .cv-container { border-radius: 16px; box-shadow: 0 4px 25px rgba(0,0,0,0.05); }
                 header { background: #2d3748; border-bottom: 5px solid #4a5568; }
@@ -148,25 +145,7 @@
                 .contact-info span { color: #e2e8f0; background: transparent; padding: 0; margin-right: 10px; }
                 h3 { color: #1a202c; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; width: 100%; }
                 .skill-badge { background-color: #edf2f7; color: #2d3748; border-radius: 4px; }
-            `,
-            4: `
-                body { background-color: #ffffff; color: #000000; padding: 0; }
-                .cv-container { box-shadow: none; padding: 10px; border-radius: 0; }
-                header { background: none; color: #000000; padding: 0; margin: 0 0 20px 0; border-bottom: 2px solid #000000; }
-                .profile-photo { border: 1px solid #000000; border-radius: 0; width: 110px; height: 140px; }
-                .header-text h2 { color: #555555; }
-                .contact-info span { color: #000000; background: transparent; padding: 0; margin-right: 15px; }
-                .cv-body { display: block; } /* Mengubah 2 kolom menjadi 1 kolom standar */
-                .left-column, .right-column { width: 100%; }
-                h3 { color: #000000; border-bottom: 1px solid #000000; padding-bottom: 4px; margin-top: 20px; width: 100%; }
-                h3::after { display: none; }
-                .item-title { color: #000000; }
-                .company-uni { color: #333333; }
-                .skill-badge { background: none; color: #000000; padding: 0; margin: 0 10px 0 0; border-radius: 0; display: inline; }
-                .skill-badge::after { content: ', '; }
-                .skill-badge:last-child::after { content: '.'; }
             `
-`
         };
 
         function gantiTema(nomorTema) {
@@ -186,4 +165,3 @@
     </script>
 </body>
 </html>
-
