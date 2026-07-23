@@ -1,0 +1,50 @@
+/* 1. Reset Dasar untuk Semua Elemen */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* 2. Mengatur Latar Belakang Aplikasi */
+body {
+  background-color: #f8fafc; /* Warna abu-abu terang yang nyaman di mata */
+  color: #334155; /* Warna teks utama */
+}
+
+/* 3. Pembungkus Utama Aplikasi (Flexbox Layout) */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* 4. Area Konten Utama Dashboard */
+.main-content {
+  flex: 1;
+  margin-left: 250px; /* Jarak agar konten tidak tertutup oleh sidebar yang bersifat fixed */
+  padding: 40px;
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+
+/* 5. Utility Classes Tambahan untuk Merapikan Halaman Dashboard */
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #0f172a;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
