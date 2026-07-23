@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikator Lapangan Real-time</title>
+    <script src="https://jsdelivr.net"></script>
+    <script src="https://unpkg.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col justify-between">
+
+    <header class="bg-gray-800 p-4 text-center border-b border-gray-700">
+        <h1 class="text-lg font-bold">VERIFIKATOR SERVER AKTIF</h1>
+        <p class="text-xs text-emerald-400">Sistem Perlindungan Duplikasi Online</p>
+    </header>
+
+    <main class="flex-1 flex flex-col items-center justify-center p-4">
+        <div class="w-full max-w-sm bg-gray-800 p-4 rounded-2xl border border-gray-700">
+            <div id="reader" class="w-full rounded-xl overflow-hidden bg-black aspect-square"></div>
+        </div>
+
+        <!-- Popup Box Hasil Verifikasi -->
+        <div id="scanResultBox" class="hidden w-full max-w-sm mt-6 p-5 rounded-2xl border text-center">
+            <h2 id="resultStatus" class="text-xl font-black uppercase">STATUS TIKET</h2>
+            
+            <div class="mt-3 text-left space-y-1 text-sm bg-black/20 p-3 rounded-lg">
+                <p><strong>ID:</strong> <span id="outID" class="font-mono text-amber-400">-</span></p>
+                <p><strong>Nama:</strong> <span id="outName">-</span></p>
+                <p><strong>Pesan:</strong> <span id="outMessage" class="text-yellow-300">-</span></p>
+            </div>
+
+            <button onclick="resetScanner()" class="mt-4 w-full bg-white text-gray-900 font-bold py-2 rounded-xl text-sm">
+                Scan Tiket Berikutnya
+            </button>
+        </div>
+    </main>
+
+    <script>
+        let html5QrcodeScanner;
+
+// JANTUNG OTOMATIS: Cek apakah ada parameter di URL browser saat halaman dibuka
+window.onload = async function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+    const sig = urlParams.get('sig');
+
+    if (id && sig) {
+        // JIKA PETUGAS KLIK LINK DARI KAMERA HP: Langsung Verifikasi
+        document.getElementById('reader').innerHTML = "<p class='text-center p-8 text-amber-400 animate-pulse'>Memverifikasi Tiket ke Server...</p>";
+        await prosesVerifikasiKeServer(id, sig);
+    } else {
+        // JIKA PETUGAS BUKA MANUAL: Jalankan kamera scanner seperti biasa
+        startScanning();
+    }
+};
+
+function startScanning() {
+    html5QrcodeScanner = new Html5Qrcode("reader");
+    const config = { fps: 10, qrbox: { width: 220, height: 220 } };
+    html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
+        .catch(err => alert("Kamera diblokir! Gunakan HTTPS atau localhost."));
+}
+
+// Fungsi ketika kamera membaca QR Code link
+async function onScanSuccess(decodedText) {
+    html5QrcodeScanner.stop();
+    try {
+        // Ekstrak parameter id dan sig dari link URL yang terbaca kamera
+        const url = new URL(decodedText);
+        const id = url.searchParams.get('id');
+        const sig = url.searchParams.get('sig');
+        
+        await prosesVerifikasiKeServer(id, sig);
+    } catch (error) {
+        tampilkanUIGagal();
+    }
+}
+
+// FUNGSI UTAMA: Menembak API Server Node.js Anda
+async function prosesVerifikasiKeServer(id, sig) {
+    const box = document.getElementById('scanResultBox');
+    const statusText = document.getElementById('resultStatus');
+
+    try {
+        const response = await fetch('/api/verify-ticket', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, sig })
+        });
+
+        const result = await response.json();
+        box.classList.remove('hidden');
+        
+        document.getElementById('outID').innerText = id;
+        document.getElementById('outName').innerText = result.data ? result.data.nama : "Tidak Dikenal";
+        document.getElementById('outMessage').innerText = result.message;
+
+        if (result.valid) {
+            box.className = "w-full max-w-sm mt-6 p-5 rounded-2xl border bg-emerald-950/80 border-emerald-500 text-emerald-200 text-center";
+            statusText.className = "text-xl font-black text-emerald-400";
+            statusText.innerText = "✓ BERHASIL MASUK";
+        } else {
+            box.className = "w-full max-w-sm mt-6 p-5 rounded-2xl border bg-rose-950/80 border-rose-500 text-rose-200 text-center";
+            statusText.className = "text-xl font-black text-rose-400";
+            statusText.innerText = "❌ TIKET DITOLAK";
+        }
+    } catch (error) {
+        tampilkanUIGagal();
+    }
+}
+
+function tampilkanUIGagal() {
+    const box = document.getElementById('scanResultBox');
+    box.classList.remove('hidden');
+    box.className = "w-full max-w-sm mt-6 p-5 rounded-2xl border bg-rose-950/80 border-rose-500 text-rose-200 text-center";
+    document.getElementById('resultStatus').innerText = "❌ BUKAN TIKET RESMI";
+    document.getElementById('outID').innerText = "ERROR";
+    document.getElementById('outName').innerText = "Format Salah";
+    document.getElementById('outMessage').innerText = "QR Code bukan dari sistem resmi.";
+}
+
+function onScanFailure() {}
+
+function resetScanner() {
+    // Bersihkan parameter URL di browser agar kembali bersih, lalu nyalakan kamera lagi
+    window.history.pushState({}, document.title, window.location.pathname);
+    document.getElementById('scanResultBox').classList.add('hidden');
+    document.getElementById('reader').innerHTML = "";
+    startScanning();
+}
+
+    </script>
+
+</body>
+</html>
