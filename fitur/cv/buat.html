@@ -3,22 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Modern Curve</title>
-    <!-- Menghubungkan ke file gaya.css -->
-    <link rel="stylesheet" href="gaya.css">
+    <title>CV Modern Multi-Tema</title>
+    <style id="theme-styles">
+        body { margin: 0; padding: 30px 20px; font-family: 'Segoe UI', Roboto, Arial, sans-serif; transition: all 0.3s ease; }
+        .cv-container { max-width: 850px; background: #ffffff; margin: 0 auto; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; transition: all 0.3s ease; }
+        header { display: flex; align-items: center; padding: 35px; margin: -40px -40px 35px -40px; color: white; transition: all 0.3s ease; }
+        .photo-container { margin-right: 35px; }
+        .profile-photo { width: 130px; height: 160px; object-fit: cover; cursor: pointer; transition: all 0.3s ease; }
+        .header-text h1 { margin: 0 0 5px 0; font-size: 2.2rem; }
+        .header-text h2 { margin: 0 0 15px 0; font-size: 1.2rem; font-weight: 400; }
+        .contact-info { display: flex; flex-wrap: wrap; gap: 10px; }
+        .contact-info span { padding: 6px 14px; font-size: 0.85rem; }
+        .cv-body { display: grid; grid-template-columns: 1fr 2fr; gap: 35px; }
+        section { margin-bottom: 25px; }
+        h3 { font-size: 1.15rem; text-transform: uppercase; margin-top: 0; margin-bottom: 15px; display: inline-block; position: relative; padding-bottom: 5px; }
+        .item { margin-bottom: 20px; }
+        .item-title { font-weight: 600; display: flex; justify-content: space-between; }
+        .company-uni { font-style: italic; margin: 3px 0 8px 0; }
+        ul { padding-left: 18px; line-height: 1.5; }
+        .skill-badge { display: inline-block; padding: 6px 14px; margin: 4px 2px; font-size: 0.85rem; font-weight: 500; }
+        .btn-container { max-width: 850px; margin: 0 auto 20px auto; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: #ffffff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .btn-container label { font-weight: bold; font-size: 0.9rem; color: #333; margin-right: 5px; }
+        select { padding: 10px 15px; border-radius: 8px; border: 2px solid #ddd; font-size: 0.9rem; font-weight: 600; color: #333; cursor: pointer; background: #fff; outline: none; }
+        button { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
+        .btn-main { background: #3498db; color: white; }
+        .btn-sec { background: #e2e8f0; color: #333; }
+        .input-file { display: none; }
+        @media print {
+            body { background: none; padding: 0; }
+            .cv-container { box-shadow: none; padding: 0; width: 100%; border-radius: 0 !important; }
+            .btn-container { display: none; }
+            header { margin: 0 0 30px 0; padding: 30px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .skill-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+    <style id="active-theme"></style>
 </head>
 <body>
-
     <div class="btn-container">
-        <button class="btn-secondary" onclick="document.getElementById('fileInput').click()">Ganti Foto</button>
-        <button onclick="window.print()">Cetak / Simpan ke PDF</button>
+        <label for="themeSelect">🎨 Pilih Desain CV:</label>
+        <select id="themeSelect" onchange="gantiTema(this.value)">
+            <option value="1">Pilihan 1: Teal Emerald (Melingkar & Kreatif)</option>
+            <option value="2">Pilihan 2: Luxury Burgundy (Asimetris & Elegan)</option>
+            <option value="3">Pilihan 3: Minimalist Charcoal (Kotak & Formal)</option>
+        </select>
+        <button class="btn-sec" onclick="document.getElementById('fileInput').click()">📷 Ganti Foto</button>
+        <button class="btn-main" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
         <input type="file" id="fileInput" class="input-file" accept="image/*" onchange="loadPhoto(event)">
     </div>
 
     <div class="cv-container" contenteditable="true">
         <header contenteditable="false">
             <div class="photo-container">
-                <img id="outputPhoto" class="profile-photo" src="https://placeholder.com" alt="Foto" onclick="document.getElementById('fileInput').click()">
+                <img id="outputPhoto" class="profile-photo" src="https://placeholder.com" alt="Foto Profil" onclick="document.getElementById('fileInput').click()">
             </div>
             <div class="header-text" contenteditable="true">
                 <h1>NAMA LENGKAP ANDA</h1>
@@ -35,7 +72,7 @@
             <div class="left-column">
                 <section>
                     <h3>Tentang Saya</h3>
-                    <p style="font-size: 0.9rem; line-height: 1.6; margin: 0;">Tuliskan ringkasan singkat profil profesional Anda di sini. Deskripsikan kekuatan utama Anda.</p>
+                    <p style="font-size: 0.9rem; line-height: 1.6; margin: 0;">Tuliskan ringkasan singkat profil profesional Anda di sini. Deskripsikan kekuatan utama Anda, minat karier, dan kontribusi untuk perusahaan.</p>
                 </section>
                 <section>
                     <h3>Keahlian</h3>
@@ -75,8 +112,48 @@
             </div>
         </div>
     </div>
-
     <script>
+        const gayaTema = {
+            1: `
+                body { background-color: #f2f7f5; color: #2c3e50; }
+                .cv-container { border-radius: 30px; box-shadow: 0 12px 40px rgba(22, 160, 133, 0.06); }
+                header { background: linear-gradient(135deg, #114b43, #16a085); border-bottom-left-radius: 60px; border-bottom-right-radius: 60px; }
+                .profile-photo { border: 4px solid #ffffff; border-radius: 50%; width: 140px; height: 140px; }
+                .header-text h2 { color: #a3e4d7; }
+                .contact-info span { background: rgba(255, 255, 255, 0.15); border-radius: 30px; }
+                h3 { color: #114b43; }
+                h3::after { content: ''; position: absolute; bottom: 0; left: 0; width: 35px; height: 4px; background-color: #16a085; border-radius: 10px; }
+                .skill-badge { background-color: #e8f8f5; color: #114b43; border-radius: 50px; }
+            `,
+            2: `
+                body { background-color: #fdfafb; color: #4a3b32; }
+                .cv-container { border-radius: 40px 10px 40px 10px; box-shadow: 0 15px 35px rgba(100, 30, 22, 0.05); }
+                header { background: linear-gradient(135deg, #4a0e17, #781d2a); border-bottom-left-radius: 100px 30px; border-bottom-right-radius: 100px 30px; }
+                .profile-photo { border: 3px solid rgba(255,255,255,0.7); border-radius: 30px 0px 30px 0px; }
+                .header-text h2 { color: #f5b0b7; }
+                .contact-info span { background: rgba(255, 255, 255, 0.12); border-radius: 12px; }
+                h3 { color: #4a0e17; }
+                h3::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 2px; background-color: #781d2a; }
+                .skill-badge { background-color: #f9ebec; color: #4a0e17; border-radius: 8px 20px 8px 20px; }
+            `,
+            3: `
+                body { background-color: #f4f5f7; color: #2d3748; }
+                .cv-container { border-radius: 16px; box-shadow: 0 4px 25px rgba(0,0,0,0.05); }
+                header { background: #2d3748; border-bottom: 5px solid #4a5568; }
+                .profile-photo { border: 3px solid #718096; border-radius: 12px; }
+                .header-text h2 { color: #cbd5e0; }
+                .contact-info span { color: #e2e8f0; background: transparent; padding: 0; margin-right: 10px; }
+                h3 { color: #1a202c; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; width: 100%; }
+                .skill-badge { background-color: #edf2f7; color: #2d3748; border-radius: 4px; }
+            `
+        };
+
+        function gantiTema(nomorTema) {
+            document.getElementById('active-theme').innerHTML = gayaTema[nomorTema];
+        }
+
+        gantiTema(1);
+
         function loadPhoto(event) {
             var reader = new FileReader();
             reader.onload = function(){
@@ -88,3 +165,4 @@
     </script>
 </body>
 </html>
+
