@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curriculum Vitae</title>
+    <style>
+        /* Gaya Dasar untuk Tampilan Browser */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .cv-container {
+            max-width: 800px;
+            background: #fff;
+            margin: 0 auto;
+            padding: 40px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+        .photo-container {
+            margin-right: 30px;
+        }
+        .profile-photo {
+            width: 120px;
+            height: 150px;
+            object-fit: cover;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .header-text h1 {
+            margin: 0 0 5px 0;
+            color: #2c3e50;
+        }
+        .header-text h2 {
+            margin: 0 0 15px 0;
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            font-weight: normal;
+        }
+        .contact-info p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+        section {
+            margin-bottom: 25px;
+        }
+        h3 {
+            color: #2c3e50;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+        .item {
+            margin-bottom: 15px;
+        }
+        .item-title {
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+        .company-uni {
+            font-style: italic;
+            color: #555;
+            margin: 2px 0 5px 0;
+        }
+        ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        /* Tombol Aksi */
+        .btn-container {
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .input-file {
+            display: none;
+        }
+
+        /* Pengaturan Khusus untuk Cetak (Print) */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .cv-container {
+                box-shadow: none;
+                padding: 0;
+                width: 100%;
+            }
+            .btn-container {
+                display: none; /* Sembunyikan tombol saat cetak */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Tombol Kontrol (Tidak Ikut Tercetak) -->
+    <div class="btn-container">
+        <button onclick="document.getElementById('fileInput').click()">Ganti Foto</button>
+        <button onclick="window.print()">Cetak / Simpan PDF</button>
+        <input type="file" id="fileInput" class="input-file" accept="image/*" onchange="loadPhoto(event)">
+    </div>
+
+    <!-- Konten CV (Bisa Diedit Langsung di Browser) -->
+    <div class="cv-container" contenteditable="true">
+        
+        <header contenteditable="false">
+            <div class="photo-container">
+                <img id="outputPhoto" class="profile-photo" src="https://placeholder.com" alt="Foto Profil" onclick="document.getElementById('fileInput').click()">
+            </div>
+            <div class="header-text" contenteditable="true">
+                <h1>NAMA LENGKAP ANDA</h1>
+                <h2>Profesional / Pekerjaan Anda</h2>
+                <div class="contact-info">
+                    <p>📍 Alamat: Jl. Contoh No. 123, Jakarta</p>
+                    <p>📞 Telepon: 0812-3456-7890</p>
+                    <p>✉️ Email: nama.anda@email.com</p>
+                    <p>🔗 LinkedIn: ://linkedin.com</p>
+                </div>
+            </div>
+        </header>
+
+        <section>
+            <h3>Tentang Saya</h3>
+            <p>Tuliskan ringkasan profesional Anda di sini. Jelaskan keahlian utama, pengalaman singkat, dan apa yang ingin Anda capai atau kontribusikan kepada perusahaan tujuan.</p>
+        </section>
+
+        <section>
+            <h3>Pengalaman Kerja</h3>
+            <div class="item">
+                <div class="item-title">
+                    <span>Posisi Jabatan</span>
+                    <span>Januari 2024 - Sekarang</span>
+                </div>
+                <div class="company-uni">Nama Perusahaan - Kota</div>
+                <ul>
+                    <li>Menjelaskan tugas utama dan pencapaian Anda menggunakan kalimat aktif.</li>
+                    <li>Contoh: Berhasil meningkatkan penjualan sebesar 20% dalam 6 bulan.</li>
+                </ul>
+            </div>
+            <div class="item">
+                <div class="item-title">
+                    <span>Posisi Jabatan Sebelumnya</span>
+                    <span>Maret 2022 - Desember 2023</span>
+                </div>
+                <div class="company-uni">Nama Perusahaan Terdahulu - Kota</div>
+                <ul>
+                    <li>Tanggung jawab utama selama bekerja di posisi tersebut.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h3>Pendidikan</h3>
+            <div class="item">
+                <div class="item-title">
+                    <span>Nama Jurusan / Program Studi</span>
+                    <span>2018 - 2022</span>
+                </div>
+                <div class="company-uni">Nama Universitas / Sekolah - IPK: 3.50</div>
+            </div>
+        </section>
+
+        <section>
+            <h3>Keahlian</h3>
+            <p>Keahlian Teknis: HTML, CSS, JavaScript, Microsoft Office, Desain Grafis.</p>
+            <p>Keahlian Interpersonal: Komunikasi, Kerja Sama Tim, Manajemen Waktu.</p>
+        </section>
+
+    </div>
+
+    <!-- Skrip untuk Mengganti Foto -->
+    <script>
+        function loadPhoto(event) {
+            var reader = new FileReader();
+            reader.onload = function(){
+                var output = document.getElementById('outputPhoto');
+                output.src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
+
+</body>
+</html>
