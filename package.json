@@ -1,6 +1,8 @@
 {
   "name": "webapp-saya",
   "version": "1.0.0",
-  "description": "Webapp dengan integrasi endpoint payment e-money",
-  "main": "index.js"
+  "description": "Webapp dengan integrasi endpoint payment DANA",
+  "dependencies": {
+    "dana-node": "latest"
+  }
 }
