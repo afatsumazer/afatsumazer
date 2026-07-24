@@ -1,0 +1,12 @@
+{
+  "name": "webapp-saya",
+  "version": "1.0.0",
+  "description": "Webapp dengan integrasi endpoint payment e-money",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
