@@ -337,20 +337,38 @@
         }
 
 
-async function bayarSekarang() {
-  const response = await fetch('https://afatsumazer.vercel.app/api/create-order', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ amount: 10000, orderTitle: 'Produk A' })
-  });
-  const data = await response.json();
-  window.location.href = data.webRedirectUrl; // redirect user ke halaman bayar DANA
-}
+
         
     </script>
 
 
+<button onclick="bayarSekarang()">Bayar Sekarang</button>
 
+<script>
+async function bayarSekarang() {
+  try {
+    const response = await fetch('https://afatsumazer.vercel.app/api/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        amount: 10000,           // ganti sesuai jumlah yang mau dibayar
+        orderTitle: 'Produk A'   // ganti sesuai nama produk/layanan
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.webRedirectUrl) {
+      window.location.href = data.webRedirectUrl; // arahkan user ke halaman bayar DANA
+    } else {
+      alert('Gagal membuat pesanan, coba lagi.');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Terjadi kesalahan, coba lagi.');
+  }
+}
+</script>
 
     
 </body>
