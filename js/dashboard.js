@@ -26,6 +26,39 @@ let limitMB = 50;
 let sisaKuotaCukup = true;
 let currentUserProfile = {};
 
+// ================= FIATUR SECURE WHATSAPP KLAIM (BASE64) =================
+// Mengarah langsung ke nomor +6285215079324
+const secureBaseUrl = "aHR0cHM6Ly93YS5tZS82Mjg1MjE1MDc5MzI0P3RleHQ9";
+
+window.klaimVoucherKeWhatsApp = function(namaHadiah, hargaPoin) {
+    if (!userUID) {
+        alert("Sesi Anda tidak valid atau telah berakhir. Silakan login kembali.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    // Mengambil username atau nama asli pengguna dari profil Firebase yang sedang aktif
+    const usernamePengguna = currentUserProfile.username || "@username";
+    const namaPengguna = currentUserProfile.name || "Pengguna";
+
+    // Format pesan klaim otomatis rapi menggunakan markdown WhatsApp
+    const pesanTeks = `Halo admin,\n\nSaya ingin meminta klaim poin untuk hadiah berikut:\n\n` +
+                      `📌 *Nama Hadiah:* ${namaHadiah}\n` +
+                      `🪙 *Harga Poin:* ${hargaPoin} Poin\n\n` +
+                      `============= DATA USER =============\n` +
+                      `🆔 *ID Firebase:* ${userUID}\n` +
+                      `👤 *Nama Akun:* ${namaPengguna} (${usernamePengguna})`;
+
+    // Menyamarkan pesan ke dalam format URL Encoding agar kompatibel dengan browser/aplikasi WA
+    const encodedPesan = encodeURIComponent(pesanTeks);
+
+    // Menggabungkan nomor tujuan hasil dekripsi Base64 dengan isi pesan klaim otomatis
+    const linkFinal = atob(secureBaseUrl) + encodedPesan;
+
+    // Membuka aplikasi WhatsApp di jendela/tab browser baru
+    window.open(linkFinal, '_blank');
+};
+
 // ================= HELPER FUNCTIONS =================
 function formatBytes(bytes, decimals = 1) {
     if (!bytes || bytes === 0) return '0 KB';
