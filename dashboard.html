@@ -390,11 +390,10 @@
                             <div class="text-xs font-bold text-gray-800">${v.label || 'Hadiah'}</div>
                             <div class="text-[10px] font-bold text-amber-500">${(v.cost || 0).toLocaleString('id-ID')} poin</div>
                         </div>
-                        <!-- Contoh Tombol Klaim di dalam dashboard.html -->
-<button onclick="klaimVoucherKeWhatsApp('${voucher.label}', '${voucher.cost}')" 
-        class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl text-xs">
-    Klaim Hadiah
-</button>
+                        <button data-voucher="${v.id}" data-cost="${v.cost || 0}" onclick="redeemReward(this)"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg ${claimed ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}">
+                            ${claimed ? 'Diklaim' : 'Klaim'}
+                        </button>
 
                         
                     </div>
