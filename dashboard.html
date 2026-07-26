@@ -478,9 +478,10 @@
                 return;
             }
 
-            // Ambil label hadiah dari config voucher untuk dikirim ke pesan WhatsApp
+            // Ambil label hadiah & nomor WA khusus voucher ini (jika diatur admin)
             const voucherData = vouchersConfig[voucher] || {};
             const namaHadiah = voucherData.label || voucher;
+            const nomorWaVoucher = voucherData.whatsapp || '';
 
             // PENTING: buka tab kosong SEKARANG (langsung dari klik user), bukan di
             // dalam .then(). Ini supaya browser (terutama Safari/iOS) tidak
@@ -502,7 +503,9 @@
                     .then(() => {
                         showRewardToast('Hadiah berhasil diklaim');
                         // Arahkan tab yang sudah dibuka tadi ke link WhatsApp
-                        window.klaimVoucherKeWhatsApp(namaHadiah, cost, waTabRef);
+                        // (nomor tujuan mengikuti pengaturan voucher ini di panel admin,
+                        // atau nomor default jika belum diatur)
+                        window.klaimVoucherKeWhatsApp(namaHadiah, cost, nomorWaVoucher, waTabRef);
                     });
             }).catch((err) => {
                 showRewardToast('Gagal menukar, coba lagi');
