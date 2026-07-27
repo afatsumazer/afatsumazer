@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Afatsumazer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 pb-16 min-h-screen">
+
+    <!-- ================= GERBANG AKSES (dicek sebelum konten admin ditampilkan) ================= -->
+    <div id="access-checking" class="min-h-screen flex items-center justify-center">
+        <p class="text-xs font-bold text-gray-400">Memeriksa akses admin...</p>
+    </div>
+
+    <div id="access-denied" class="hidden min-h-screen flex-col items-center justify-center text-center px-6">
+        <div class="text-4xl mb-3">🔒</div>
+        <h1 class="text-lg font-black text-gray-900">Akses ditolak</h1>
+        <p class="text-xs text-gray-500 mt-1 max-w-xs">Akun ini tidak memiliki hak admin. Hubungi pemilik sistem jika ini keliru.</p>
+        <a href="dashboard.html" class="mt-4 text-xs font-bold text-indigo-600 hover:underline">&larr; Kembali ke Dashboard</a>
+    </div>
+
+    <!-- ================= KONTEN ADMIN ================= -->
+    <div id="admin-content" class="hidden">
+
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span class="text-lg">⚙️</span>
+                    <h1 class="text-lg font-black text-gray-900 tracking-tight">Panel Admin</h1>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="dashboard.html" class="text-xs font-semibold text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-xl transition">
+                        &larr; Dashboard
+                    </a>
+                    <button onclick="adminLogout()" class="text-xs font-semibold text-red-600 hover:bg-red-50 px-3 py-2 rounded-xl transition">
+                        Keluar
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+
+            <!-- Navigasi Sub-tab -->
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button id="admin-tab-btn-missions" onclick="switchAdminTab('missions')" class="text-xs font-bold px-4 py-2.5 rounded-xl bg-indigo-900 text-white transition">
+                    📌 Misi Harian
+                </button>
+                <button id="admin-tab-btn-vouchers" onclick="switchAdminTab('vouchers')" class="text-xs font-bold px-4 py-2.5 rounded-xl bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 transition">
+                    🎁 Voucher / Hadiah
+                </button>
+                <button id="admin-tab-btn-users" onclick="switchAdminTab('users')" class="text-xs font-bold px-4 py-2.5 rounded-xl bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 transition">
+                    👥 Pengguna
+                </button>
+                <button id="admin-tab-btn-quickmenu" onclick="switchAdminTab('quickmenu')" class="text-xs font-bold px-4 py-2.5 rounded-xl bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 transition">
+                    🔗 Menu Cepat
+                </button>
+            </div>
+
+            <!-- ============ TAB MISI HARIAN ============ -->
+            <section id="admin-tab-missions" class="space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h3 class="font-extrabold text-sm text-gray-900 mb-1">Tambah Misi Baru</h3>
+                    <p class="text-xs text-gray-500 mb-4">Misi yang aktif akan langsung muncul di dashboard pengguna.</p>
+
+                    <!-- Pilihan Tipe Misi -->
+                    <div class="mb-3">
+                        <label class="text-[10px] font-extrabold uppercase text-gray-400 block mb-1">Tipe Misi</label>
+                        <select id="mission-type" onchange="onMissionTypeChange()" class="w-full sm:w-64 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                            <option value="normal">Normal (poin tetap, sekali/hari)</option>
+                            <option value="streak">Streak Harian (poin naik tiap hari, sampai hari ke-100)</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                        <input id="mission-icon" type="text" placeholder="🎯" maxlength="4" class="col-span-2 sm:col-span-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-center">
+                        <input id="mission-label" type="text" placeholder="Nama misi" class="col-span-2 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+
+                        <!-- Field khusus misi Normal -->
+                        <input id="mission-points" type="number" placeholder="Poin" min="0" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+
+                        <!-- Field khusus misi Streak (disembunyikan default) -->
+                        <input id="mission-base-points" type="number" placeholder="Base Poin (hari 1)" min="0" class="hidden border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                        <input id="mission-increment" type="number" placeholder="Kenaikan/hari" min="0" class="hidden border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+
+                        <input id="mission-order" type="number" placeholder="Urutan" min="0" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                        <button onclick="addMission()" class="col-span-2 sm:col-span-5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs shadow-sm transition">
+                            + Tambah Misi
+                        </button>
+                    </div>
+                    <p id="mission-streak-hint" class="hidden text-[10px] text-gray-400 mt-2">
+                        Poin misi streak dihitung otomatis: <b>Base Poin + (Kenaikan × (hari ke-N − 1))</b>. Setelah hari ke-100 tercapai, streak pengguna otomatis reset ke hari 1.
+                    </p>
+                </div>
+
+                <div id="missions-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="col-span-2 py-6 text-center text-xs text-gray-400">Memuat misi...</div>
+                </div>
+            </section>
+
+            <!-- ============ TAB VOUCHER ============ -->
+            <section id="admin-tab-vouchers" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h3 class="font-extrabold text-sm text-gray-900 mb-1">Tambah Voucher / Hadiah</h3>
+                    <p class="text-xs text-gray-500 mb-4">Voucher yang aktif akan muncul di modal "Tukar Poin" pengguna. Nomor WhatsApp menentukan ke mana klaim voucher ini diarahkan — kosongkan untuk memakai nomor default.</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                        <input id="voucher-label" type="text" placeholder="Nama hadiah" class="col-span-2 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                        <input id="voucher-cost" type="number" placeholder="Harga (poin)" min="0" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                        <input id="voucher-order" type="number" placeholder="Urutan" min="0" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                        <input id="voucher-whatsapp" type="text" placeholder="No. WA (cth: 6281234567890)" class="col-span-2 sm:col-span-1 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                        <input id="voucher-link" type="text" placeholder="Link kustom (https://...) — opsional" class="col-span-2 sm:col-span-4 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                        <button onclick="addVoucher()" class="col-span-2 sm:col-span-5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs shadow-sm transition">
+                            + Tambah Voucher
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-2">Jika <b>Link kustom</b> diisi, klaim voucher ini akan diarahkan ke link tersebut (Telegram, halaman lain, dll) dan nomor WA di atas akan diabaikan.</p>
+                </div>
+
+                <div id="vouchers-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="col-span-2 py-6 text-center text-xs text-gray-400">Memuat voucher...</div>
+                </div>
+            </section>
+
+            <!-- ============ TAB PENGGUNA ============ -->
+            <section id="admin-tab-users" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h3 class="font-extrabold text-sm text-gray-900 mb-1">Cari Pengguna</h3>
+                    <p class="text-xs text-gray-500 mb-4">Cari berdasarkan nama atau username. Klik hasil untuk kelola saldo poin & lencana.</p>
+                    <input id="user-search-input" type="text" placeholder="Ketik nama atau username..." oninput="filterUsers()" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm">
+                    <div id="user-search-results" class="mt-4 space-y-2 max-h-72 overflow-y-auto"></div>
+                </div>
+
+                <div id="user-detail-panel" class="hidden bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <div class="flex items-center space-x-3 border-b border-gray-100 pb-4 mb-4">
+                        <img id="user-detail-avatar" src="https://via.placeholder.com/150" class="w-12 h-12 rounded-full object-cover border border-indigo-200">
+                        <div>
+                            <div id="user-detail-name" class="text-sm font-extrabold text-gray-900">-</div>
+                            <div id="user-detail-username" class="text-xs text-indigo-600 font-semibold">-</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <!-- Kelola Saldo Poin -->
+                        <div>
+                            <h4 class="font-extrabold text-xs uppercase tracking-wider text-gray-400 mb-2">Saldo Poin</h4>
+                            <div class="text-2xl font-black text-indigo-600 mb-3" id="user-detail-points">0</div>
+                            <div class="flex gap-2">
+                                <input id="user-points-amount" type="number" placeholder="Jumlah" class="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                                <button onclick="adjustUserPoints(1)" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-xl">+ Tambah</button>
+                                <button onclick="adjustUserPoints(-1)" class="bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-xl">- Kurangi</button>
+                            </div>
+                        </div>
+
+                        <!-- Kelola Lencana -->
+                        <div>
+                            <h4 class="font-extrabold text-xs uppercase tracking-wider text-gray-400 mb-2">Lencana</h4>
+                            <div id="user-detail-badges" class="flex flex-wrap gap-1.5 mb-3"></div>
+                            <div class="flex gap-2">
+                                <input id="badge-icon" type="text" placeholder="🏅" maxlength="4" class="w-14 border border-gray-200 rounded-xl px-2 py-2 text-xs text-center">
+                                <input id="badge-label" type="text" placeholder="Nama lencana" class="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                                <button onclick="giveBadge()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-xl">Beri</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kelola Berkas Pengguna (supaya bisa hapus berkas lama/hantu yang bikin kuota kepakai) -->
+                    <div class="mt-6 pt-4 border-t border-gray-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-extrabold text-xs uppercase tracking-wider text-gray-400">Berkas Pengguna</h4>
+                            <span id="user-detail-storage" class="text-[10px] font-bold text-gray-400">0 MB terpakai</span>
+                        </div>
+                        <div id="user-detail-files" class="space-y-2 max-h-72 overflow-y-auto">
+                            <p class="text-xs text-gray-400 italic py-2">Pilih pengguna untuk melihat berkasnya.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ TAB MENU CEPAT (FAB) ============ -->
+            <section id="admin-tab-quickmenu" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h3 class="font-extrabold text-sm text-gray-900 mb-1">Tambah Menu Cepat (Link Kustom)</h3>
+                    <p class="text-xs text-gray-500 mb-4">Item ini akan muncul tambahan di panel "Menu Cepat" (tombol melayang) pengguna, di bawah menu bawaan. Saat diklik, akan pindah ke URL ini di tab yang sama (dengan efek transisi loading).</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                        <input id="quickmenu-icon" type="text" placeholder="🔗" maxlength="4" class="col-span-2 sm:col-span-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-center">
+                        <input id="quickmenu-label" type="text" placeholder="Nama menu" class="col-span-2 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                        <input id="quickmenu-url" type="text" placeholder="URL tujuan (https://...)" class="col-span-2 sm:col-span-1 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                        <input id="quickmenu-order" type="number" placeholder="Urutan" min="0" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                        <button onclick="addQuickMenu()" class="col-span-2 sm:col-span-5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs shadow-sm transition">
+                            + Tambah Menu Cepat
+                        </button>
+                    </div>
+                </div>
+
+                <div id="quickmenu-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="col-span-2 py-6 text-center text-xs text-gray-400">Memuat menu cepat...</div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <div id="admin-toast" class="fixed left-1/2 -bottom-16 -translate-x-1/2 bg-gray-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl z-50 transition-all duration-300"></div>
+
+    <!-- Toggle tampilan field form sesuai Tipe Misi yang dipilih -->
+    <script>
+        function onMissionTypeChange() {
+            const type = document.getElementById('mission-type').value;
+            const pointsField = document.getElementById('mission-points');
+            const baseField = document.getElementById('mission-base-points');
+            const incField = document.getElementById('mission-increment');
+            const hint = document.getElementById('mission-streak-hint');
+
+            if (type === 'streak') {
+                pointsField.classList.add('hidden');
+                baseField.classList.remove('hidden');
+                incField.classList.remove('hidden');
+                hint.classList.remove('hidden');
+            } else {
+                pointsField.classList.remove('hidden');
+                baseField.classList.add('hidden');
+                incField.classList.add('hidden');
+                hint.classList.add('hidden');
+            }
+        }
+    </script>
+
+    <script type="module" src="js/admin.js"></script>
+</body>
+</html>
