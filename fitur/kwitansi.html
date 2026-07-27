@@ -899,5 +899,54 @@
             }
         });
     </script>
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tombol Kembali Melayang</title>
+    <style>
+        /* Gaya untuk tombol melayang */
+        .btn-melayang {
+            position: fixed;
+            bottom: 20px; /* Jarak dari bawah layar */
+            right: 20px;  /* Jarak dari kanan layar */
+            padding: 12px 24px;
+            font-size: 16px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #007bff; /* Warna biru */
+            border: none;
+            border-radius: 50px; /* Membuat sudut tombol bulat sempurna */
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Efek bayangan melayang */
+            transition: all 0.3s ease;
+            z-index: 9999; /* Memastikan tombol selalu di lapisan paling atas */
+        }
+
+        /* Efek saat tombol disorot (hover) */
+        .btn-melayang:hover {
+            background-color: #0056b3; /* Biru lebih gelap */
+            transform: translateY(-3px); /* Tombol sedikit naik saat disorot */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); /* Bayangan lebih tebal */
+        }
+
+        /* Efek saat tombol diklik */
+        .btn-melayang:active {
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Tombol Kembali Melayang Satu Klik -->
+    <button class="btn-melayang" onclick="history.back()">← Kembali</button>
+
+</body>
+</html>
+
+    
 </body>
 </html>
