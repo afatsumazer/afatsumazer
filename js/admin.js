@@ -565,6 +565,7 @@ function loadOrderReview() {
         document.getElementById('or-checkout-label').value = d.checkoutLabel || 'Continue to Payment';
         document.getElementById('or-checkout-link').value = d.checkoutLink || '';
         document.getElementById('or-checkout-qr').value = d.checkoutQr || '';
+        document.getElementById('or-notify-whatsapp').value = d.notifyWhatsapp || '';
     }).catch(err => showToast('Gagal memuat data order review: ' + err.message));
 }
 
@@ -582,6 +583,7 @@ window.saveOrderReview = function() {
         checkoutLabel: document.getElementById('or-checkout-label').value.trim() || 'Continue to Payment',
         checkoutLink: document.getElementById('or-checkout-link').value.trim(),
         checkoutQr: document.getElementById('or-checkout-qr').value.trim(),
+        notifyWhatsapp: bersihkanNomorWA(document.getElementById('or-notify-whatsapp').value),
         updatedAt: Date.now(),
         updatedBy: adminUID
     };

@@ -63,6 +63,9 @@
       qrWrap.style.display = 'none';
     }
 
+    const waBtn = document.querySelector('.wa-btn');
+    waBtn.style.display = d.notifyWhatsapp ? 'flex' : 'none';
+
     updateTotals();
   }
 
@@ -83,11 +86,46 @@
     updateTotals();
   });
 
-  const checkoutBtn = document.querySelector('.cta button');
+  const checkoutBtn = document.querySelector('.checkout-btn');
   checkoutBtn.addEventListener('click', () => {
     if (current.checkoutLink) {
       window.open(current.checkoutLink, '_blank');
     }
+  });
+
+  function buildReceiptText() {
+    const d = current;
+    const productPrice = Number(d.productPrice) || 0;
+    const addonPrice = Number(d.addonPrice) || 0;
+    const total = productPrice + (addonSelected ? addonPrice : 0);
+    const now = new Date().toLocaleString('id-ID');
+
+    let lines = [];
+    lines.push('*STRUK PESANAN*');
+    lines.push(now);
+    lines.push('');
+    lines.push(`Produk: ${d.productName || '-'}`);
+    if (d.productSpec) lines.push(`Spesifikasi: ${d.productSpec}`);
+    lines.push(`Harga: ${formatMoney(productPrice)}`);
+    if (addonSelected && d.addonName) {
+      lines.push('');
+      lines.push(`Add-on: ${d.addonName}`);
+      lines.push(`Harga add-on: ${formatMoney(addonPrice)}/bulan`);
+    }
+    lines.push('');
+    lines.push(`Subtotal: ${formatMoney(productPrice)}`);
+    lines.push(`Ongkir: ${d.shippingLabel || 'Free'}`);
+    lines.push(`*Total: ${formatMoney(total)}*`);
+    lines.push('');
+    lines.push('Status: Sudah dibayar, mohon dikonfirmasi. Terima kasih!');
+    return lines.join('\n');
+  }
+
+  const waBtn = document.querySelector('.wa-btn');
+  waBtn.addEventListener('click', () => {
+    if (!current.notifyWhatsapp) return;
+    const text = encodeURIComponent(buildReceiptText());
+    window.open(`https://wa.me/${current.notifyWhatsapp}?text=${text}`, '_blank');
   });
 
   onSnapshot(doc(firestore, 'config', 'orderReview'), (snap) => {
