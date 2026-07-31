@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Lumbung Perang</title>
+<style>
+  :root{
+    --soil-dark:#3b2a1a;--soil:#5a4530;--wheat:#d9a441;--wheat-light:#f0c869;
+    --leaf:#4c7a3f;--leaf-dark:#325228;--parchment:#efe4c9;--parchment-dark:#e0d1a8;
+    --blood:#a13d2c;--steel:#6b7686;--ink:#2b2118;--gold:#c99a2e;--shadow:rgba(0,0,0,.35);
+    --font-display:'Georgia','Palatino Linotype',serif;--font-body:'Trebuchet MS','Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--font-body);background:var(--soil-dark);color:var(--parchment);min-height:100vh;}
+  .wrap{max-width:1100px;margin:0 auto;padding:16px;}
+  header.game-header{
+    display:flex;justify-content:space-between;align-items:center;
+    background:linear-gradient(180deg,#6b4e2e,#4a3620);border:3px solid var(--gold);
+    border-radius:10px;padding:14px 20px;margin-bottom:14px;box-shadow:0 6px 14px var(--shadow);
+  }
+  header.game-header h1{font-family:var(--font-display);margin:0;font-size:1.4rem;color:var(--wheat-light);text-shadow:2px 2px 0 var(--ink);}
+  .conn-badge{font-size:.7rem;padding:5px 10px;border-radius:20px;border:1px solid var(--gold);display:flex;align-items:center;gap:6px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:#888;}
+  .dot.on{background:#6fbf5a;box-shadow:0 0 6px #6fbf5a;}
+  .dot.off{background:#c9542e;}
+
+  nav.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+  nav.tabs button{
+    font-family:var(--font-display);background:var(--soil);color:var(--parchment);
+    border:2px solid var(--gold);border-bottom:none;padding:9px 16px;border-radius:8px 8px 0 0;
+    cursor:pointer;font-size:.85rem;opacity:.7;
+  }
+  nav.tabs button.active{opacity:1;background:var(--parchment);color:var(--ink);box-shadow:0 -3px 8px var(--shadow);}
+
+  .panel{background:var(--parchment);color:var(--ink);border:3px solid var(--soil);border-radius:0 10px 10px 10px;padding:20px;min-height:400px;box-shadow:0 8px 20px var(--shadow);}
+  .panel h2{font-family:var(--font-display);margin-top:0;border-bottom:2px dashed var(--soil);padding-bottom:8px;color:var(--leaf-dark);}
+
+  input, select{padding:6px 8px;border-radius:5px;border:1px solid var(--soil);font-size:.82rem;}
+  label{font-size:.7rem;color:#5a4530;display:block;margin-bottom:2px;text-transform:uppercase;letter-spacing:.3px;}
+  .field{margin-bottom:8px;}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+
+  button.act{font-family:var(--font-body);font-weight:bold;background:var(--leaf);color:#fff;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;font-size:.8rem;}
+  button.act:hover{background:var(--leaf-dark);}
+  button.danger{background:var(--blood);}
+  button.danger:hover{background:#7c2d1f;}
+  button.steel{background:var(--steel);}
+
+  table{width:100%;border-collapse:collapse;font-size:.8rem;}
+  th,td{border-bottom:1px solid var(--parchment-dark);padding:6px 8px;text-align:left;}
+  th{color:var(--soil-dark);font-family:var(--font-display);}
+  tr:hover{background:var(--parchment-dark);cursor:pointer;}
+
+  .split{display:grid;grid-template-columns:280px 1fr;gap:16px;}
+  .list-col{border-right:2px dashed var(--soil);padding-right:12px;max-height:520px;overflow-y:auto;}
+  .search{width:100%;padding:8px;margin-bottom:10px;}
+  .card{border:2px solid var(--soil);border-radius:10px;padding:14px;background:var(--parchment-dark);margin-bottom:14px;}
+  .card h3{margin:2px 0 10px;font-family:var(--font-display);color:var(--soil-dark);}
+  .row-actions{display:flex;gap:8px;margin-top:10px;}
+
+  .login-screen{display:flex;align-items:center;justify-content:center;min-height:80vh;flex-direction:column;gap:16px;}
+  .login-card{background:var(--parchment);color:var(--ink);border:3px solid var(--gold);border-radius:12px;padding:32px;max-width:380px;text-align:center;box-shadow:0 10px 30px var(--shadow);}
+  .login-card h2{font-family:var(--font-display);color:var(--soil-dark);}
+  .login-card input{width:100%;padding:10px;border-radius:6px;border:2px solid var(--soil);margin:12px 0;font-size:1rem;text-align:center;}
+  .hint{font-size:.7rem;color:#7a6b4a;margin-top:8px;}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--wheat-light);padding:10px 18px;border-radius:8px;font-size:.85rem;box-shadow:0 6px 16px var(--shadow);z-index:999;opacity:0;pointer-events:none;transition:opacity .3s, transform .3s;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+  .empty-note{font-size:.8rem;color:#7a6b4a;padding:20px;text-align:center;}
+  .mission-block{border:1px solid var(--soil);border-radius:8px;padding:10px;margin-bottom:10px;background:#fbf6e6;}
+  .close-x{float:right;cursor:pointer;color:var(--blood);font-weight:bold;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDg2b6LERZ2zE86mTiYvUO1Uj--lAtpmgM",
+  authDomain: "afatsumazer-app.firebaseapp.com",
+  databaseURL: "https://afatsumazer-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "afatsumazer-app",
+  storageBucket: "afatsumazer-app.firebasestorage.app",
+  messagingSenderId: "16280759060",
+  appId: "1:16280759060:web:fd4deacafdf5cadd777001",
+  measurementId: "G-WB9YW9D726"
+};
+let db=null, firebaseReady=false;
+try{
+  if(window.firebase){
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    firebaseReady = true;
+  }
+}catch(e){ console.warn("firebase gagal init", e); firebaseReady=false; }
+
+const DEFAULT_BUILDINGS = {
+  balai:  {name:"Gedung Utama", desc:"Pusat desa. Level lebih tinggi membuka batas bangunan lain.", icon:"🏛️", baseCost:{padi:50,kayu:30,batu:20,emas:0}},
+  gudang: {name:"Gudang", desc:"Menambah kapasitas simpan semua sumber daya.", icon:"🏚️", baseCost:{padi:30,kayu:40,batu:10,emas:0}},
+  barak:  {name:"Barak Prajurit", desc:"Tempat melatih prajurit serang & bertahan.", icon:"⚔️", baseCost:{padi:20,kayu:50,batu:30,emas:10}},
+  benteng:{name:"Pertahanan (Benteng)", desc:"Menaikkan rating pertahanan desa saat diserang.", icon:"🛡️", baseCost:{padi:10,kayu:30,batu:60,emas:5}},
+  hutan:  {name:"Tempat Perlindungan (Hutan)", desc:"Mengungsikan sebagian sumber daya & prajurit saat diserang.", icon:"🌲", baseCost:{padi:15,kayu:60,batu:20,emas:5}},
+};
+const DEFAULT_MISSIONS = [
+  {id:"m1", name:"Bersihkan Ladang Liar", diff:"mudah", req:{atk:2}, reward:{padi:40,emas:5,loyalitas:2}, risk:0.05},
+  {id:"m2", name:"Kawal Pedagang", diff:"mudah", req:{def:2}, reward:{kayu:30,emas:10,loyalitas:2}, risk:0.05},
+  {id:"m3", name:"Usir Perampok Perbatasan", diff:"sedang", req:{atk:5}, reward:{emas:35,batu:20,loyalitas:5}, risk:0.15},
+  {id:"m4", name:"Pertahankan Jembatan", diff:"sedang", req:{def:5}, reward:{emas:35,padi:30,loyalitas:5}, risk:0.15},
+  {id:"m5", name:"Serbu Markas Bandit", diff:"sulit", req:{atk:10,def:4}, reward:{emas:90,batu:40,loyalitas:12}, risk:0.35},
+  {id:"m6", name:"Bertahan dari Gerombolan", diff:"sulit", req:{def:10,atk:4}, reward:{emas:90,kayu:50,loyalitas:12}, risk:0.35},
+];
+
+let state = {
+  screen:"login",
+  tab:"players",
+  players:[],
+  guilds:[],
+  selectedPlayer:null,
+  selectedGuild:null,
+  buildingsCfg: JSON.parse(JSON.stringify(DEFAULT_BUILDINGS)),
+  missionsCfg: JSON.parse(JSON.stringify(DEFAULT_MISSIONS)),
+  search:"",
+  toast:"",
+};
+const root = document.getElementById("root");
+function setState(p){ state={...state,...p}; render(); }
+function showToast(msg){ setState({toast:msg}); clearTimeout(window.__t); window.__t=setTimeout(()=>setState({toast:""}),2600); }
+function fmt(n){ return Math.floor(n||0).toLocaleString("id-ID"); }
+
+/* ---------- login ---------- */
+function renderLogin(){
+  root.innerHTML = `
+    <div class="login-screen">
+      <div class="login-card">
+        <h2>🔑 Admin — Lumbung Perang</h2>
+        <p style="font-size:.85rem;color:#5a4530;">Masukkan PIN admin untuk mengakses panel kontrol game.</p>
+        <input id="pinInput" type="password" placeholder="PIN Admin" maxlength="12"/>
+        <button class="act" id="pinBtn" style="width:100%;padding:12px;">Masuk</button>
+        <div class="hint">${firebaseReady?"🟢 Firestore siap":"🟠 Firestore tidak tersambung"}</div>
+        <div class="hint">Catatan: PIN ini hanya penghalang ringan di sisi tampilan, bukan keamanan sungguhan. Keamanan asli tetap bergantung pada Security Rules Firestore kamu.</div>
+      </div>
+    </div>`;
+  document.getElementById("pinBtn").onclick = ()=>{
+    const v = document.getElementById("pinInput").value;
+    if(v==="admin123"){ setState({screen:"admin"}); loadAll(); }
+    else showToast("PIN salah. (Default: admin123 — ganti di kode admin.html)");
+  };
+  document.getElementById("pinInput").addEventListener("keydown", e=>{ if(e.key==="Enter") document.getElementById("pinBtn").click(); });
+}
+
+/* ---------- data loading ---------- */
+async function loadAll(){
+  await Promise.all([loadPlayers(), loadGuilds(), loadConfig()]);
+  render();
+}
+async function loadPlayers(){
+  if(!(firebaseReady&&db)){ showToast("Tidak tersambung ke Firestore."); return; }
+  try{
+    const snap = await db.collection("players").get();
+    state.players = snap.docs.map(d=>d.data());
+  }catch(e){ console.warn(e); showToast("Gagal memuat data pemain."); }
+}
+async function loadGuilds(){
+  if(!(firebaseReady&&db)) return;
+  try{
+    const snap = await db.collection("guilds").get();
+    state.guilds = snap.docs.map(d=>d.data());
+  }catch(e){ console.warn(e); }
+}
+async function loadConfig(){
+  if(!(firebaseReady&&db)) return;
+  try{
+    const bDoc = await db.collection("config").doc("buildings").get();
+    if(bDoc.exists && bDoc.data().data) state.buildingsCfg = bDoc.data().data;
+    const mDoc = await db.collection("config").doc("missions").get();
+    if(mDoc.exists && mDoc.data().list) state.missionsCfg = mDoc.data().list;
+  }catch(e){ console.warn(e); }
+}
+
+/* ---------- save/delete ---------- */
+async function savePlayerDoc(p){
+  if(!(firebaseReady&&db)){ showToast("Tidak tersambung."); return; }
+  try{
+    await db.collection("players").doc(p.name).set(p);
+    showToast(`Data pemain "${p.name}" tersimpan.`);
+    await loadPlayers();
+    setState({selectedPlayer:p});
+  }catch(e){ console.warn(e); showToast("Gagal menyimpan."); }
+}
+async function deletePlayerDoc(name){
+  if(!confirm(`Yakin hapus data pemain "${name}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+  try{
+    await db.collection("players").doc(name).delete();
+    showToast(`Pemain "${name}" dihapus.`);
+    state.selectedPlayer=null;
+    await loadPlayers();
+    render();
+  }catch(e){ console.warn(e); showToast("Gagal menghapus."); }
+}
+async function saveGuildDoc(g){
+  try{
+    await db.collection("guilds").doc(g.name).set(g);
+    showToast(`Guild "${g.name}" tersimpan.`);
+    await loadGuilds();
+    setState({selectedGuild:g});
+  }catch(e){ console.warn(e); showToast("Gagal menyimpan guild."); }
+}
+async function deleteGuildDoc(name){
+  if(!confirm(`Yakin hapus guild "${name}"?`)) return;
+  try{
+    await db.collection("guilds").doc(name).delete();
+    showToast(`Guild "${name}" dihapus.`);
+    state.selectedGuild=null;
+    await loadGuilds();
+    render();
+  }catch(e){ console.warn(e); showToast("Gagal menghapus."); }
+}
+async function saveBuildingsCfg(){
+  try{
+    await db.collection("config").doc("buildings").set({data: state.buildingsCfg});
+    showToast("Konfigurasi bangunan tersimpan & langsung berlaku di game.");
+  }catch(e){ console.warn(e); showToast("Gagal menyimpan konfigurasi."); }
+}
+async function saveMissionsCfg(){
+  try{
+    await db.collection("config").doc("missions").set({list: state.missionsCfg});
+    showToast("Konfigurasi misi tersimpan & langsung berlaku di game.");
+  }catch(e){ console.warn(e); showToast("Gagal menyimpan konfigurasi."); }
+}
+
+/* ---------- render shell ---------- */
+function render(){
+  if(state.screen==="login"){ renderLogin(); return; }
+  root.innerHTML = `
+    <div class="wrap">
+      <header class="game-header">
+        <h1>🔑 Panel Admin — Lumbung Perang</h1>
+        <div class="conn-badge"><span class="dot ${firebaseReady?'on':'off'}"></span>${firebaseReady?"Tersambung":"Tidak tersambung"}</div>
+      </header>
+      <nav class="tabs">
+        ${tabBtn("players","👤 Data Pemain")}
+        ${tabBtn("guilds","🛡️ Guild")}
+        ${tabBtn("buildings","🏛️ Konfigurasi Bangunan")}
+        ${tabBtn("missions","📜 Konfigurasi Misi")}
+      </nav>
+      <div class="panel">${renderTab()}</div>
+    </div>
+    <div class="toast ${state.toast?'show':''}">${state.toast}</div>
+  `;
+  attachHandlers();
+}
+function tabBtn(key,label){ return `<button data-tab="${key}" class="${state.tab===key?'active':''}">${label}</button>`; }
+function renderTab(){
+  switch(state.tab){
+    case "players": return renderPlayers();
+    case "guilds": return renderGuilds();
+    case "buildings": return renderBuildingsCfg();
+    case "missions": return renderMissionsCfg();
+  }
+}
+
+/* ---------- players tab ---------- */
+function renderPlayers(){
+  const filtered = state.players.filter(p=>p.name.toLowerCase().includes(state.search.toLowerCase()));
+  const p = state.selectedPlayer;
+  return `
+    <h2>Data Pemain (${state.players.length})</h2>
+    <div class="split">
+      <div class="list-col">
+        <input class="search" id="playerSearch" placeholder="Cari nama pemain..." value="${state.search}"/>
+        ${filtered.length===0? `<div class="empty-note">Belum ada / tidak ditemukan.</div>` : `
+        <table>
+          <tbody>
+            ${filtered.map(pl=>`<tr data-select-player="${pl.name}"><td>${pl.name}${pl.guildId?` <small>(${pl.guildId})</small>`:""}</td></tr>`).join("")}
+          </tbody>
+        </table>`}
+      </div>
+      <div>
+        ${!p ? `<div class="empty-note">Pilih pemain di daftar sebelah kiri untuk melihat/mengedit datanya.</div>` : renderPlayerForm(p)}
+      </div>
+    </div>
+  `;
+}
+function renderPlayerForm(p){
+  return `
+    <div class="card">
+      <h3>${p.name}</h3>
+      <div class="grid4">
+        ${["padi","kayu","batu","emas"].map(k=>`
+          <div class="field"><label>${k}</label><input type="number" data-pf="resources.${k}" value="${p.resources[k]}"/></div>
+        `).join("")}
+      </div>
+      <div class="grid4">
+        ${["padi","kayu","batu","emas"].map(k=>`
+          <div class="field"><label>cap ${k}</label><input type="number" data-pf="cap.${k}" value="${p.cap[k]}"/></div>
+        `).join("")}
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Loyalitas</label><input type="number" min="0" max="100" data-pf="loyalitas" value="${p.loyalitas}"/></div>
+        <div class="field"><label>Guild ID</label><input data-pf="guildId" value="${p.guildId||""}"/></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Prajurit Penyerang</label><input type="number" data-pf="soldiers.atk" value="${p.soldiers.atk}"/></div>
+        <div class="field"><label>Prajurit Bertahan</label><input type="number" data-pf="soldiers.def" value="${p.soldiers.def}"/></div>
+      </div>
+      <div class="grid4">
+        ${Object.keys(p.buildings).map(k=>`
+          <div class="field"><label>${k} (level)</label><input type="number" min="0" data-pf="buildings.${k}" value="${p.buildings[k]}"/></div>
+        `).join("")}
+      </div>
+      <div class="field">
+        <label>Status mengungsi</label>
+        <select data-pf="sheltered">
+          <option value="false" ${!p.sheltered?"selected":""}>Normal</option>
+          <option value="true" ${p.sheltered?"selected":""}>Mengungsi ke hutan</option>
+        </select>
+      </div>
+      <div class="row-actions">
+        <button class="act" id="savePlayerBtn">💾 Simpan Perubahan</button>
+        <button class="act danger" id="deletePlayerBtn">🗑️ Hapus Pemain</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ---------- guilds tab ---------- */
+function renderGuilds(){
+  const g = state.selectedGuild;
+  return `
+    <h2>Data Guild (${state.guilds.length})</h2>
+    <div class="split">
+      <div class="list-col">
+        ${state.guilds.length===0? `<div class="empty-note">Belum ada guild.</div>` : `
+        <table><tbody>
+          ${state.guilds.map(gg=>`<tr data-select-guild="${gg.name}"><td>${gg.name} <small>(${(gg.members||[]).length} anggota)</small></td></tr>`).join("")}
+        </tbody></table>`}
+      </div>
+      <div>${!g? `<div class="empty-note">Pilih guild untuk mengedit.</div>` : renderGuildForm(g)}</div>
+    </div>
+  `;
+}
+function renderGuildForm(g){
+  const wc = g.warChest||{padi:0,kayu:0,batu:0,emas:0};
+  return `
+    <div class="card">
+      <h3>${g.name}</h3>
+      <div class="field"><label>Anggota (pisahkan koma)</label><input style="width:100%;" id="guildMembers" value="${(g.members||[]).join(", ")}"/></div>
+      <div class="grid4">
+        ${["padi","kayu","batu","emas"].map(k=>`
+          <div class="field"><label>Kas ${k}</label><input type="number" data-gf="warChest.${k}" value="${wc[k]||0}"/></div>
+        `).join("")}
+      </div>
+      <div class="row-actions">
+        <button class="act" id="saveGuildBtn">💾 Simpan Guild</button>
+        <button class="act danger" id="deleteGuildBtn">🗑️ Hapus Guild</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ---------- buildings config tab ---------- */
+function renderBuildingsCfg(){
+  return `
+    <h2>Konfigurasi Bangunan</h2>
+    <p style="font-size:.8rem;">Ubah nama, deskripsi, ikon, atau biaya dasar tiap bangunan. Perubahan langsung berlaku untuk semua pemain begitu disimpan.</p>
+    ${Object.entries(state.buildingsCfg).map(([key,b])=>`
+      <div class="mission-block">
+        <strong>${key}</strong>
+        <div class="grid2" style="margin-top:6px;">
+          <div class="field"><label>Nama</label><input data-bf="${key}.name" value="${b.name}"/></div>
+          <div class="field"><label>Ikon (emoji)</label><input data-bf="${key}.icon" value="${b.icon}"/></div>
+        </div>
+        <div class="field"><label>Deskripsi</label><input style="width:100%;" data-bf="${key}.desc" value="${b.desc}"/></div>
+        <div class="grid4">
+          ${["padi","kayu","batu","emas"].map(r=>`
+            <div class="field"><label>Biaya ${r}</label><input type="number" data-bf="${key}.baseCost.${r}" value="${b.baseCost[r]||0}"/></div>
+          `).join("")}
+        </div>
+      </div>
+    `).join("")}
+    <button class="act" id="saveBuildingsBtn">💾 Simpan Semua Konfigurasi Bangunan</button>
+    <button class="act steel" id="resetBuildingsBtn" style="margin-left:8px;">↩️ Kembalikan ke Default</button>
+  `;
+}
+
+/* ---------- missions config tab ---------- */
+function renderMissionsCfg(){
+  return `
+    <h2>Konfigurasi Misi</h2>
+    <p style="font-size:.8rem;">Tambah, ubah, atau hapus misi. Perubahan langsung berlaku untuk semua pemain begitu disimpan.</p>
+    ${state.missionsCfg.map((m,i)=>`
+      <div class="mission-block">
+        <span class="close-x" data-remove-mission="${i}">✕ hapus</span>
+        <div class="grid2">
+          <div class="field"><label>ID</label><input data-mf="${i}.id" value="${m.id}"/></div>
+          <div class="field"><label>Nama Misi</label><input data-mf="${i}.name" value="${m.name}"/></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>Tingkat Kesulitan</label>
+            <select data-mf="${i}.diff">
+              <option value="mudah" ${m.diff==="mudah"?"selected":""}>Mudah</option>
+              <option value="sedang" ${m.diff==="sedang"?"selected":""}>Sedang</option>
+              <option value="sulit" ${m.diff==="sulit"?"selected":""}>Sulit</option>
+            </select>
+          </div>
+          <div class="field"><label>Risiko Gagal (0–1)</label><input type="number" step="0.01" min="0" max="1" data-mf="${i}.risk" value="${m.risk}"/></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>Butuh Penyerang</label><input type="number" min="0" data-mf="${i}.req.atk" value="${m.req.atk||0}"/></div>
+          <div class="field"><label>Butuh Bertahan</label><input type="number" min="0" data-mf="${i}.req.def" value="${m.req.def||0}"/></div>
+        </div>
+        <div class="grid4">
+          ${["padi","kayu","batu","emas"].map(r=>`
+            <div class="field"><label>Hadiah ${r}</label><input type="number" min="0" data-mf="${i}.reward.${r}" value="${m.reward[r]||0}"/></div>
+          `).join("")}
+          <div class="field"><label>Hadiah Loyalitas</label><input type="number" min="0" data-mf="${i}.reward.loyalitas" value="${m.reward.loyalitas||0}"/></div>
+        </div>
+      </div>
+    `).join("")}
+    <div class="row-actions">
+      <button class="act" id="addMissionBtn">➕ Tambah Misi Baru</button>
+      <button class="act" id="saveMissionsBtn">💾 Simpan Semua Misi</button>
+      <button class="act steel" id="resetMissionsBtn">↩️ Kembalikan ke Default</button>
+    </div>
+  `;
+}
+
+/* ---------- helpers ---------- */
+function setDeep(obj, path, value){
+  const parts = path.split(".");
+  let cur = obj;
+  for(let i=0;i<parts.length-1;i++){
+    cur = cur[parts[i]];
+  }
+  const last = parts[parts.length-1];
+  cur[last] = value;
+}
+function getDeep(obj, path){
+  return path.split(".").reduce((o,k)=> (o?o[k]:undefined), obj);
+}
+
+/* ---------- event wiring ---------- */
+function attachHandlers(){
+  root.querySelectorAll("[data-tab]").forEach(b=> b.onclick=()=>setState({tab:b.dataset.tab}));
+
+  const searchEl = document.getElementById("playerSearch");
+  if(searchEl){
+    searchEl.oninput = ()=>{ state.search = searchEl.value; render(); setTimeout(()=>{ const el=document.getElementById("playerSearch"); if(el){el.focus(); el.selectionStart=el.selectionEnd=el.value.length;} },0); };
+  }
+  root.querySelectorAll("[data-select-player]").forEach(tr=>{
+    tr.onclick = ()=>{
+      const pl = state.players.find(x=>x.name===tr.dataset.selectPlayer);
+      setState({selectedPlayer: JSON.parse(JSON.stringify(pl))});
+    };
+  });
+  root.querySelectorAll("[data-pf]").forEach(inp=>{
+    inp.onchange = ()=>{
+      const path = inp.dataset.pf;
+      let val = inp.type==="number" ? parseFloat(inp.value)||0 : inp.value;
+      if(inp.tagName==="SELECT") val = inp.value==="true";
+      setDeep(state.selectedPlayer, path, val);
+    };
+  });
+  const saveP = document.getElementById("savePlayerBtn");
+  if(saveP) saveP.onclick = ()=> savePlayerDoc(state.selectedPlayer);
+  const delP = document.getElementById("deletePlayerBtn");
+  if(delP) delP.onclick = ()=> deletePlayerDoc(state.selectedPlayer.name);
+
+  root.querySelectorAll("[data-select-guild]").forEach(tr=>{
+    tr.onclick = ()=>{
+      const g = state.guilds.find(x=>x.name===tr.dataset.selectGuild);
+      setState({selectedGuild: JSON.parse(JSON.stringify(g))});
+    };
+  });
+  const membersEl = document.getElementById("guildMembers");
+  if(membersEl) membersEl.onchange = ()=>{
+    state.selectedGuild.members = membersEl.value.split(",").map(s=>s.trim()).filter(Boolean);
+  };
+  root.querySelectorAll("[data-gf]").forEach(inp=>{
+    inp.onchange = ()=> setDeep(state.selectedGuild, inp.dataset.gf, parseFloat(inp.value)||0);
+  });
+  const saveG = document.getElementById("saveGuildBtn");
+  if(saveG) saveG.onclick = ()=> saveGuildDoc(state.selectedGuild);
+  const delG = document.getElementById("deleteGuildBtn");
+  if(delG) delG.onclick = ()=> deleteGuildDoc(state.selectedGuild.name);
+
+  root.querySelectorAll("[data-bf]").forEach(inp=>{
+    inp.onchange = ()=>{
+      const val = inp.type==="number" ? parseFloat(inp.value)||0 : inp.value;
+      setDeep(state.buildingsCfg, inp.dataset.bf, val);
+    };
+  });
+  const saveB = document.getElementById("saveBuildingsBtn");
+  if(saveB) saveB.onclick = saveBuildingsCfg;
+  const resetB = document.getElementById("resetBuildingsBtn");
+  if(resetB) resetB.onclick = ()=>{ state.buildingsCfg = JSON.parse(JSON.stringify(DEFAULT_BUILDINGS)); render(); showToast("Dikembalikan ke default (belum disimpan)."); };
+
+  root.querySelectorAll("[data-mf]").forEach(inp=>{
+    inp.onchange = ()=>{
+      const [idxStr, ...rest] = inp.dataset.mf.split(".");
+      const idx = parseInt(idxStr);
+      const path = rest.join(".");
+      const val = inp.type==="number" ? parseFloat(inp.value)||0 : inp.value;
+      setDeep(state.missionsCfg[idx], path, val);
+    };
+  });
+  root.querySelectorAll("[data-remove-mission]").forEach(el=>{
+    el.onclick = ()=>{
+      const idx = parseInt(el.dataset.removeMission);
+      state.missionsCfg.splice(idx,1);
+      render();
+    };
+  });
+  const addM = document.getElementById("addMissionBtn");
+  if(addM) addM.onclick = ()=>{
+    state.missionsCfg.push({id:"m"+(state.missionsCfg.length+1), name:"Misi Baru", diff:"mudah", req:{atk:1}, reward:{padi:10,loyalitas:1}, risk:0.1});
+    render();
+  };
+  const saveM = document.getElementById("saveMissionsBtn");
+  if(saveM) saveM.onclick = saveMissionsCfg;
+  const resetM = document.getElementById("resetMissionsBtn");
+  if(resetM) resetM.onclick = ()=>{ state.missionsCfg = JSON.parse(JSON.stringify(DEFAULT_MISSIONS)); render(); showToast("Dikembalikan ke default (belum disimpan)."); };
+}
+
+render();
+</script>
+</body>
+</html>

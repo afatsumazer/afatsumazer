@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumbung Perang — Farm & Guild Strategy</title>
+<style>
+  :root{
+    --soil-dark:#3b2a1a;
+    --soil:#5a4530;
+    --wheat:#d9a441;
+    --wheat-light:#f0c869;
+    --leaf:#4c7a3f;
+    --leaf-dark:#325228;
+    --stone:#8a8478;
+    --parchment:#efe4c9;
+    --parchment-dark:#e0d1a8;
+    --blood:#a13d2c;
+    --steel:#6b7686;
+    --ink:#2b2118;
+    --gold:#c99a2e;
+    --shadow:rgba(0,0,0,.35);
+    --font-display:'Georgia', 'Palatino Linotype', serif;
+    --font-body:'Trebuchet MS', 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:var(--font-body);
+    background:
+      radial-gradient(ellipse at top left, #4a6a3a 0%, transparent 55%),
+      radial-gradient(ellipse at bottom right, #2f4a26 0%, transparent 55%),
+      var(--soil-dark);
+    color:var(--parchment);
+    min-height:100vh;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:16px;}
+
+  header.game-header{
+    display:flex;justify-content:space-between;align-items:center;
+    background:linear-gradient(180deg, #6b4e2e, #4a3620);
+    border:3px solid var(--gold);
+    border-radius:10px;
+    padding:14px 20px;
+    margin-bottom:14px;
+    box-shadow:0 6px 14px var(--shadow);
+  }
+  header.game-header h1{
+    font-family:var(--font-display);
+    margin:0;font-size:1.5rem;color:var(--wheat-light);
+    text-shadow:2px 2px 0 var(--ink);
+    letter-spacing:1px;
+  }
+  header.game-header .sub{font-size:.75rem;color:var(--parchment-dark);margin-top:2px;}
+
+  .conn-badge{
+    font-size:.7rem;padding:5px 10px;border-radius:20px;
+    border:1px solid var(--gold);
+    display:flex;align-items:center;gap:6px;
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:#888;}
+  .dot.on{background:#6fbf5a;box-shadow:0 0 6px #6fbf5a;}
+  .dot.off{background:#c9542e;}
+
+  .resbar{
+    display:grid;grid-template-columns:repeat(5,1fr);
+    gap:8px;margin-bottom:14px;
+  }
+  .res{
+    background:var(--parchment);
+    color:var(--ink);
+    border:2px solid var(--soil);
+    border-radius:8px;
+    padding:8px 6px;
+    text-align:center;
+    box-shadow:inset 0 0 0 2px var(--parchment-dark);
+  }
+  .res .icon{font-size:1.2rem;}
+  .res .val{font-family:var(--font-display);font-weight:bold;font-size:1.05rem;}
+  .res .lbl{font-size:.65rem;color:#5a4530;text-transform:uppercase;letter-spacing:.5px;}
+  .loyalty-row{
+    background:var(--parchment);color:var(--ink);
+    border:2px solid var(--soil);border-radius:8px;
+    padding:8px 12px;margin-bottom:14px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .loyalty-bar-bg{flex:1;height:14px;background:#c9bd97;border-radius:7px;overflow:hidden;border:1px solid var(--soil);}
+  .loyalty-bar-fill{height:100%;background:linear-gradient(90deg,#a13d2c,#c99a2e,#4c7a3f);transition:width .4s;}
+
+  nav.tabs{
+    display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;
+  }
+  nav.tabs button{
+    font-family:var(--font-display);
+    background:var(--soil);color:var(--parchment);
+    border:2px solid var(--gold);
+    border-bottom:none;
+    padding:9px 16px;border-radius:8px 8px 0 0;
+    cursor:pointer;font-size:.85rem;
+    opacity:.7;
+  }
+  nav.tabs button.active{
+    opacity:1;background:var(--parchment);color:var(--ink);
+    box-shadow:0 -3px 8px var(--shadow);
+  }
+
+  .panel{
+    background:var(--parchment);color:var(--ink);
+    border:3px solid var(--soil);border-radius:0 10px 10px 10px;
+    padding:20px;min-height:360px;
+    box-shadow:0 8px 20px var(--shadow);
+  }
+  .panel h2{
+    font-family:var(--font-display);margin-top:0;
+    border-bottom:2px dashed var(--soil);padding-bottom:8px;
+    color:var(--leaf-dark);
+  }
+
+  /* Farm grid */
+  .farm-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+  .plot{
+    aspect-ratio:1;border-radius:8px;
+    border:2px solid var(--soil);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    cursor:pointer;position:relative;
+    background:#6b4e2e;
+    transition:transform .15s;
+    font-size:1.6rem;
+    user-select:none;
+  }
+  .plot:hover{transform:translateY(-2px);}
+  .plot.empty{background:repeating-linear-gradient(45deg,#7a5c38,#7a5c38 6px,#6b4e2e 6px,#6b4e2e 12px);}
+  .plot.growing{background:linear-gradient(180deg,#8fae52,#5f8a3a);}
+  .plot.ready{background:linear-gradient(180deg,var(--wheat-light),var(--wheat));animation:pulse 1.2s infinite;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,164,65,.6);}50%{box-shadow:0 0 0 6px rgba(217,164,65,0);}}
+  .plot .timer{position:absolute;bottom:3px;font-size:.6rem;color:var(--ink);background:rgba(255,255,255,.6);border-radius:4px;padding:0 3px;}
+
+  /* Buildings */
+  .bldg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;}
+  .bldg-card{
+    border:2px solid var(--soil);border-radius:10px;padding:14px;
+    background:var(--parchment-dark);
+  }
+  .bldg-card h3{margin:4px 0;font-family:var(--font-display);color:var(--soil-dark);}
+  .bldg-card .lvl{font-size:.75rem;color:var(--leaf-dark);font-weight:bold;}
+  .bldg-card .desc{font-size:.75rem;color:#5a4530;margin:6px 0 10px;}
+  .cost-row{font-size:.72rem;margin-bottom:8px;color:var(--blood);}
+
+  button.act{
+    font-family:var(--font-body);font-weight:bold;
+    background:var(--leaf);color:#fff;border:none;
+    border-radius:6px;padding:8px 12px;cursor:pointer;
+    font-size:.8rem;
+  }
+  button.act:hover{background:var(--leaf-dark);}
+  button.act:disabled{background:#999;cursor:not-allowed;}
+  button.danger{background:var(--blood);}
+  button.danger:hover{background:#7c2d1f;}
+
+  /* Soldiers */
+  .soldier-types{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .soldier-card{border:2px solid var(--soil);border-radius:10px;padding:14px;background:var(--parchment-dark);}
+  .soldier-card h3{font-family:var(--font-display);margin:4px 0;}
+  .soldier-count{font-size:2rem;font-weight:bold;color:var(--soil-dark);}
+  .train-row{display:flex;gap:6px;align-items:center;margin-top:8px;}
+  .train-row input{width:50px;padding:4px;border-radius:4px;border:1px solid var(--soil);}
+
+  /* Missions */
+  .mission-list{display:flex;flex-direction:column;gap:10px;}
+  .mission-card{
+    border:2px solid var(--soil);border-radius:8px;padding:12px 14px;
+    background:var(--parchment-dark);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .diff{padding:2px 8px;border-radius:12px;font-size:.68rem;font-weight:bold;color:#fff;}
+  .diff.mudah{background:var(--leaf);}
+  .diff.sedang{background:var(--gold);color:var(--ink);}
+  .diff.sulit{background:var(--blood);}
+
+  /* Guild */
+  .guild-box{border:2px solid var(--soil);border-radius:10px;padding:16px;background:var(--parchment-dark);margin-bottom:14px;}
+  .member-list{list-style:none;padding:0;margin:8px 0;font-size:.85rem;}
+  .member-list li{padding:6px 8px;border-bottom:1px solid var(--soil);display:flex;justify-content:space-between;}
+
+  /* War map */
+  .village-list{display:flex;flex-direction:column;gap:8px;}
+  .village-card{
+    border:2px solid var(--soil);border-radius:8px;padding:10px 14px;
+    background:var(--parchment-dark);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+  }
+  .shelter-toggle{display:flex;align-items:center;gap:8px;background:var(--leaf);color:#fff;padding:8px 12px;border-radius:8px;font-size:.8rem;margin-bottom:12px;}
+  .shelter-toggle.active{background:var(--blood);}
+  .switch{width:38px;height:20px;background:#999;border-radius:20px;position:relative;cursor:pointer;flex-shrink:0;}
+  .switch::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .2s;}
+  .switch.on{background:#2b5c1f;}
+  .switch.on::after{left:20px;}
+
+  .log-box{max-height:220px;overflow-y:auto;font-size:.8rem;border:1px solid var(--soil);border-radius:6px;padding:8px;background:#fbf6e6;}
+  .log-line{padding:4px 0;border-bottom:1px dashed #d8c8a0;}
+  .log-line.attack-in{color:var(--blood);}
+  .log-line.attack-out{color:var(--leaf-dark);}
+
+  .login-screen{
+    display:flex;align-items:center;justify-content:center;min-height:80vh;flex-direction:column;gap:16px;
+  }
+  .login-card{
+    background:var(--parchment);color:var(--ink);border:3px solid var(--gold);border-radius:12px;
+    padding:32px;max-width:380px;text-align:center;box-shadow:0 10px 30px var(--shadow);
+  }
+  .login-card h2{font-family:var(--font-display);color:var(--soil-dark);}
+  .login-card input{
+    width:100%;padding:10px;border-radius:6px;border:2px solid var(--soil);margin:12px 0;font-size:1rem;text-align:center;
+  }
+  .hint{font-size:.7rem;color:#7a6b4a;margin-top:8px;}
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:var(--wheat-light);padding:10px 18px;border-radius:8px;
+    font-size:.85rem;box-shadow:0 6px 16px var(--shadow);z-index:999;opacity:0;pointer-events:none;transition:opacity .3s, transform .3s;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+  footer.hint-foot{text-align:center;font-size:.7rem;color:var(--parchment-dark);margin-top:16px;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+/* ============================================================
+   FIREBASE SETUP (dengan fallback ke mode lokal jika gagal)
+   ============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyDg2b6LERZ2zE86mTiYvUO1Uj--lAtpmgM",
+  authDomain: "afatsumazer-app.firebaseapp.com",
+  databaseURL: "https://afatsumazer-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "afatsumazer-app",
+  storageBucket: "afatsumazer-app.firebasestorage.app",
+  messagingSenderId: "16280759060",
+  appId: "1:16280759060:web:fd4deacafdf5cadd777001",
+  measurementId: "G-WB9YW9D726"
+};
+
+let db = null;
+let firebaseReady = false;
+try{
+  if(window.firebase){
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    firebaseReady = true;
+  }
+}catch(e){
+  console.warn("Firebase gagal init, pakai mode lokal:", e);
+  firebaseReady = false;
+}
+
+/* Local fallback store (in-memory only, hilang saat reload) */
+const localStore = { players:{}, guilds:{}, logs:[] };
+
+/* ============================================================
+   GAME CONSTANTS
+   ============================================================ */
+const CROP_GROW_MS = 20000; // 20s per panen (demo speed)
+const PLOT_COUNT = 10;
+
+let BUILDINGS = {
+  balai:  {name:"Gedung Utama", desc:"Pusat desa. Level lebih tinggi membuka batas bangunan lain.", icon:"🏛️", baseCost:{padi:50,kayu:30,batu:20,emas:0}},
+  gudang: {name:"Gudang", desc:"Menambah kapasitas simpan semua sumber daya.", icon:"🏚️", baseCost:{padi:30,kayu:40,batu:10,emas:0}},
+  barak:  {name:"Barak Prajurit", desc:"Tempat melatih prajurit serang & bertahan.", icon:"⚔️", baseCost:{padi:20,kayu:50,batu:30,emas:10}},
+  benteng:{name:"Pertahanan (Benteng)", desc:"Menaikkan rating pertahanan desa saat diserang.", icon:"🛡️", baseCost:{padi:10,kayu:30,batu:60,emas:5}},
+  hutan:  {name:"Tempat Perlindungan (Hutan)", desc:"Mengungsikan sebagian sumber daya & prajurit saat diserang.", icon:"🌲", baseCost:{padi:15,kayu:60,batu:20,emas:5}},
+};
+
+let MISSIONS = [
+  {id:"m1", name:"Bersihkan Ladang Liar", diff:"mudah", req:{atk:2}, reward:{padi:40,emas:5,loyalitas:2}, risk:0.05},
+  {id:"m2", name:"Kawal Pedagang", diff:"mudah", req:{def:2}, reward:{kayu:30,emas:10,loyalitas:2}, risk:0.05},
+  {id:"m3", name:"Usir Perampok Perbatasan", diff:"sedang", req:{atk:5}, reward:{emas:35,batu:20,loyalitas:5}, risk:0.15},
+  {id:"m4", name:"Pertahankan Jembatan", diff:"sedang", req:{def:5}, reward:{emas:35,padi:30,loyalitas:5}, risk:0.15},
+  {id:"m5", name:"Serbu Markas Bandit", diff:"sulit", req:{atk:10,def:4}, reward:{emas:90,batu:40,loyalitas:12}, risk:0.35},
+  {id:"m6", name:"Bertahan dari Gerombolan", diff:"sulit", req:{def:10,atk:4}, reward:{emas:90,kayu:50,loyalitas:12}, risk:0.35},
+];
+
+async function loadRemoteConfig(){
+  if(!(firebaseReady && db)) return;
+  try{
+    const bDoc = await db.collection("config").doc("buildings").get();
+    if(bDoc.exists && bDoc.data().data){
+      BUILDINGS = bDoc.data().data;
+    }
+  }catch(e){ console.warn("gagal muat config bangunan", e); }
+  try{
+    const mDoc = await db.collection("config").doc("missions").get();
+    if(mDoc.exists && mDoc.data().list){
+      MISSIONS = mDoc.data().list;
+    }
+  }catch(e){ console.warn("gagal muat config misi", e); }
+}
+
+function freshPlayer(name){
+  return {
+    name,
+    resources:{padi:100,kayu:80,batu:60,emas:20},
+    cap:{padi:500,kayu:500,batu:500,emas:500},
+    loyalitas:50,
+    buildings:{balai:1,gudang:1,barak:0,benteng:0,hutan:0},
+    soldiers:{atk:0,def:0},
+    plots: Array.from({length:PLOT_COUNT},()=>({state:"empty",readyAt:0})),
+    guildId:null,
+    sheltered:false,
+    createdAt:Date.now(),
+    lastSeen:Date.now(),
+  };
+}
+
+/* ============================================================
+   TINY STATE + RENDER ENGINE (no framework)
+   ============================================================ */
+let state = {
+  screen:"login", // login | game
+  playerName:"",
+  player:null,
+  tab:"farm",
+  guild:null,
+  guildMembers:[],
+  allVillages:[],
+  logs:[],
+  toast:"",
+  unsub:[],
+};
+
+const root = document.getElementById("root");
+
+function setState(patch){
+  state = {...state, ...patch};
+  render();
+}
+
+function showToast(msg){
+  setState({toast:msg});
+  clearTimeout(window.__toastT);
+  window.__toastT = setTimeout(()=>setState({toast:""}), 2600);
+}
+
+/* ---------- persistence helpers ---------- */
+async function savePlayer(p){
+  p.lastSeen = Date.now();
+  if(firebaseReady && db){
+    try{
+      await db.collection("players").doc(p.name).set(p);
+      return;
+    }catch(e){ console.warn("save gagal, fallback lokal", e); }
+  }
+  localStore.players[p.name] = JSON.parse(JSON.stringify(p));
+}
+
+async function loadPlayer(name){
+  if(firebaseReady && db){
+    try{
+      const doc = await db.collection("players").doc(name).get();
+      if(doc.exists) return doc.data();
+      return null;
+    }catch(e){ console.warn("load gagal, fallback lokal", e); }
+  }
+  return localStore.players[name] || null;
+}
+
+async function pushLog(playerName, text, cls){
+  const entry = {text, cls, ts:Date.now()};
+  if(firebaseReady && db){
+    try{
+      await db.collection("players").doc(playerName).collection("logs").add(entry);
+      return;
+    }catch(e){ console.warn("log gagal", e); }
+  }
+  localStore.logs.unshift(entry);
+}
+
+async function fetchAllVillages(){
+  if(firebaseReady && db){
+    try{
+      const snap = await db.collection("players").limit(30).get();
+      return snap.docs.map(d=>d.data()).filter(v=>v.name!==state.player.name);
+    }catch(e){ console.warn("fetch villages gagal", e); }
+  }
+  return Object.values(localStore.players).filter(v=>v.name!==state.player.name);
+}
+
+async function joinOrCreateGuild(guildName, action){
+  const p = state.player;
+  if(firebaseReady && db){
+    try{
+      const ref = db.collection("guilds").doc(guildName);
+      if(action==="create"){
+        await ref.set({name:guildName, members:[p.name], warChest:{padi:0,kayu:0,batu:0,emas:0}, createdAt:Date.now()}, {merge:false});
+      } else {
+        await ref.set({members:firebase.firestore.FieldValue.arrayUnion(p.name)}, {merge:true});
+      }
+      p.guildId = guildName;
+      await savePlayer(p);
+      subscribeGuild(guildName);
+      return true;
+    }catch(e){ console.warn("guild gagal", e); showToast("Gagal terhubung ke guild (jaringan)."); return false; }
+  } else {
+    localStore.guilds[guildName] = localStore.guilds[guildName] || {name:guildName, members:[], warChest:{padi:0,kayu:0,batu:0,emas:0}};
+    if(!localStore.guilds[guildName].members.includes(p.name)) localStore.guilds[guildName].members.push(p.name);
+    p.guildId = guildName;
+    await savePlayer(p);
+    setState({guild:localStore.guilds[guildName], guildMembers:localStore.guilds[guildName].members});
+    return true;
+  }
+}
+
+function subscribeGuild(guildName){
+  if(firebaseReady && db){
+    const unsubG = db.collection("guilds").doc(guildName).onSnapshot(doc=>{
+      if(doc.exists) setState({guild:doc.data(), guildMembers:doc.data().members||[]});
+    });
+    state.unsub.push(unsubG);
+  }
+}
+
+function subscribeLogs(playerName){
+  if(firebaseReady && db){
+    const unsubL = db.collection("players").doc(playerName).collection("logs")
+      .orderBy("ts","desc").limit(20)
+      .onSnapshot(snap=>{
+        const logs = snap.docs.map(d=>d.data());
+        setState({logs});
+      });
+    state.unsub.push(unsubL);
+  }
+}
+
+/* ============================================================
+   GAME LOGIC
+   ============================================================ */
+function costFor(bldgKey, level){
+  const base = BUILDINGS[bldgKey].baseCost;
+  const mult = 1 + level*0.6;
+  const c = {};
+  Object.keys(base).forEach(k=> c[k]=Math.round(base[k]*mult));
+  return c;
+}
+function canAfford(p, cost){
+  return Object.keys(cost).every(k => (p.resources[k]||0) >= cost[k]);
+}
+function pay(p, cost){
+  Object.keys(cost).forEach(k=> p.resources[k]-=cost[k]);
+}
+
+async function upgradeBuilding(key){
+  const p = state.player;
+  const lvl = p.buildings[key]||0;
+  const cost = costFor(key, lvl);
+  if(!canAfford(p, cost)){ showToast("Sumber daya tidak cukup!"); return; }
+  pay(p, cost);
+  p.buildings[key] = lvl+1;
+  if(key==="gudang"){
+    Object.keys(p.cap).forEach(k=> p.cap[k]+=150);
+  }
+  await savePlayer(p);
+  setState({player:{...p}});
+  showToast(`${BUILDINGS[key].name} naik ke level ${lvl+1}!`);
+}
+
+async function plantPlot(idx){
+  const p = state.player;
+  const plot = p.plots[idx];
+  if(plot.state==="empty"){
+    if(p.resources.padi < 5){ showToast("Butuh 5 padi untuk menanam benih."); return; }
+    p.resources.padi -= 5;
+    plot.state = "growing";
+    plot.readyAt = Date.now()+CROP_GROW_MS;
+    await savePlayer(p);
+    setState({player:{...p}});
+  } else if(plot.state==="ready"){
+    const yieldAmt = 25;
+    p.resources.padi = Math.min(p.cap.padi, p.resources.padi+yieldAmt);
+    plot.state = "empty";
+    plot.readyAt = 0;
+    await savePlayer(p);
+    setState({player:{...p}});
+    showToast(`+${yieldAmt} padi dipanen!`);
+  }
+}
+
+async function trainSoldier(type, amount){
+  const p = state.player;
+  if((p.buildings.barak||0) < 1){ showToast("Bangun Barak Prajurit dulu!"); return; }
+  const unitCost = type==="atk" ? {padi:8,kayu:4,emas:2} : {padi:6,kayu:8,emas:2};
+  const totalCost = {};
+  Object.keys(unitCost).forEach(k=> totalCost[k]=unitCost[k]*amount);
+  if(!canAfford(p, totalCost)){ showToast("Sumber daya tidak cukup untuk melatih!"); return; }
+  pay(p, totalCost);
+  p.soldiers[type]+=amount;
+  await savePlayer(p);
+  setState({player:{...p}});
+  showToast(`${amount} prajurit ${type==="atk"?"penyerang":"bertahan"} selesai dilatih.`);
+}
+
+async function doMission(mission){
+  const p = state.player;
+  const req = mission.req;
+  if((req.atk && p.soldiers.atk<req.atk) || (req.def && p.soldiers.def<req.def)){
+    showToast("Prajurit tidak cukup untuk misi ini!"); return;
+  }
+  const success = Math.random() > mission.risk;
+  if(success){
+    Object.keys(mission.reward).forEach(k=>{
+      if(k==="loyalitas"){ p.loyalitas = Math.min(100, p.loyalitas+mission.reward[k]); }
+      else { p.resources[k] = Math.min(p.cap[k], (p.resources[k]||0)+mission.reward[k]); }
+    });
+    await pushLog(p.name, `✅ Misi "${mission.name}" berhasil! Karaktermu pulang membawa hasil.`, "attack-out");
+    showToast(`Misi berhasil! ${mission.name}`);
+  } else {
+    const lostAtk = Math.min(p.soldiers.atk, Math.ceil((req.atk||1)*0.3));
+    const lostDef = Math.min(p.soldiers.def, Math.ceil((req.def||1)*0.3));
+    p.soldiers.atk -= lostAtk;
+    p.soldiers.def -= lostDef;
+    p.loyalitas = Math.max(0, p.loyalitas-5);
+    await pushLog(p.name, `❌ Misi "${mission.name}" gagal. Kehilangan ${lostAtk} penyerang, ${lostDef} bertahan.`, "attack-in");
+    showToast(`Misi gagal, sebagian prajurit gugur.`);
+  }
+  await savePlayer(p);
+  setState({player:{...p}});
+}
+
+async function toggleShelter(){
+  const p = state.player;
+  if((p.buildings.hutan||0) < 1){ showToast("Bangun Tempat Perlindungan (Hutan) dulu!"); return; }
+  p.sheltered = !p.sheltered;
+  await savePlayer(p);
+  setState({player:{...p}});
+  showToast(p.sheltered ? "Penduduk & sebagian sumber daya mengungsi ke hutan." : "Kembali beraktivitas normal di desa.");
+}
+
+async function attackVillage(target){
+  const p = state.player;
+  if(p.soldiers.atk < 3){ showToast("Minimal 3 prajurit penyerang untuk menyerang!"); return; }
+  const atkPower = p.soldiers.atk * 1.0;
+  let defPower = (target.soldiers?.def||0)*1.2 + (target.buildings?.benteng||0)*15;
+  if(target.sheltered){ defPower *= 1.8; } // mengungsi = mitigasi besar
+  const win = atkPower > defPower;
+
+  if(win){
+    const lootRatio = target.sheltered ? 0.08 : 0.25;
+    const loot = {};
+    ["padi","kayu","batu","emas"].forEach(k=>{
+      const amt = Math.floor((target.resources[k]||0)*lootRatio);
+      loot[k]=amt;
+    });
+    Object.keys(loot).forEach(k=>{
+      p.resources[k]=Math.min(p.cap[k], p.resources[k]+loot[k]);
+    });
+    await pushLog(p.name, `⚔️ Kamu menyerang desa ${target.name} dan menang! Rampasan: ${Object.entries(loot).map(([k,v])=>`${v} ${k}`).join(", ")}.`, "attack-out");
+    if(firebaseReady && db){
+      Object.keys(loot).forEach(k=> target.resources[k]=Math.max(0,(target.resources[k]||0)-loot[k]));
+      await savePlayer(target);
+      await pushLog(target.name, `🔥 Desamu diserang oleh ${p.name}! ${target.sheltered? "Untung penduduk sudah mengungsi ke hutan, kerugian kecil.":"Sebagian sumber daya dirampas."}`, "attack-in");
+    }
+    showToast(`Menang melawan ${target.name}!`);
+  } else {
+    p.soldiers.atk = Math.max(0, p.soldiers.atk-Math.ceil(p.soldiers.atk*0.4));
+    await pushLog(p.name, `🛡️ Serangan ke ${target.name} gagal, pertahanan mereka terlalu kuat.`, "attack-in");
+    showToast(`Serangan ke ${target.name} gagal!`);
+  }
+  await savePlayer(p);
+  setState({player:{...p}});
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function fmt(n){ return Math.floor(n).toLocaleString("id-ID"); }
+
+function render(){
+  if(state.screen==="login"){ renderLogin(); return; }
+  renderGame();
+}
+
+function renderLogin(){
+  root.innerHTML = `
+    <div class="login-screen">
+      <div class="login-card">
+        <h2>🌾 Lumbung Perang</h2>
+        <p style="font-size:.85rem;color:#5a4530;">Bangun desa dari hasil tani, latih prajurit, bergabung dengan guild, dan bertahan dari serangan pemain lain.</p>
+        <input id="nameInput" placeholder="Masukkan nama pemainmu" maxlength="20"/>
+        <button class="act" id="startBtn" style="width:100%;padding:12px;font-size:.95rem;">Mulai Bermain</button>
+        <div class="hint">${firebaseReady ? "🟢 Tersambung ke Firestore (multiplayer aktif)" : "🟠 Mode lokal (Firestore tidak tersambung di sesi ini)"}</div>
+      </div>
+    </div>
+  `;
+  document.getElementById("startBtn").onclick = handleLogin;
+  document.getElementById("nameInput").addEventListener("keydown",(e)=>{ if(e.key==="Enter") handleLogin(); });
+}
+
+async function handleLogin(){
+  const val = document.getElementById("nameInput").value.trim();
+  if(!val){ showToast("Isi nama dulu ya!"); return; }
+  showToast("Memuat desa...");
+  let p = await loadPlayer(val);
+  if(!p){ p = freshPlayer(val); await savePlayer(p); }
+  setState({screen:"game", player:p, playerName:val});
+  subscribeLogs(val);
+  if(p.guildId) subscribeGuild(p.guildId);
+  const villages = await fetchAllVillages();
+  setState({allVillages:villages});
+  startGrowthLoop();
+}
+
+function startGrowthLoop(){
+  setInterval(()=>{
+    if(!state.player) return;
+    let changed=false;
+    state.player.plots.forEach(pl=>{
+      if(pl.state==="growing" && Date.now()>=pl.readyAt){ pl.state="ready"; changed=true; }
+    });
+    if(changed) setState({player:{...state.player}});
+    else if(state.tab==="farm") render(); // refresh timers display
+  },1000);
+}
+
+function renderGame(){
+  const p = state.player;
+  root.innerHTML = `
+    <div class="wrap">
+      <header class="game-header">
+        <div>
+          <h1>🌾 Lumbung Perang</h1>
+          <div class="sub">Desa: <strong>${p.name}</strong> ${p.guildId ? `· Guild: <strong>${p.guildId}</strong>`:""}</div>
+        </div>
+        <div class="conn-badge"><span class="dot ${firebaseReady?'on':'off'}"></span>${firebaseReady?"Realtime tersambung":"Mode lokal"}</div>
+      </header>
+
+      <div class="resbar">
+        <div class="res"><div class="icon">🌾</div><div class="val">${fmt(p.resources.padi)}</div><div class="lbl">Padi / ${p.cap.padi}</div></div>
+        <div class="res"><div class="icon">🪵</div><div class="val">${fmt(p.resources.kayu)}</div><div class="lbl">Kayu / ${p.cap.kayu}</div></div>
+        <div class="res"><div class="icon">🪨</div><div class="val">${fmt(p.resources.batu)}</div><div class="lbl">Batu / ${p.cap.batu}</div></div>
+        <div class="res"><div class="icon">💰</div><div class="val">${fmt(p.resources.emas)}</div><div class="lbl">Emas / ${p.cap.emas}</div></div>
+        <div class="res"><div class="icon">${p.sheltered?"🌲":"🏠"}</div><div class="val">${p.sheltered?"Mengungsi":"Normal"}</div><div class="lbl">Status Desa</div></div>
+      </div>
+
+      <div class="loyalty-row">
+        <span>💛 Loyalitas</span>
+        <div class="loyalty-bar-bg"><div class="loyalty-bar-fill" style="width:${p.loyalitas}%"></div></div>
+        <span>${p.loyalitas}/100</span>
+      </div>
+
+      <nav class="tabs">
+        ${tabBtn("farm","🌾 Pertanian")}
+        ${tabBtn("bldg","🏛️ Bangunan")}
+        ${tabBtn("army","⚔️ Prajurit")}
+        ${tabBtn("mission","📜 Misi")}
+        ${tabBtn("guild","🛡️ Guild")}
+        ${tabBtn("war","🗺️ Peta & Perang")}
+      </nav>
+
+      <div class="panel">${renderTab()}</div>
+      <footer class="hint-foot">Data disimpan otomatis ${firebaseReady? "ke Firestore, bisa dilihat pemain lain secara realtime.":"secara lokal di sesi ini."}</footer>
+    </div>
+    <div class="toast ${state.toast?'show':''}">${state.toast}</div>
+  `;
+  attachTabHandlers();
+}
+
+function tabBtn(key,label){
+  return `<button data-tab="${key}" class="${state.tab===key?'active':''}">${label}</button>`;
+}
+
+function renderTab(){
+  switch(state.tab){
+    case "farm": return renderFarm();
+    case "bldg": return renderBuildings();
+    case "army": return renderArmy();
+    case "mission": return renderMissions();
+    case "guild": return renderGuild();
+    case "war": return renderWar();
+    default: return "";
+  }
+}
+
+function renderFarm(){
+  const p = state.player;
+  return `
+    <h2>Ladang Pertanian</h2>
+    <p style="font-size:.8rem;">Klik petak kosong untuk menanam (5 padi/benih), klik petak matang (⭐) untuk panen.</p>
+    <div class="farm-grid">
+      ${p.plots.map((pl,i)=>{
+        let cls="plot "+pl.state;
+        let content = "";
+        if(pl.state==="empty") content="➕";
+        if(pl.state==="growing"){
+          const remain = Math.max(0, Math.ceil((pl.readyAt-Date.now())/1000));
+          content = `🌱<span class="timer">${remain}s</span>`;
+        }
+        if(pl.state==="ready") content="⭐";
+        return `<div class="${cls}" data-plot="${i}">${content}</div>`;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderBuildings(){
+  const p = state.player;
+  return `
+    <h2>Bangunan Desa</h2>
+    <div class="bldg-grid">
+      ${Object.entries(BUILDINGS).map(([key,b])=>{
+        const lvl = p.buildings[key]||0;
+        const cost = costFor(key, lvl);
+        const afford = canAfford(p, cost);
+        return `
+          <div class="bldg-card">
+            <div style="font-size:1.8rem;">${b.icon}</div>
+            <h3>${b.name}</h3>
+            <div class="lvl">Level ${lvl}</div>
+            <div class="desc">${b.desc}</div>
+            <div class="cost-row">Biaya: ${Object.entries(cost).filter(([,v])=>v>0).map(([k,v])=>`${v} ${k}`).join(", ")}</div>
+            <button class="act" data-upgrade="${key}" ${afford?"":"disabled"}>${lvl===0?"Bangun":"Upgrade"}</button>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderArmy(){
+  const p = state.player;
+  const hasBarak = (p.buildings.barak||0) >= 1;
+  return `
+    <h2>Prajurit</h2>
+    ${!hasBarak ? `<p style="color:var(--blood);font-size:.85rem;">⚠️ Bangun Barak Prajurit dulu di tab Bangunan sebelum bisa melatih prajurit.</p>`:""}
+    <div class="soldier-types">
+      <div class="soldier-card">
+        <h3>⚔️ Penyerang</h3>
+        <div class="soldier-count">${p.soldiers.atk}</div>
+        <div style="font-size:.72rem;color:#5a4530;">Biaya per unit: 8 padi, 4 kayu, 2 emas. Dipakai untuk misi serang & menyerang desa lain.</div>
+        <div class="train-row">
+          <input type="number" min="1" value="1" id="atkAmt"/>
+          <button class="act" data-train="atk" ${hasBarak?"":"disabled"}>Latih</button>
+        </div>
+      </div>
+      <div class="soldier-card">
+        <h3>🛡️ Bertahan</h3>
+        <div class="soldier-count">${p.soldiers.def}</div>
+        <div style="font-size:.72rem;color:#5a4530;">Biaya per unit: 6 padi, 8 kayu, 2 emas. Menjaga desa dari serangan pemain lain.</div>
+        <div class="train-row">
+          <input type="number" min="1" value="1" id="defAmt"/>
+          <button class="act" data-train="def" ${hasBarak?"":"disabled"}>Latih</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderMissions(){
+  return `
+    <h2>Papan Misi</h2>
+    <p style="font-size:.8rem;">Karakter utamamu menjalankan misi menggunakan prajurit yang sudah dilatih. Semakin sulit, semakin besar hadiah — dan risikonya.</p>
+    <div class="mission-list">
+      ${MISSIONS.map(m=>`
+        <div class="mission-card">
+          <div>
+            <strong>${m.name}</strong> <span class="diff ${m.diff}">${m.diff.toUpperCase()}</span>
+            <div style="font-size:.72rem;margin-top:4px;">Butuh: ${Object.entries(m.req).map(([k,v])=>`${v} ${k==="atk"?"penyerang":"bertahan"}`).join(" & ")}</div>
+            <div style="font-size:.72rem;">Hadiah: ${Object.entries(m.reward).map(([k,v])=>`${v} ${k}`).join(", ")} · Risiko gagal: ${Math.round(m.risk*100)}%</div>
+          </div>
+          <button class="act" data-mission="${m.id}">Jalankan</button>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderGuild(){
+  const p = state.player;
+  if(!p.guildId){
+    return `
+      <h2>Guild</h2>
+      <p style="font-size:.85rem;">Kamu belum bergabung guild manapun. Buat guild baru atau gabung ke guild yang sudah ada.</p>
+      <div class="guild-box">
+        <input id="guildNameInput" placeholder="Nama guild" style="padding:8px;border-radius:6px;border:1px solid var(--soil);width:60%;"/>
+        <div style="margin-top:10px;display:flex;gap:8px;">
+          <button class="act" id="createGuildBtn">Buat Guild</button>
+          <button class="act" id="joinGuildBtn" style="background:var(--steel);">Gabung Guild</button>
+        </div>
+      </div>
+    `;
+  }
+  const g = state.guild;
+  return `
+    <h2>Guild: ${p.guildId}</h2>
+    <div class="guild-box">
+      <strong>Anggota (${state.guildMembers.length})</strong>
+      <ul class="member-list">
+        ${state.guildMembers.map(m=>`<li>${m} ${m===p.name?"(kamu)":""}</li>`).join("")}
+      </ul>
+      <strong>Kas Perang Guild</strong>
+      <div style="font-size:.82rem;margin:6px 0;">
+        ${g && g.warChest ? Object.entries(g.warChest).map(([k,v])=>`${k}: ${fmt(v)}`).join(" · ") : "Memuat..."}
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="act" data-contribute="padi">Sumbang 20 Padi</button>
+        <button class="act" data-contribute="kayu">Sumbang 20 Kayu</button>
+        <button class="act" data-contribute="batu">Sumbang 20 Batu</button>
+        <button class="act" data-contribute="emas">Sumbang 10 Emas</button>
+      </div>
+      <div style="font-size:.72rem;margin-top:8px;color:#5a4530;">Sumbangan ke kas perang guild meningkatkan loyalitasmu terhadap guild (+1 loyalitas per sumbangan).</div>
+    </div>
+  `;
+}
+
+function renderWar(){
+  const p = state.player;
+  return `
+    <h2>Peta & Serangan</h2>
+    <div class="shelter-toggle ${p.sheltered?'active':''}">
+      <div class="switch ${p.sheltered?'on':''}" id="shelterSwitch"></div>
+      <div>${p.sheltered ? "Penduduk sedang mengungsi ke Hutan/Perlindungan — kerugian saat diserang jauh lebih kecil." : "Desa beraktivitas normal. Aktifkan pengungsian jika merasa terancam."}</div>
+    </div>
+    <button class="act" id="refreshVillages" style="margin-bottom:10px;">🔄 Muat ulang daftar desa</button>
+    <div class="village-list">
+      ${state.allVillages.length===0 ? `<p style="font-size:.85rem;">Belum ada desa pemain lain yang terdeteksi. Coba muat ulang, atau ajak temanmu bermain juga!</p>` : ""}
+      ${state.allVillages.map(v=>`
+        <div class="village-card">
+          <div>
+            <strong>${v.name}</strong> ${v.sheltered?'<span style="font-size:.7rem;color:var(--leaf-dark);">🌲 sedang mengungsi</span>':''}
+            <div style="font-size:.72rem;">🌾${fmt(v.resources.padi)} 🪵${fmt(v.resources.kayu)} 🪨${fmt(v.resources.batu)} 💰${fmt(v.resources.emas)}</div>
+            <div style="font-size:.72rem;">Pertahanan: ${v.soldiers?.def||0} prajurit, Benteng Lv.${v.buildings?.benteng||0}</div>
+          </div>
+          <button class="act danger" data-attack="${v.name}">⚔️ Serang</button>
+        </div>
+      `).join("")}
+    </div>
+    <h2 style="margin-top:20px;">Riwayat Kejadian</h2>
+    <div class="log-box">
+      ${state.logs.length===0 ? "<div class='log-line'>Belum ada catatan.</div>" : state.logs.map(l=>`<div class="log-line ${l.cls}">${l.text}</div>`).join("")}
+    </div>
+  `;
+}
+
+/* ---------- event delegation ---------- */
+function attachTabHandlers(){
+  root.querySelectorAll("[data-tab]").forEach(btn=>{
+    btn.onclick = ()=> setState({tab:btn.dataset.tab});
+  });
+  root.querySelectorAll("[data-plot]").forEach(el=>{
+    el.onclick = ()=> plantPlot(parseInt(el.dataset.plot));
+  });
+  root.querySelectorAll("[data-upgrade]").forEach(el=>{
+    el.onclick = ()=> upgradeBuilding(el.dataset.upgrade);
+  });
+  root.querySelectorAll("[data-train]").forEach(el=>{
+    el.onclick = ()=>{
+      const type = el.dataset.train;
+      const amt = parseInt(document.getElementById(type==="atk"?"atkAmt":"defAmt").value)||1;
+      trainSoldier(type, amt);
+    };
+  });
+  root.querySelectorAll("[data-mission]").forEach(el=>{
+    el.onclick = ()=>{
+      const m = MISSIONS.find(x=>x.id===el.dataset.mission);
+      doMission(m);
+    };
+  });
+  const createBtn = document.getElementById("createGuildBtn");
+  if(createBtn) createBtn.onclick = ()=>{
+    const val = document.getElementById("guildNameInput").value.trim();
+    if(!val){ showToast("Isi nama guild dulu."); return; }
+    joinOrCreateGuild(val,"create");
+  };
+  const joinBtn = document.getElementById("joinGuildBtn");
+  if(joinBtn) joinBtn.onclick = ()=>{
+    const val = document.getElementById("guildNameInput").value.trim();
+    if(!val){ showToast("Isi nama guild dulu."); return; }
+    joinOrCreateGuild(val,"join");
+  };
+  root.querySelectorAll("[data-contribute]").forEach(el=>{
+    el.onclick = async ()=>{
+      const res = el.dataset.contribute;
+      const amt = res==="emas" ? 10 : 20;
+      const p = state.player;
+      if((p.resources[res]||0) < amt){ showToast("Sumber daya tidak cukup."); return; }
+      p.resources[res]-=amt;
+      p.loyalitas = Math.min(100, p.loyalitas+1);
+      await savePlayer(p);
+      if(firebaseReady && db && p.guildId){
+        try{
+          await db.collection("guilds").doc(p.guildId).set({
+            warChest:{ [res]: firebase.firestore.FieldValue.increment(amt) }
+          },{merge:true});
+        }catch(e){ console.warn(e); }
+      }
+      setState({player:{...p}});
+      showToast(`Menyumbang ${amt} ${res} ke kas perang guild.`);
+    };
+  });
+  const shelterSw = document.getElementById("shelterSwitch");
+  if(shelterSw) shelterSw.onclick = toggleShelter;
+  const refreshBtn = document.getElementById("refreshVillages");
+  if(refreshBtn) refreshBtn.onclick = async ()=>{
+    const villages = await fetchAllVillages();
+    setState({allVillages:villages});
+    showToast("Daftar desa diperbarui.");
+  };
+  root.querySelectorAll("[data-attack]").forEach(el=>{
+    el.onclick = async ()=>{
+      const targetName = el.dataset.attack;
+      const target = await loadPlayer(targetName);
+      if(target) attackVillage(target);
+    };
+  });
+}
+
+(async function init(){
+  await loadRemoteConfig();
+  render();
+})();
+</script>
+</body>
+</html>
