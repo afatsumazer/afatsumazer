@@ -1,0 +1,39 @@
+name: Generate Article Pages
+
+on:
+  # Jalan otomatis tiap 10 menit — cek kalau ada artikel baru yang di-approve admin
+  schedule:
+    - cron: '*/10 * * * *'
+  # Tombol "Run workflow" manual di tab Actions, buat generate langsung tanpa nunggu
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install firebase-admin
+        run: npm install firebase-admin
+
+      - name: Generate halaman artikel statis
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node scripts/generate-articles.mjs
+
+      - name: Commit & push kalau ada perubahan
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "chore: perbarui halaman artikel [skip ci]"
+          git push
