@@ -63,6 +63,9 @@
                 <button id="admin-tab-btn-orderreview" onclick="switchAdminTab('orderreview')" class="text-xs font-bold px-4 py-2.5 rounded-xl bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 transition">
                     🛍️ Order Review
                 </button>
+                <button id="admin-tab-btn-articles" onclick="switchAdminTab('articles')" class="text-xs font-bold px-4 py-2.5 rounded-xl bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 transition">
+                    📝 Artikel
+                </button>
             </div>
 
             <!-- ============ TAB MISI HARIAN ============ -->
@@ -252,6 +255,47 @@
                         </button>
                         <p id="or-last-saved" class="text-[10px] text-gray-400"></p>
                     </div>
+                </div>
+            </section>
+
+            <!-- ============ TAB ARTIKEL (TAYANG DI domain.com/slug) ============ -->
+            <section id="admin-tab-articles" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h3 id="article-form-title" class="font-extrabold text-sm text-gray-900 mb-1">Tulis Artikel Baru</h3>
+                    <p class="text-xs text-gray-500 mb-4">Artikel yang statusnya <b>Tayang</b> akan langsung bisa diakses publik di alamat <code>/slug</code> di bawah ini.</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-1">
+                        <input id="article-title" type="text" placeholder="Judul artikel" oninput="onArticleTitleInput()" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                        <input id="article-slug" type="text" placeholder="slug-artikel" oninput="updateArticleSlugPreview()" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                    </div>
+                    <p class="text-[10px] text-gray-400 mb-3">Alamat publik: <span id="article-slug-preview" class="font-bold text-indigo-600">/judul-artikel</span></p>
+
+                    <input id="article-cover" type="text" placeholder="URL gambar sampul (opsional)" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold mb-3">
+
+                    <textarea id="article-content" rows="10" placeholder="Isi artikel (boleh pakai HTML sederhana: <b>, <i>, <p>, <br>, <a href>, dsb)" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold mb-3"></textarea>
+
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <select id="article-status" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                            <option value="draft">Draft (belum tayang)</option>
+                            <option value="pending">Menunggu Review</option>
+                            <option value="published">Tayang</option>
+                            <option value="rejected">Ditolak</option>
+                        </select>
+                        <input id="article-order" type="number" placeholder="Urutan" min="0" value="0" class="border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold">
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button id="article-save-btn" onclick="saveArticle()" class="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs shadow-sm transition">
+                            Simpan Artikel
+                        </button>
+                        <button id="article-cancel-btn" onclick="resetArticleForm()" class="hidden text-xs font-bold px-4 py-2.5 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200">
+                            Batal Edit
+                        </button>
+                    </div>
+                </div>
+
+                <div id="articles-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="col-span-2 py-6 text-center text-xs text-gray-400">Memuat artikel...</div>
                 </div>
             </section>
 
