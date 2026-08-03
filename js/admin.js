@@ -5,7 +5,7 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
 import { getDatabase, ref, get, set, push, remove, onValue, runTransaction, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 // Firestore dipakai KHUSUS untuk data Order Review — semua data lain (users, misi,
 // voucher, menu cepat) tetap di Realtime Database seperti semula, tidak diubah.
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, onSnapshot as onFirestoreSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Konfigurasi sama persis dengan js/dashboard.js — satu project Firebase yang sama
 const firebaseConfig = {
@@ -71,6 +71,7 @@ onAuthStateChanged(auth, (user) => {
             loadAllUsers();
             loadQuickMenu();
             loadOrderReview();
+            loadArticles();
         } else {
             document.getElementById('access-denied').classList.remove('hidden');
             document.getElementById('access-denied').classList.add('flex');
@@ -90,7 +91,7 @@ window.adminLogout = function() {
 
 // ================= 2. NAVIGASI SUB-TAB =================
 window.switchAdminTab = function(tabName) {
-    const tabs = ['missions', 'vouchers', 'users', 'quickmenu', 'orderreview'];
+    const tabs = ['missions', 'vouchers', 'users', 'quickmenu', 'orderreview', 'articles'];
     tabs.forEach(t => {
         const section = document.getElementById(`admin-tab-${t}`);
         if (section) section.classList.add('hidden');
@@ -643,5 +644,177 @@ window.removeBadge = function(badgeId) {
             showToast('Lencana dicabut');
             refreshSelectedUserIfOpen(selectedUserUID);
         });
+    }
+};
+
+// ================= 8. KELOLA ARTIKEL (TAYANG DI domain.com/slug) =================
+// Disimpan di FIRESTORE, koleksi "articles", dengan ID DOKUMEN = SLUG.
+// Memakai slug sebagai document id (bukan id random dari push()) supaya halaman
+// publik (p/index.html + 404.html) bisa langsung getDoc(articles/{slug}) tanpa query.
+const articlesCollectionRef = collection(firestore, 'articles');
+let editingArticleSlug = null; // null = mode tambah baru; diisi slug asli kalau sedang edit
+
+function slugifyArticle(text) {
+    return String(text || '')
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+}
+
+window.onArticleTitleInput = function() {
+    if (editingArticleSlug) return; // saat edit, slug tidak diubah otomatis oleh judul
+    const title = document.getElementById('article-title').value;
+    document.getElementById('article-slug').value = slugifyArticle(title);
+    updateArticleSlugPreview();
+};
+
+window.updateArticleSlugPreview = function() {
+    const slug = document.getElementById('article-slug').value || 'judul-artikel';
+    document.getElementById('article-slug-preview').textContent = `/${slug}`;
+};
+
+function statusBadgeArticle(status) {
+    if (status === 'published') return `<span class="inline-block mt-1.5 text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">TAYANG</span>`;
+    if (status === 'pending') return `<span class="inline-block mt-1.5 text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">MENUNGGU REVIEW</span>`;
+    if (status === 'rejected') return `<span class="inline-block mt-1.5 text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-600">DITOLAK</span>`;
+    return `<span class="inline-block mt-1.5 text-[9px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">DRAFT</span>`;
+}
+
+function loadArticles() {
+    onFirestoreSnapshot(articlesCollectionRef, (snapshot) => {
+        const container = document.getElementById('articles-list');
+        if (!container) return;
+
+        if (snapshot.empty) {
+            container.innerHTML = `<div class="col-span-2 py-6 text-center text-xs text-gray-400">Belum ada artikel. Tambahkan lewat form di atas.</div>`;
+            return;
+        }
+
+        const items = [];
+        snapshot.forEach(docSnap => items.push({ slug: docSnap.id, ...docSnap.data() }));
+        // Yang menunggu review naik ke atas supaya tidak terlewat oleh admin
+        items.sort((a, b) => {
+            const rank = { pending: 0, draft: 1, published: 2, rejected: 3 };
+            const ra = rank[a.status] ?? 1, rb = rank[b.status] ?? 1;
+            if (ra !== rb) return ra - rb;
+            return (a.order || 0) - (b.order || 0);
+        });
+
+        // Cache mentah supaya tombol Edit tidak perlu fetch ulang ke Firestore
+        loadArticles._cache = {};
+        items.forEach(a => loadArticles._cache[a.slug] = a);
+
+        container.innerHTML = items.map(a => `
+            <div class="bg-white p-4 rounded-2xl border ${a.status === 'pending' ? 'border-amber-300' : 'border-gray-200'} shadow-sm flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <div class="text-xs font-extrabold text-gray-800">${escapeHtml(a.title)}</div>
+                    <div class="text-[10px] font-semibold text-indigo-500 mt-0.5 break-all">/${escapeHtml(a.slug)}</div>
+                    ${a.authorName ? `<div class="text-[10px] text-gray-400 mt-0.5">Oleh: ${escapeHtml(a.authorName)}</div>` : ''}
+                    ${statusBadgeArticle(a.status)}
+                </div>
+                <div class="flex flex-col gap-1.5 shrink-0">
+                    ${a.status === 'pending' ? `
+                        <button onclick="approveArticle('${a.slug}')" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200">Setujui</button>
+                        <button onclick="rejectArticle('${a.slug}')" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-200">Tolak</button>
+                    ` : ''}
+                    <button onclick="editArticle('${a.slug}')" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200">Edit</button>
+                    <button onclick="deleteArticle('${a.slug}')" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-200">Hapus</button>
+                </div>
+            </div>
+        `).join('');
+    }, err => showToast('Gagal memuat artikel: ' + err.message));
+}
+
+window.approveArticle = function(slug) {
+    setDoc(doc(articlesCollectionRef, slug), { status: 'published', reviewedAt: serverTimestamp(), reviewedBy: adminUID }, { merge: true })
+        .then(() => showToast('Artikel disetujui dan tayang'))
+        .catch(err => showToast('Gagal: ' + err.message));
+};
+
+window.rejectArticle = function(slug) {
+    if (!confirm('Tolak artikel ini? Penulis akan melihat statusnya sebagai "Ditolak".')) return;
+    setDoc(doc(articlesCollectionRef, slug), { status: 'rejected', reviewedAt: serverTimestamp(), reviewedBy: adminUID }, { merge: true })
+        .then(() => showToast('Artikel ditolak'))
+        .catch(err => showToast('Gagal: ' + err.message));
+};
+
+window.saveArticle = function() {
+    const title = document.getElementById('article-title').value.trim();
+    const slug = slugifyArticle(document.getElementById('article-slug').value);
+    const cover = document.getElementById('article-cover').value.trim();
+    const content = document.getElementById('article-content').value;
+    const status = document.getElementById('article-status').value;
+    const order = parseInt(document.getElementById('article-order').value, 10) || 0;
+
+    if (!title) { showToast('Judul artikel wajib diisi'); return; }
+    if (!slug) { showToast('Slug wajib diisi (dipakai sebagai alamat /...)'); return; }
+
+    const data = {
+        title, slug, cover, content, status, order,
+        updatedAt: serverTimestamp(),
+        updatedBy: adminUID
+    };
+
+    const isRenaming = editingArticleSlug && editingArticleSlug !== slug;
+
+    // Slug tidak berubah -> tulis langsung ke dokumen yang sama (create atau update)
+    if (!editingArticleSlug || !isRenaming) {
+        if (!editingArticleSlug) data.createdAt = serverTimestamp();
+        setDoc(doc(articlesCollectionRef, slug), data, { merge: true }).then(() => {
+            showToast(editingArticleSlug ? 'Artikel diperbarui' : 'Artikel ditambahkan');
+            resetArticleForm();
+        }).catch(err => showToast('Gagal: ' + err.message));
+        return;
+    }
+
+    // Slug berubah saat edit -> buat dokumen baru dengan slug baru, hapus dokumen lama
+    data.createdAt = (loadArticles._cache && loadArticles._cache[editingArticleSlug] && loadArticles._cache[editingArticleSlug].createdAt) || serverTimestamp();
+    setDoc(doc(articlesCollectionRef, slug), data).then(() => {
+        return deleteDoc(doc(articlesCollectionRef, editingArticleSlug));
+    }).then(() => {
+        showToast('Artikel diperbarui (alamat baru: /' + slug + ')');
+        resetArticleForm();
+    }).catch(err => showToast('Gagal: ' + err.message));
+};
+
+window.editArticle = function(slug) {
+    const cache = loadArticles._cache || {};
+    const a = cache[slug];
+    if (!a) { showToast('Data artikel tidak ditemukan, coba muat ulang halaman'); return; }
+
+    editingArticleSlug = slug;
+    document.getElementById('article-form-title').textContent = 'Edit Artikel';
+    document.getElementById('article-title').value = a.title || '';
+    document.getElementById('article-slug').value = a.slug || '';
+    document.getElementById('article-cover').value = a.cover || '';
+    document.getElementById('article-content').value = a.content || '';
+    document.getElementById('article-status').value = a.status || 'draft';
+    document.getElementById('article-order').value = a.order || 0;
+    updateArticleSlugPreview();
+    document.getElementById('article-cancel-btn').classList.remove('hidden');
+    document.getElementById('article-save-btn').textContent = 'Perbarui Artikel';
+    window.scrollTo({ top: document.getElementById('admin-tab-articles').offsetTop - 80, behavior: 'smooth' });
+};
+
+window.resetArticleForm = function() {
+    editingArticleSlug = null;
+    document.getElementById('article-form-title').textContent = 'Tulis Artikel Baru';
+    document.getElementById('article-title').value = '';
+    document.getElementById('article-slug').value = '';
+    document.getElementById('article-cover').value = '';
+    document.getElementById('article-content').value = '';
+    document.getElementById('article-status').value = 'draft';
+    document.getElementById('article-order').value = 0;
+    updateArticleSlugPreview();
+    document.getElementById('article-cancel-btn').classList.add('hidden');
+    document.getElementById('article-save-btn').textContent = 'Simpan Artikel';
+};
+
+window.deleteArticle = function(slug) {
+    if (confirm(`Hapus artikel "/${slug}" secara permanen? Halaman ini akan langsung tidak bisa diakses lagi.`)) {
+        deleteDoc(doc(articlesCollectionRef, slug)).then(() => showToast('Artikel dihapus'))
+            .catch(err => showToast('Gagal menghapus: ' + err.message));
     }
 };
