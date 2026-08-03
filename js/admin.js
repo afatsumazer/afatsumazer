@@ -91,7 +91,7 @@ window.adminLogout = function() {
 
 // ================= 2. NAVIGASI SUB-TAB =================
 window.switchAdminTab = function(tabName) {
-    const tabs = ['missions', 'vouchers', 'users', 'quickmenu', 'orderreview', 'articles'];
+    const tabs = ['missions', 'vouchers', 'users', 'quickmenu', 'orderreview', 'articles', 'statistik'];
     tabs.forEach(t => {
         const section = document.getElementById(`admin-tab-${t}`);
         if (section) section.classList.add('hidden');
@@ -105,6 +105,8 @@ window.switchAdminTab = function(tabName) {
     const activeBtn = document.getElementById(`admin-tab-btn-${tabName}`);
     activeBtn.classList.add('bg-indigo-900', 'text-white');
     activeBtn.classList.remove('bg-white', 'text-gray-600', 'border', 'border-gray-200');
+
+    if (tabName === 'statistik') loadStatistik();
 };
 
 // ================= 3. KELOLA MISI HARIAN =================
@@ -375,6 +377,8 @@ window.openUserDetail = function(uid) {
     document.getElementById('user-detail-username').textContent = p.username || uid;
     document.getElementById('user-detail-points').textContent = (rewards.points || 0).toLocaleString('id-ID');
 
+    renderStatusAkunButtons(p.isPremium === true, p.isVerified === true);
+
     const badgesEl = document.getElementById('user-detail-badges');
     const badgeEntries = Object.entries(badges);
     badgesEl.innerHTML = badgeEntries.length === 0
@@ -387,6 +391,44 @@ window.openUserDetail = function(uid) {
         `).join('');
 
     loadUserFilesForAdmin(uid);
+};
+
+// ================= STATUS AKUN: TOGGLE PREMIUM & VERIFIKASI =================
+// Sebelumnya cuma bisa diubah manual lewat RTDB Console. Sekarang admin cukup
+// klik tombol di panel detail user — langsung update ke users/{uid}/profile.
+function renderStatusAkunButtons(isPremium, isVerified) {
+    const premiumBtn = document.getElementById('user-detail-premium-btn');
+    const verifiedBtn = document.getElementById('user-detail-verified-btn');
+
+    premiumBtn.className = 'text-xs font-bold px-3 py-2 rounded-xl border transition ' +
+        (isPremium ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50');
+    premiumBtn.textContent = isPremium ? '⭐ Member Premium (aktif)' : '⭐ Jadikan Member Premium';
+
+    verifiedBtn.className = 'text-xs font-bold px-3 py-2 rounded-xl border transition ' +
+        (isVerified ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50');
+    verifiedBtn.textContent = isVerified ? '✔️ Terverifikasi (aktif)' : '✔️ Jadikan Terverifikasi';
+}
+
+window.toggleUserPremium = function() {
+    if (!selectedUserUID) return;
+    const u = allUsersCache[selectedUserUID] || {};
+    const current = (u.profile && u.profile.isPremium) === true;
+
+    update(ref(database, `users/${selectedUserUID}/profile`), { isPremium: !current }).then(() => {
+        showToast(!current ? 'Member Premium diaktifkan' : 'Member Premium dinonaktifkan');
+        refreshSelectedUserIfOpen(selectedUserUID);
+    }).catch(err => showToast('Gagal: ' + err.message));
+};
+
+window.toggleUserVerified = function() {
+    if (!selectedUserUID) return;
+    const u = allUsersCache[selectedUserUID] || {};
+    const current = (u.profile && u.profile.isVerified) === true;
+
+    update(ref(database, `users/${selectedUserUID}/profile`), { isVerified: !current }).then(() => {
+        showToast(!current ? 'Akun diverifikasi' : 'Verifikasi akun dicabut');
+        refreshSelectedUserIfOpen(selectedUserUID);
+    }).catch(err => showToast('Gagal: ' + err.message));
 };
 
 // Format ukuran file (Bytes/KB/MB) untuk ditampilkan di panel admin
@@ -818,3 +860,182 @@ window.deleteArticle = function(slug) {
             .catch(err => showToast('Gagal menghapus: ' + err.message));
     }
 };
+
+// ================= 9. STATISTIK (RINGKASAN ANGKA UNTUK ADMIN) =================
+async function loadStatistik() {
+    const container = document.getElementById('statistik-content');
+    container.innerHTML = `<div class="col-span-2 py-10 text-center text-xs text-gray-400">Menghitung statistik...</div>`;
+
+    try {
+        const [usersSnap, missionsSnap, vouchersSnap, quickMenuSnap, sharedSnap, claimsSnap] = await Promise.all([
+            get(ref(database, 'users')),
+            get(ref(database, 'config/missions')),
+            get(ref(database, 'config/vouchers')),
+            get(ref(database, 'config/quickMenu')),
+            get(ref(database, 'shared')),
+            get(ref(database, 'voucherClaims'))
+        ]);
+
+        const usersData = usersSnap.val() || {};
+        const userList = Object.values(usersData);
+        const totalUsers = userList.length;
+        const totalPoints = userList.reduce((sum, u) => sum + ((u.rewards && u.rewards.points) || 0), 0);
+        const totalBadgesGiven = userList.reduce((sum, u) => sum + (u.badges ? Object.keys(u.badges).length : 0), 0);
+        const totalPremium = userList.filter(u => u.profile && u.profile.isPremium === true).length;
+        const totalVerified = userList.filter(u => u.profile && u.profile.isVerified === true).length;
+        const totalPortfolioItems = userList.reduce((sum, u) => sum + (u.portfolio ? Object.keys(u.portfolio).length : 0), 0);
+        const totalStorageBytes = userList.reduce((sum, u) => {
+            if (!u.files) return sum;
+            return sum + Object.values(u.files).reduce((s, f) => s + (f.size || 0), 0);
+        }, 0);
+
+        const missionsData = missionsSnap.val() || {};
+        const totalMissions = Object.keys(missionsData).length;
+        const activeMissions = Object.values(missionsData).filter(m => m.active !== false).length;
+
+        const vouchersData = vouchersSnap.val() || {};
+        const totalVouchers = Object.keys(vouchersData).length;
+        const activeVouchers = Object.values(vouchersData).filter(v => v.active !== false).length;
+
+        const quickMenuData = quickMenuSnap.val() || {};
+        const totalQuickMenu = Object.keys(quickMenuData).length;
+
+        const sharedData = sharedSnap.val() || {};
+        const totalPublicFiles = Object.keys(sharedData).length;
+
+        // Klaim voucher: dicatat otomatis oleh dashboard.js sejak fitur ini dipasang.
+        // Klaim dari SEBELUM fitur ini dipasang tidak tercatat (data lama tidak ada).
+        const claimsData = claimsSnap.val() || {};
+        const claimsList = Object.values(claimsData);
+        const totalClaims = claimsList.length;
+        const claimCountByVoucher = {};
+        claimsList.forEach(c => {
+            const key = c.voucherId || c.voucherLabel || 'Tanpa nama';
+            if (!claimCountByVoucher[key]) claimCountByVoucher[key] = { label: c.voucherLabel || key, count: 0 };
+            claimCountByVoucher[key].count++;
+        });
+        const topVouchers = Object.values(claimCountByVoucher).sort((a, b) => b.count - a.count).slice(0, 5);
+
+        // Artikel: ambil sekali dari Firestore (tidak pakai cache tab Artikel supaya
+        // akurat walau tab Artikel belum pernah dibuka)
+        const articlesSnap = await getFirestoreArticlesOnce();
+        const statusCount = { published: 0, pending: 0, draft: 0, rejected: 0 };
+        articlesSnap.forEach(a => { statusCount[a.status] = (statusCount[a.status] || 0) + 1; });
+        const totalArticles = articlesSnap.length;
+
+        const storageMB = (totalStorageBytes / (1024 * 1024)).toFixed(1);
+
+        container.innerHTML = `
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-1">Total Pengguna</p>
+                <p class="text-2xl font-black text-gray-900">${totalUsers.toLocaleString('id-ID')}</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-1">Total Poin Beredar</p>
+                <p class="text-2xl font-black text-indigo-600">${totalPoints.toLocaleString('id-ID')}</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-1">Lencana Diberikan</p>
+                <p class="text-2xl font-black text-gray-900">${totalBadgesGiven.toLocaleString('id-ID')}</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-1">Member Premium</p>
+                <p class="text-2xl font-black text-amber-600">${totalPremium.toLocaleString('id-ID')}</p>
+                <p class="text-[10px] text-gray-400 font-semibold mt-1">dari ${totalUsers} pengguna</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-1">Akun Terverifikasi</p>
+                <p class="text-2xl font-black text-blue-600">${totalVerified.toLocaleString('id-ID')}</p>
+                <p class="text-[10px] text-gray-400 font-semibold mt-1">dari ${totalUsers} pengguna</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-1">Storage Terpakai</p>
+                <p class="text-2xl font-black text-gray-900">${storageMB} MB</p>
+                <p class="text-[10px] text-gray-400 font-semibold mt-1">semua pengguna</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-1">Berkas Publik (Tugas)</p>
+                <p class="text-2xl font-black text-gray-900">${totalPublicFiles.toLocaleString('id-ID')}</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-1">Total Portofolio</p>
+                <p class="text-2xl font-black text-gray-900">${totalPortfolioItems.toLocaleString('id-ID')}</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-1">Menu Cepat Kustom</p>
+                <p class="text-2xl font-black text-gray-900">${totalQuickMenu}</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-1">Misi Harian</p>
+                <p class="text-2xl font-black text-gray-900">${totalMissions}</p>
+                <p class="text-[10px] text-emerald-600 font-bold mt-1">${activeMissions} aktif</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-1">Voucher/Hadiah</p>
+                <p class="text-2xl font-black text-gray-900">${totalVouchers}</p>
+                <p class="text-[10px] text-emerald-600 font-bold mt-1">${activeVouchers} aktif</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-1">Total Klaim Voucher</p>
+                <p class="text-2xl font-black text-gray-900">${totalClaims.toLocaleString('id-ID')}</p>
+                <p class="text-[10px] text-gray-400 font-semibold mt-1">sejak pencatatan aktif</p>
+            </div>
+
+            <div class="col-span-2 sm:col-span-3 bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-3">Voucher Paling Sering Diklaim</p>
+                ${topVouchers.length === 0
+                    ? `<p class="text-xs text-gray-400 italic">Belum ada data klaim tercatat. Statistik ini akan terisi begitu ada user yang klaim voucher baru.</p>`
+                    : `<div class="space-y-2">
+                        ${topVouchers.map((v, i) => `
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="font-semibold text-gray-700">${i + 1}. ${escapeHtml(v.label)}</span>
+                                <span class="font-black text-indigo-600">${v.count}x</span>
+                            </div>
+                        `).join('')}
+                       </div>`
+                }
+            </div>
+
+            <div class="col-span-2 sm:col-span-3 bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-3">Artikel (${totalArticles} total)</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div>
+                        <p class="text-xl font-black text-emerald-600">${statusCount.published}</p>
+                        <p class="text-[10px] text-gray-400 font-semibold">Tayang</p>
+                    </div>
+                    <div>
+                        <p class="text-xl font-black text-amber-600">${statusCount.pending}</p>
+                        <p class="text-[10px] text-gray-400 font-semibold">Menunggu Review</p>
+                    </div>
+                    <div>
+                        <p class="text-xl font-black text-gray-400">${statusCount.draft}</p>
+                        <p class="text-[10px] text-gray-400 font-semibold">Draft</p>
+                    </div>
+                    <div>
+                        <p class="text-xl font-black text-red-500">${statusCount.rejected}</p>
+                        <p class="text-[10px] text-gray-400 font-semibold">Ditolak</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-span-2 sm:col-span-3 bg-amber-50 border border-amber-200 p-4 rounded-2xl text-[11px] text-amber-800 leading-relaxed">
+                ℹ️ Statistik "misi paling sering diselesaikan" masih belum tersedia — pencatatan penyelesaian misi harian belum ada di kode manapun yang saya lihat sejauh ini.
+            </div>
+        `;
+    } catch (err) {
+        container.innerHTML = `<div class="col-span-2 py-10 text-center text-xs text-red-500">Gagal memuat statistik: ${err.message}</div>`;
+    }
+}
+
+// Ambil semua artikel dari Firestore sekali jalan (dipakai khusus statistik,
+// terpisah dari onFirestoreSnapshot real-time yang dipakai tab Artikel)
+async function getFirestoreArticlesOnce() {
+    const { getDocs } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+    const snap = await getDocs(articlesCollectionRef);
+    const items = [];
+    snap.forEach(d => items.push({ slug: d.id, ...d.data() }));
+    return items;
+}

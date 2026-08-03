@@ -39,20 +39,23 @@ function bersihkanNomorWA(nomor) {
     return String(nomor || '').replace(/[^0-9]/g, '');
 }
 
-/**
- * Membuka (atau mengarahkan tab yang sudah ada) ke WhatsApp dengan pesan
- * klaim voucher berisi detail hadiah dan data user yang login.
- *
- * @param {string} namaHadiah  Nama/label hadiah yang diklaim
- * @param {number|string} hargaPoin  Jumlah poin yang dipakai untuk klaim
- * @param {string} nomorTujuan  (Opsional) nomor WA khusus voucher ini,
- *        diambil dari field "whatsapp" pada config/vouchers/{id} yang diatur
- *        admin. Jika kosong/tidak diisi, dipakai nomor default.
- * @param {Window|null} existingTab  (Opsional) referensi tab yang sudah
- *        dibuka lebih dulu lewat window.open('', '_blank') tepat saat user
- *        klik tombol. Jika diisi, kita redirect tab itu (menghindari
- *        pop-up blocker). Jika kosong, fungsi akan membuka tab baru sendiri.
- */
+// Mencatat setiap klaim voucher ke RTDB (voucherClaims/{id}) supaya admin bisa
+// lihat statistik voucher mana yang paling sering diklaim. Dipanggil sebelum
+// redirect terjadi (baik lewat link kustom maupun WhatsApp), jadi tetap
+// tercatat di kedua alur.
+function catatKlaimVoucher(namaHadiah, hargaPoin, voucherId) {
+    if (!userUID) return;
+    const logRef = push(ref(database, 'voucherClaims'));
+    set(logRef, {
+        voucherId: voucherId || null,
+        voucherLabel: namaHadiah || 'Tanpa nama',
+        costPoints: hargaPoin || 0,
+        userUID: userUID,
+        userName: currentUserProfile.name || null,
+        claimedAt: Date.now()
+    }).catch(err => console.error('Gagal mencatat klaim voucher:', err));
+}
+
 /**
  * Fungsi utama yang dipanggil saat klaim voucher berhasil. Mengecek dulu
  * apakah voucher ini punya "link kustom" (diisi admin di panel admin) —
@@ -65,10 +68,15 @@ function bersihkanNomorWA(nomor) {
  *        berisi (opsional) field "link" dan "whatsapp".
  * @param {Window|null} existingTab  Tab kosong yang sudah dibuka saat user
  *        klik tombol (lihat catatan pop-up blocker di klaimVoucherKeWhatsApp).
+ * @param {string} [voucherId]  (Opsional) ID voucher (key di config/vouchers)
+ *        supaya klaim bisa dikelompokkan per voucher di statistik admin,
+ *        bukan cuma per nama. Kalau tidak diisi, tetap tercatat pakai nama.
  */
-window.arahkanKlaimHadiah = function(namaHadiah, hargaPoin, voucherData, existingTab) {
+window.arahkanKlaimHadiah = function(namaHadiah, hargaPoin, voucherData, existingTab, voucherId) {
     const data = voucherData || {};
     const linkKustom = (data.link || '').trim();
+
+    catatKlaimVoucher(namaHadiah, hargaPoin, voucherId);
 
     if (linkKustom) {
         // Ada link kustom yang diatur admin -> redirect langsung ke situ,
