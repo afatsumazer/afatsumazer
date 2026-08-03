@@ -47,8 +47,23 @@
                 <input id="article-cover" type="text" placeholder="URL gambar (https://...)" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm mb-3">
 
                 <label class="text-[10px] font-extrabold uppercase text-gray-400 block mb-1">Isi Artikel</label>
+
+                <!-- ============ TOOLBAR FORMAT TEKS & LAMPIRAN ============ -->
+                <div class="flex flex-wrap gap-1.5 mb-2 p-2 bg-gray-50 border border-gray-200 rounded-xl">
+                    <button type="button" onclick="wrapSelection('<b>','</b>')" title="Tebal" class="w-9 h-9 rounded-lg bg-white border border-gray-200 hover:bg-gray-100 font-black text-sm">B</button>
+                    <button type="button" onclick="wrapSelection('<i>','</i>')" title="Miring" class="w-9 h-9 rounded-lg bg-white border border-gray-200 hover:bg-gray-100 italic text-sm">I</button>
+                    <button type="button" onclick="wrapSelection('<u>','</u>')" title="Garis bawah" class="w-9 h-9 rounded-lg bg-white border border-gray-200 hover:bg-gray-100 underline text-sm">U</button>
+                    <button type="button" onclick="wrapSelection('<h3>','</h3>')" title="Judul bagian" class="px-3 h-9 rounded-lg bg-white border border-gray-200 hover:bg-gray-100 font-extrabold text-xs">H</button>
+                    <button type="button" onclick="insertLink()" title="Sisipkan link" class="px-3 h-9 rounded-lg bg-white border border-gray-200 hover:bg-gray-100 text-xs font-bold">🔗 Link</button>
+                    <button type="button" onclick="wrapList()" title="Daftar poin" class="px-3 h-9 rounded-lg bg-white border border-gray-200 hover:bg-gray-100 text-xs font-bold">• List</button>
+                    <span class="w-px h-9 bg-gray-200 mx-0.5"></span>
+                    <button type="button" onclick="insertImageUrl()" title="Sisipkan gambar (URL)" class="px-3 h-9 rounded-lg bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 text-indigo-700 text-xs font-bold">🖼️ Gambar</button>
+                    <button type="button" onclick="insertAttachmentUrl()" title="Sisipkan link lampiran" class="px-3 h-9 rounded-lg bg-violet-50 border border-violet-100 hover:bg-violet-100 text-violet-700 text-xs font-bold">📎 Lampiran</button>
+                </div>
+                <p id="upload-status" class="text-[10px] text-indigo-500 font-semibold mb-2 hidden"></p>
+
                 <textarea id="article-content" rows="10" placeholder="Tulis isi artikelmu di sini..." class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm mb-1"></textarea>
-                <p class="text-[10px] text-gray-400 mb-4">Boleh pakai HTML sederhana: &lt;b&gt;, &lt;i&gt;, &lt;p&gt;, &lt;br&gt;, &lt;a href&gt;.</p>
+                <p class="text-[10px] text-gray-400 mb-4">Pakai tombol di atas untuk format teks otomatis, atau tulis HTML sederhana sendiri: &lt;b&gt;, &lt;i&gt;, &lt;p&gt;, &lt;br&gt;, &lt;a href&gt;.</p>
 
                 <div id="form-msg" class="text-xs mb-3"></div>
 
@@ -119,6 +134,87 @@
         if (editingSlug) return;
         const slug = slugify(document.getElementById('article-title').value);
         document.getElementById('slug-preview').textContent = '/' + (slug || 'judul-artikel');
+    };
+
+    // ================= TOOLBAR FORMAT TEKS =================
+    // Membungkus teks yang sedang diseleksi di textarea dengan tag pembuka/penutup.
+    // Kalau tidak ada teks terpilih, tag kosong disisipkan di posisi kursor.
+    window.wrapSelection = function(before, after) {
+        const ta = document.getElementById('article-content');
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        const selected = ta.value.slice(start, end);
+        const newText = ta.value.slice(0, start) + before + selected + after + ta.value.slice(end);
+        ta.value = newText;
+        ta.focus();
+        const cursorPos = selected ? start + before.length + selected.length + after.length : start + before.length;
+        ta.selectionStart = ta.selectionEnd = cursorPos;
+    };
+
+    window.insertLink = function() {
+        const url = prompt('Alamat link (https://...):');
+        if (!url) return;
+        const ta = document.getElementById('article-content');
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        const selected = ta.value.slice(start, end) || 'teks link';
+        wrapSelectionWithText(`<a href="${url}" target="_blank">`, '</a>', selected, start, end);
+    };
+
+    function wrapSelectionWithText(before, after, text, start, end) {
+        const ta = document.getElementById('article-content');
+        ta.value = ta.value.slice(0, start) + before + text + after + ta.value.slice(end);
+        ta.focus();
+        const cursorPos = start + before.length + text.length + after.length;
+        ta.selectionStart = ta.selectionEnd = cursorPos;
+    }
+
+    window.wrapList = function() {
+        const ta = document.getElementById('article-content');
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        const selected = ta.value.slice(start, end);
+        const lines = (selected || 'poin pertama').split('\n').filter(l => l.trim());
+        const listHtml = '<ul>\n' + lines.map(l => `  <li>${l.trim()}</li>`).join('\n') + '\n</ul>';
+        ta.value = ta.value.slice(0, start) + listHtml + ta.value.slice(end);
+        ta.focus();
+    };
+
+    function insertAtCursor(text) {
+        const ta = document.getElementById('article-content');
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
+        ta.focus();
+        const cursorPos = start + text.length;
+        ta.selectionStart = ta.selectionEnd = cursorPos;
+    }
+
+    function showUploadStatus(text, isError) {
+        const el = document.getElementById('upload-status');
+        el.textContent = text;
+        el.className = 'text-[10px] font-semibold mb-2 ' + (isError ? 'text-red-500' : 'text-indigo-500');
+        el.classList.remove('hidden');
+        if (!isError && text.startsWith('✓')) {
+            setTimeout(() => el.classList.add('hidden'), 2500);
+        }
+    }
+
+    // ================= SISIP GAMBAR (lewat URL, tanpa Firebase Storage) =================
+    window.insertImageUrl = function() {
+        const url = prompt('Tempel URL gambar (dari Google Drive, Imgur, dsb):');
+        if (!url) return;
+        insertAtCursor(`\n<img src="${url}" alt="">\n`);
+        showUploadStatus('✓ Gambar disisipkan ke isi artikel.', false);
+    };
+
+    // ================= SISIP LAMPIRAN (lewat URL, tanpa Firebase Storage) =================
+    window.insertAttachmentUrl = function() {
+        const url = prompt('Tempel URL berkas/lampiran (link download):');
+        if (!url) return;
+        const label = prompt('Nama yang ditampilkan untuk link ini:', 'Unduh Berkas') || 'Unduh Berkas';
+        insertAtCursor(`\n<a href="${url}" target="_blank">📎 ${label}</a>\n`);
+        showUploadStatus('✓ Lampiran disisipkan ke isi artikel.', false);
     };
 
     function showMsg(text, isError) {
