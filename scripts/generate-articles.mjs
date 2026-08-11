@@ -28,7 +28,7 @@ const MANIFEST_PATH = '.generated-articles.json';
 const RESERVED_SLUGS = new Set([
     'admin', 'dashboard', 'login', 'index', 'js', 'css', 'images', 'assets',
     'tulis-artikel', 'daftar-artikel', '404', 'p', 'scripts', '.github',
-    'api', 'first-artikel-anyone', 'fitur', 'src', 'toko-tiket', 'user'
+    'api', 'fitur', 'src', 'toko-tiket', 'user'
 ]);
 
 // ================= AMBIL DATA ARTIKEL LEWAT FIRESTORE REST API (PUBLIK) =================
