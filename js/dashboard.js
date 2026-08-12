@@ -232,8 +232,8 @@ onAuthStateChanged(auth, (user) => {
 
         // Load Data Utama
         loadFolders();
-        loadUserFiles();       // Tab Berkas
-        loadTasksTab();        // Tab Tugas (File Publik)
+        loadUserFiles();       // Statistik "Total Berkas" & kuota di tab Ringkasan
+        loadTasksTab();        // Tidak lagi dipakai (lihat catatan di fungsinya) — dibiarkan no-op
         loadUserPortfolio();   // Sinkronisasi Portofolio Saya
     } else {
         localStorage.removeItem('userSession');
@@ -264,6 +264,10 @@ function loadUserBadges() {
 }
 
 // ================= 2. LOGIKA UNGGAH BERKAS (PUBLIK vs PRIVAT) =================
+// CATATAN: elemen file-selector/file-label/file-is-public sudah tidak ada di
+// dashboard.html (tab "Semua Artikel" sekarang berisi daftar artikel, bukan
+// upload). Fungsi-fungsi ini dibiarkan di sini (tidak dihapus) supaya tidak
+// mengubah bagian lain, tapi sudah tidak dipanggil dari UI mana pun.
 window.updateFileLabel = function() {
     const selector = document.getElementById('file-selector');
     const label = document.getElementById('file-label');
@@ -324,12 +328,12 @@ window.uploadSelectedFile = function() {
 
         // 1. Simpan ke Berkas Pribadi User
         set(newFileRef, fileDataObject).then(() => {
-            // 2. JIKA PUBLIK -> Simpan ke node 'shared' untuk Tab Tugas
+            // 2. JIKA PUBLIK -> Simpan ke node 'shared'
             if (isPublic) {
                 set(ref(database, `shared/${fileKey}`), fileDataObject);
-                alert("Berkas berhasil diunggah secara PUBLIK dan muncul di Tab Tugas!");
+                alert("Berkas berhasil diunggah secara PUBLIK!");
             } else {
-                alert("Berkas berhasil disimpan secara PRIVAT di Tab Berkas!");
+                alert("Berkas berhasil disimpan secara PRIVAT!");
             }
 
             document.getElementById('file-label').innerText = "Pilih file dari komputer Anda...";
@@ -395,13 +399,13 @@ function loadFolders() {
     });
 }
 
-// ================= 4. LOAD BERKAS (TAB BERKAS - PRIVAT) =================
+// ================= 4. LOAD BERKAS (statistik "Total Berkas" & kuota di Ringkasan) =================
 function loadUserFiles() {
     if (!userUID) return;
 
     const fileRef = ref(database, `users/${userUID}/files`);
     onValue(fileRef, (snapshot) => {
-        const tableBody = document.getElementById('file-table-body');
+        const tableBody = document.getElementById('file-table-body'); // sudah tidak ada di HTML, aman (null-checked)
         if (tableBody) tableBody.innerHTML = '';
 
         let totalBytes = 0;
@@ -461,74 +465,15 @@ function loadUserFiles() {
     });
 }
 
-// ================= 5. LOAD TAB TUGAS (FILE PUBLIK) =================
+// ================= 5. STATISTIK TAB "UPDATE TERBARU" =================
+// Tab Tugas sekarang berisi feed like/komentar artikel (dikelola oleh script
+// terpisah di dashboard.html), bukan lagi berkas publik dari node 'shared'.
+// Fungsi ini dibiarkan ada (dan tetap dipanggil di tempat yang sama seperti
+// sebelumnya) supaya tidak ada pemanggilan lain di file ini yang perlu diubah,
+// tapi isinya dikosongkan karena elemen 'collaboration-files-container' sudah
+// tidak ada di HTML.
 function loadTasksTab() {
-    const tasksContainer = document.getElementById('collaboration-files-container') || document.getElementById('tasks-files-container');
-    if (!tasksContainer) return;
-
-    const sharedRef = ref(database, 'shared');
-    onValue(sharedRef, (snapshot) => {
-        tasksContainer.innerHTML = '';
-
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            let count = 0;
-
-            Object.keys(data).forEach((key) => {
-                const file = data[key];
-                
-                if (file.isPublic !== false) {
-                    count++;
-                    const fileSizeStr = formatBytes(file.size);
-                    const ext = file.format || getFileExtension(file.name, file.type);
-                    const pubDateStr = file.pubDate ? new Date(file.pubDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
-                    const uploaderName = file.uploadedBy || 'Pengguna';
-                    const uploaderUID = file.uploaderUID || '';
-
-                    tasksContainer.innerHTML += `
-                        <div class="bg-gray-50 hover:bg-white border border-gray-200 rounded-xl p-4 shadow-sm transition group hover:shadow-md flex flex-col justify-between">
-                            <div class="flex items-start justify-between">
-                                <div class="flex items-center space-x-3 min-w-0">
-                                    <div class="bg-indigo-600 text-white text-xs font-black px-2.5 py-2 rounded-lg shadow-sm uppercase shrink-0">
-                                        ${escapeHtml(ext)}
-                                    </div>
-                                    <div class="min-w-0">
-                                        <h4 onclick="openFileDetailModal('${key}')" 
-                                            class="text-sm font-bold text-gray-800 group-hover:text-indigo-600 cursor-pointer transition break-all line-clamp-1">
-                                            ${escapeHtml(file.name)}
-                                        </h4>
-                                        <button onclick="showUserPortfolioModal('${uploaderUID}', '${escapeHtml(uploaderName)}')" 
-                                           class="text-xs text-indigo-600 hover:underline font-semibold cursor-pointer mt-0.5 text-left">
-                                           👤 ${escapeHtml(uploaderName)}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center justify-between border-t border-gray-200/60 mt-4 pt-3 text-[11px] text-gray-500">
-                                <span>Ukuran: <b>${fileSizeStr}</b></span>
-                                <button onclick="downloadSharedDirect(event, '${key}')" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
-                                    Unduh
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-
-            // Update Statistik Overview
-            const pendingStat = document.getElementById('stat-tasks-pending');
-            const completedStat = document.getElementById('stat-tasks-completed');
-            if (pendingStat) pendingStat.innerText = 0; 
-            if (completedStat) completedStat.innerText = count;
-
-            if (count === 0) {
-                tasksContainer.innerHTML = `<div class="col-span-2 py-8 text-center text-gray-400 text-sm">Belum ada berkas publik/tugas yang dibagikan.</div>`;
-            }
-        } else {
-            tasksContainer.innerHTML = `<div class="col-span-2 py-8 text-center text-gray-400 text-sm">Belum ada berkas publik/tugas yang dibagikan.</div>`;
-        }
-    });
+    // Sengaja dikosongkan — lihat catatan di atas.
 }
 
 // Detail berkas publik: dipanggil dengan key saja (bukan seluruh base64 file)
@@ -645,7 +590,7 @@ window.deletePortfolioItem = function(portfolioKey) {
     }
 };
 
-// MODAL PROFIL PENGGUNA LAIN (diklik dari nama pengunggah di Tab Tugas)
+// MODAL PROFIL PENGGUNA LAIN
 // Ditampilkan selengkap kartu "Profil Saya": foto asli, nama + centang verifikasi,
 // username, label member premium, bio, dan daftar portofolio.
 window.showUserPortfolioModal = function(uploaderUID, uploaderName) {
@@ -792,11 +737,11 @@ window.deleteFile = function(fileId) {
 window.switchTab = function(tabName) {
     const tabs = ['overview', 'tasks', 'files', 'profile'];
     
-    // Pemetaan Judul Halaman
+    // Pemetaan Judul Halaman — disesuaikan dengan isi tab yang baru
     const pageTitles = {
         'overview': 'Ringkasan',
-        'tasks': 'Tugas',
-        'files': 'Berkas',
+        'tasks': 'Update Terbaru',
+        'files': 'Semua Artikel',
         'profile': 'Profil'
     };
 
@@ -846,8 +791,8 @@ window.switchTab = function(tabName) {
     }
 
     // 6. MUAT DATA SESUAI TAB
-    if (tabName === 'tasks') loadTasksTab();
-    if (tabName === 'files') loadUserFiles();
+    // 'tasks' & 'files' sekarang dikelola oleh script terpisah di dashboard.html
+    // (feed like/komentar & daftar artikel), jadi tidak perlu dipanggil di sini lagi.
 };
 
 window.logout = function() {
