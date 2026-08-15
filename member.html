@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AFATSUMAZER — Member NFT</title>
+  <meta name="description" content="Kartu member NFT komunitas AFATSUMAZER.">
+
+  <!-- Font: display teknikal + body + mono untuk data ID/wallet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN: dipakai oleh markup kartu di user/nft-member-card.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Styling halaman NFT ini saja — nama file & class di-namespace "afz-"
+       supaya tidak menimpa style.css / class lain yang sudah ada di situs Anda -->
+  <link rel="stylesheet" href="css/afatsumazer-nft.css">
+</head>
+<body>
+<div class="afz-nft-page">
+
+  <header class="afz-header">
+    <a href="#" class="afz-wordmark">
+      <span class="afz-wordmark-dot" aria-hidden="true"></span>
+      AFATSUMAZER
+    </a>
+    <span class="afz-header-tag">Polygon · Member NFT</span>
+  </header>
+
+  <section class="afz-hero">
+    <p class="afz-hero-eyebrow">Kartu keanggotaan digital</p>
+    <h1 class="afz-hero-title">Satu NFT, satu identitas member.</h1>
+    <p class="afz-hero-sub">
+      Setiap member AFATSUMAZER punya kartu NFT unik miliknya sendiri —
+      lengkap dengan tier, wallet, dan verifikasi sidik jari sebelum wallet
+      dapat dihubungkan.
+    </p>
+  </section>
+
+  <section class="afz-cards-section">
+    <div class="afz-cards-section-head">
+      <h2>Direktori member</h2>
+      <span id="member-count-label">memuat data…</span>
+    </div>
+
+    <div id="users-container">
+      <p class="afz-cards-loading">Mengambil daftar member dari server…</p>
+    </div>
+  </section>
+
+  <footer class="afz-footer">
+    <span>© 2026 AFATSUMAZER</span>
+    <span>app.afatsumazer.eu.org</span>
+  </footer>
+
+</div>
+
+  <!-- Logika kartu NFT: fetch data member, render kartu, connect/verify wallet -->
+  <script src="user/nft-member-card.js"></script>
+  <script>
+    const observer = new MutationObserver(() => {
+      const count = document.querySelectorAll('#users-container > div').length;
+      const label = document.getElementById('member-count-label');
+      if (count > 0) {
+        label.textContent = count + ' member terdaftar';
+      }
+    });
+    observer.observe(document.getElementById('users-container'), { childList: true });
+  </script>
+
+</body>
+</html>
