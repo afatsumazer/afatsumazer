@@ -1,125 +1,72 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Pengguna Web</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #f4f7f6; color: #333; padding: 40px 20px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        
-        header { text-align: center; margin-bottom: 40px; }
-        header h1 { font-size: 2.2rem; color: #2c3e50; margin-bottom: 10px; }
-        header p { color: #666; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AFATSUMAZER — Member NFT</title>
+  <meta name="description" content="Kartu member NFT komunitas AFATSUMAZER.">
 
-        /* Desain List Pengguna */
-        .user-list { display: flex; flex-direction: column; gap: 15px; }
-        
-        /* Tag <a> diubah menjadi card yang bisa diklik */
-        .user-link { text-decoration: none; color: inherit; display: block; }
-        
-        .user-card {
-            background: white;
-            border-radius: 12px;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-            border: 1px solid #e2e8f0;
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-        }
-        
-        .user-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-            border-color: #0095f6;
-        }
+  <!-- Font: display teknikal + body + mono untuk data ID/wallet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-        .user-avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; background-color: #ddd; }
-        .user-details { flex-grow: 1; }
-        .user-name { font-size: 1.1rem; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
-        .user-username { font-size: 0.85rem; color: #737373; }
-        
-        .arrow-icon { color: #cbd5e1; font-size: 1.2rem; font-weight: bold; }
-        .loading { text-align: center; padding: 20px; color: #666; font-size: 1.1rem; }
-    </style>
+  <!-- Tailwind CDN: dipakai oleh markup kartu di user/nft-member-card.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Styling halaman (chrome, hero, footer, efek hover kartu) -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <h1>Jelajahi Profil</h1>
-            <p>Pilih salah satu pengguna untuk melihat kartu pos dan kiriman publik mereka</p>
-        </header>
+  <header class="site-header">
+    <a href="#" class="wordmark">
+      <span class="wordmark-dot" aria-hidden="true"></span>
+      AFATSUMAZER
+    </a>
+    <span class="header-tag">Polygon · Member NFT</span>
+  </header>
 
-        <!-- Tempat daftar nama pengguna akan muncul -->
-        <div class="user-list" id="users-container">
-            <div class="loading">Memuat daftar pengguna...</div>
-        </div>
+  <section class="hero">
+    <p class="hero-eyebrow">Kartu keanggotaan digital</p>
+    <h1 class="hero-title">Satu NFT, satu identitas member.</h1>
+    <p class="hero-sub">
+      Setiap member AFATSUMAZER punya kartu NFT unik miliknya sendiri —
+      lengkap dengan tier, wallet, dan verifikasi sidik jari sebelum wallet
+      dapat dihubungkan.
+    </p>
+  </section>
+
+  <section class="cards-section">
+    <div class="cards-section-head">
+      <h2>Direktori member</h2>
+      <span id="member-count-label">memuat data…</span>
     </div>
 
-    <!-- ================= KONEKSI FIREBASE ================= -->
-    <script type="module">
-        import { initializeApp } from "https://gstatic.com";
-        import { getFirestore, collection, getDocs } from "https://gstatic.com";
+    <div id="users-container">
+      <p class="cards-loading">Mengambil daftar member dari server…</p>
+    </div>
+  </section>
 
-        // Konfigurasi Firebase Anda (Sesuai Database Aktif Anda)
-const firebaseConfig = {
-  apiKey: "AIzaSyDg2b6LERZ2zE86mTiYvUO1Uj--lAtpmgM",
-  authDomain: "afatsumazer-app.firebaseapp.com",
-  databaseURL: "https://afatsumazer-app-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "afatsumazer-app",
-  storageBucket: "afatsumazer-app.firebasestorage.app",
-  messagingSenderId: "16280759060",
-  appId: "1:16280759060:web:fd4deacafdf5cadd777001",
-  measurementId: "G-WB9YW9D726"
-};
+  <footer class="site-footer">
+    <span>© 2026 AFATSUMAZER</span>
+    <span>app.afatsumazer.eu.org</span>
+  </footer>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+  <!-- Logika kartu NFT: fetch data member, render kartu, connect/verify wallet -->
+  <script src="user/nft-member-card.js"></script>
+  <script>
+    // Update label jumlah member setelah kartu selesai dirender.
+    // (Tidak mengubah nft-member-card.js — cukup baca hasil DOM-nya.)
+    const observer = new MutationObserver(() => {
+      const count = document.querySelectorAll('#users-container > div').length;
+      const label = document.getElementById('member-count-label');
+      if (count > 0) {
+        label.textContent = count + ' member terdaftar';
+      }
+    });
+    observer.observe(document.getElementById('users-container'), { childList: true });
+  </script>
 
-        async function muatSemuaPengguna() {
-            const container = document.getElementById('users-container');
-            
-            try {
-                // Ambil semua dokumen dari koleksi "users"
-                const querySnapshot = await getDocs(collection(db, "users"));
-                container.innerHTML = ''; // Bersihkan tulisan loading
-
-                if (querySnapshot.empty) {
-                    container.innerHTML = '<div class="loading">Tidak ada pengguna terdaftar.</div>';
-                    return;
-                }
-
-                querySnapshot.forEach((doc) => {
-                    const user = doc.data();
-                    const userId = doc.id; // Ini adalah ID dokumen (misal: user123)
-
-                    // Bungkus kartu dengan tag <a href="profil.html?id=ID_USER">
-                    const userItemHtml = `
-                        <a href="profil.html?id=${userId}" class="user-link">
-                            <div class="user-card">
-                                <img src="${user.avatar || 'https://placeholder.com'}" alt="${user.name}" class="user-avatar">
-                                <div class="user-details">
-                                    <div class="user-name">${user.name}</div>
-                                    <div class="user-username">@${user.username}</div>
-                                </div>
-                                <div class="arrow-icon">➔</div>
-                            </div>
-                        </a>
-                    `;
-                    container.insertAdjacentHTML('beforeend', userItemHtml);
-                });
-
-            } catch (error) {
-                console.error("Gagal memuat daftar pengguna:", error);
-                container.innerHTML = '<div class="loading">Gagal memuat data.</div>';
-            }
-        }
-
-        window.onload = muatSemuaPengguna();
-    </script>
 </body>
 </html>

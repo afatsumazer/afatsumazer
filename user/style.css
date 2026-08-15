@@ -1,0 +1,204 @@
+/* ==========================================================================
+   AFATSUMAZER — Member NFT public page
+   Konsep: "kartu ID holografik" — latar gelap seperti meja pemindai ID,
+   kartu member tampil terang seperti kartu fisik yang baru dipindai.
+   ========================================================================== */
+
+:root {
+  --bg-deep: #0a0f1e;
+  --bg-panel: #10182c;
+  --bg-panel-2: #141d35;
+  --line: #24304d;
+
+  --accent-violet: #7f77dd;
+  --accent-teal: #22d3ac;
+  --accent-pink: #e8618c;
+
+  --text-primary: #f4f6fb;
+  --text-muted: #8891a8;
+
+  --font-display: "Space Grotesk", "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 15% 0%, rgba(127, 119, 221, 0.18), transparent 60%),
+    radial-gradient(ellipse 50% 35% at 100% 10%, rgba(34, 211, 172, 0.12), transparent 60%),
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-deep) 100%);
+  background-attachment: fixed;
+}
+
+/* ---------- Header ---------- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem clamp(1.25rem, 5vw, 3rem);
+  border-bottom: 1px solid var(--line);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+}
+
+.wordmark-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent-violet), var(--accent-teal));
+  box-shadow: 0 0 12px rgba(127, 119, 221, 0.7);
+  flex-shrink: 0;
+}
+
+.header-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  border: 1px solid var(--line);
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  padding: clamp(3rem, 8vw, 5.5rem) clamp(1.25rem, 5vw, 3rem) clamp(2.5rem, 6vw, 4rem);
+  text-align: left;
+  max-width: 920px;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-teal);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin: 0 0 1rem;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  margin: 0 0 1.1rem;
+  background: linear-gradient(100deg, #ffffff 30%, var(--accent-violet) 65%, var(--accent-teal) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-sub {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+  max-width: 52ch;
+  margin: 0;
+}
+
+/* ---------- Section: grid kartu ---------- */
+
+.cards-section {
+  padding: 0 clamp(1.25rem, 5vw, 3rem) clamp(3rem, 8vw, 5rem);
+}
+
+.cards-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.cards-section-head h2 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.cards-section-head span {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Placeholder sebelum JS memuat data */
+.cards-loading {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  padding: 2rem 0;
+}
+
+/* ---------- Bingkai holografik di sekeliling tiap kartu ----------
+   #users-container diisi oleh user/nft-member-card.js. Setiap kartu
+   yang dirender adalah <div class="... bg-gradient-to-br ...">.
+   Kita tambahkan efek hover melalui selector turunan supaya tidak
+   perlu mengubah struktur JS. */
+
+#users-container > div {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+#users-container > div:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px -12px rgba(127, 119, 221, 0.35);
+}
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+  padding: 1.5rem clamp(1.25rem, 5vw, 3rem) 2.5rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
