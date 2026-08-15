@@ -57,7 +57,11 @@
 
 </div>
 
-  <!-- Logika kartu NFT: fetch data member, render kartu, connect/verify wallet -->
+  <!-- Firebase (compat SDK, supaya bisa dipakai sebagai script biasa) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+  <!-- Logika kartu NFT: baca/tulis Firestore, render kartu, connect/verify wallet -->
   <script src="user/nft-member-card.js"></script>
   <script>
     const observer = new MutationObserver(() => {
