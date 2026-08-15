@@ -1,9 +1,0 @@
-{
-  "name": "webapp-saya",
-  "version": "1.0.0",
-  "type": "module",
-  "description": "Webapp dengan integrasi endpoint payment DANA",
-  "dependencies": {
-    "dana-node": "latest"
-  }
-}
