@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tulis Artikel</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-800 pb-16 min-h-screen">
+
+    <!-- ================= GERBANG AKSES ================= -->
+    <div id="access-checking" class="min-h-screen flex items-center justify-center">
+        <p class="text-xs font-bold text-gray-400">Memeriksa akun...</p>
+    </div>
+
+    <!-- ================= KONTEN ================= -->
+    <div id="page-content" class="hidden">
+
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+            <div class="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span class="text-lg">📝</span>
+                    <h1 class="text-lg font-black text-gray-900 tracking-tight">Tulis Artikel</h1>
+                </div>
+                <a href="dashboard.html" class="text-xs font-semibold text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-xl transition">
+                    &larr; Dashboard
+                </a>
+            </div>
+        </header>
+
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 mt-6 space-y-6">
+
+            <!-- ============ FORM TULIS ARTIKEL ============ -->
+            <section class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                <h3 id="form-title" class="font-extrabold text-sm text-gray-900 mb-1">Tulis Artikel Baru</h3>
+                <p class="text-xs text-gray-500 mb-4">Artikel yang kamu kirim akan <b>ditinjau admin dulu</b> sebelum tayang di publik. Kamu bisa lihat status kirimanmu di bagian "Artikel Saya" di bawah.</p>
+
+                <label class="text-[10px] font-extrabold uppercase text-gray-400 block mb-1">Judul</label>
+                <input id="article-title" type="text" placeholder="Judul artikel kamu" oninput="onTitleInput()" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold mb-1">
+                <p class="text-[10px] text-gray-400 mb-3">Alamat publik nanti: <span id="slug-preview" class="font-bold text-indigo-600">/judul-artikel</span></p>
+
+                <label class="text-[10px] font-extrabold uppercase text-gray-400 block mb-1">Gambar sampul (opsional)</label>
+                <input id="article-cover" type="text" placeholder="URL gambar (https://...)" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm mb-3">
+
+                <label class="text-[10px] font-extrabold uppercase text-gray-400 block mb-1">Isi Artikel</label>
+
+                <!-- ============ TOOLBAR FORMAT TEKS & LAMPIRAN ============ -->
+                <div class="flex flex-wrap gap-1.5 mb-2 p-2 bg-gray-50 border border-gray-200 rounded-xl">
+                    <button type="button" onclick="wrapSelection('<b>','</b>')" title="Tebal" class="w-9 h-9 rounded-lg bg-white border border-gray-200 hover:bg-gray-100 font-black text-sm">B</button>
+                    <button type="button" onclick="wrapSelection('<i>','</i>')" title="Miring" class="w-9 h-9 rounded-lg bg-white border border-gray-200 hover:bg-gray-100 italic text-sm">I</button>
+                    <button type="button" onclick="wrapSelection('<u>','</u>')" title="Garis bawah" class="w-9 h-9 rounded-lg bg-white border border-gray-200 hover:bg-gray-100 underline text-sm">U</button>
+                    <button type="button" onclick="wrapSelection('<h3>','</h3>')" title="Judul bagian" class="px-3 h-9 rounded-lg bg-white border border-gray-200 hover:bg-gray-100 font-extrabold text-xs">H</button>
+                    <button type="button" onclick="insertLink()" title="Sisipkan link" class="px-3 h-9 rounded-lg bg-white border border-gray-200 hover:bg-gray-100 text-xs font-bold">🔗 Link</button>
+                    <button type="button" onclick="wrapList()" title="Daftar poin" class="px-3 h-9 rounded-lg bg-white border border-gray-200 hover:bg-gray-100 text-xs font-bold">• List</button>
+                    <span class="w-px h-9 bg-gray-200 mx-0.5"></span>
+                    <button type="button" onclick="insertImageUrl()" title="Sisipkan gambar (URL)" class="px-3 h-9 rounded-lg bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 text-indigo-700 text-xs font-bold">🖼️ Gambar</button>
+                    <button type="button" onclick="insertAttachmentUrl()" title="Sisipkan link lampiran" class="px-3 h-9 rounded-lg bg-violet-50 border border-violet-100 hover:bg-violet-100 text-violet-700 text-xs font-bold">📎 Lampiran</button>
+                </div>
+                <p id="upload-status" class="text-[10px] text-indigo-500 font-semibold mb-2 hidden"></p>
+
+                <textarea id="article-content" rows="10" placeholder="Tulis isi artikelmu di sini..." class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm mb-1"></textarea>
+                <p class="text-[10px] text-gray-400 mb-4">Pakai tombol di atas untuk format teks otomatis, atau tulis HTML sederhana sendiri: &lt;b&gt;, &lt;i&gt;, &lt;p&gt;, &lt;br&gt;, &lt;a href&gt;.</p>
+
+                <div id="form-msg" class="text-xs mb-3"></div>
+
+                <div class="flex gap-2">
+                    <button id="submit-btn" onclick="submitArticle()" class="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs shadow-sm transition">
+                        Kirim untuk Ditinjau
+                    </button>
+                    <button id="cancel-edit-btn" onclick="resetForm()" class="hidden text-xs font-bold px-4 py-2.5 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200">
+                        Batal
+                    </button>
+                </div>
+            </section>
+
+            <!-- ============ DAFTAR ARTIKEL SAYA ============ -->
+            <section class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                <h3 class="font-extrabold text-sm text-gray-900 mb-1">Artikel Saya</h3>
+                <p class="text-xs text-gray-500 mb-4">Artikel yang sudah tayang tidak bisa diedit dari sini lagi — hubungi admin kalau perlu perubahan.</p>
+                <div id="my-articles-list" class="space-y-3">
+                    <div class="py-6 text-center text-xs text-gray-400">Memuat artikel kamu...</div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import {
+        getFirestore, doc, getDoc, setDoc, deleteDoc, collection,
+        query, where, onSnapshot, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDg2b6LERZ2zE86mTiYvUO1Uj--lAtpmgM",
+        authDomain: "afatsumazer-app.firebaseapp.com",
+        databaseURL: "https://afatsumazer-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "afatsumazer-app",
+        storageBucket: "afatsumazer-app.firebasestorage.app",
+        messagingSenderId: "16280759060",
+        appId: "1:16280759060:web:fd4deacafdf5cadd777001",
+        measurementId: "G-WB9YW9D726"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+    const firestore = getFirestore(app);
+    const articlesRef = collection(firestore, 'articles');
+
+    let currentUID = null;
+    let currentUserName = 'Pengguna';
+    let editArticleId = null;
+
+    // --- PROSES VALIDASI LOGIN ---
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUID = user.uid;
+            currentUserName = user.displayName || 'Pengguna';
+            
+            // Tampilkan konten utama, sembunyikan pengecekan
+            document.getElementById('access-checking').classList.add('hidden');
+            document.getElementById('page-content').classList.remove('hidden');
+            
+            // Muat daftar artikel milik user aktif
+            loadMyArticles();
+        } else {
+            // Jika tidak login, tendang ke halaman login
+            window.location.href = "login.html";
+        }
+    });
+
+    // --- FUNGSI SLUG GENERATOR ---
+    window.onTitleInput = function() {
+        const title = document.getElementById('article-title').value;
+        const slug = title.toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-');
+        document.getElementById('slug-preview').innerText = '/' + (slug || 'judul-artikel');
+    };
+
+    // --- FUNGSI TOOLBAR TEKS ---
+    window.wrapSelection = function(openTag, closeTag) {
+        const textarea = document.getElementById('article-content');
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value;
+        const selected = text.substring(start, end);
+        const replacement = openTag + selected + closeTag;
+        textarea.value = text.substring(0, start) + replacement + text.substring(end);
+        textarea.focus();
+        textarea.setSelectionRange(start + openTag.length, start + openTag.length + selected.length);
+    };
+
+    window.insertLink = function() {
+        const url = prompt("Masukkan URL link:");
+        if (url) wrapSelection(`<a href="${url}" target="_blank">`, '</a>');
+    };
+
+    window.wrapList = function() {
+        wrapSelection('<ul>\n  <li>', '</li>\n</ul>');
+    };
+
+    window.insertImageUrl = function() {
+        const url = prompt("Masukkan URL Gambar:");
+        if (url) wrapSelection(`<img src="${url}" alt="Gambar" class="rounded-xl my-4 max-w-full">`, '');
+    };
+
+    window.insertAttachmentUrl = function() {
+        const url = prompt("Masukkan URL File Lampiran:");
+        if (url) wrapSelection(`<a href="${url}" download class="inline-block bg-gray-100 px-3 py-1.5 rounded-lg text-xs font-bold text-gray-700 my-2">📎 Unduh Lampiran</a>`, '');
+    };
+
+    // --- SUBMIT / SIMPAN ARTIKEL ---
+    window.submitArticle = async function() {
+        const title = document.getElementById('article-title').value.trim();
+        const cover = document.getElementById('article-cover').value.trim();
+        const content = document.getElementById('article-content').value.trim();
+        const msgDiv = document.getElementById('form-msg');
+        
+        if (!title || !content) {
+            msgDiv.className = "text-xs mb-3 text-red-500 font-bold";
+            msgDiv.innerText = "Judul dan isi artikel tidak boleh kosong!";
+            return;
+        }
+
+        const slug = title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+        const docId = editArticleId || `${slug}-${Date.now()}`;
+
+        try {
+            document.getElementById('submit-btn').disabled = true;
+            document.getElementById('submit-btn').innerText = "Mengirim...";
+
+            const articleData = {
+                title: title,
+                slug: slug,
+                cover: cover || null,
+                content: content,
+                authorId: currentUID,
+                authorName: currentUserName,
+                status: 'pending',
+                updatedAt: serverTimestamp()
+            };
+
+            if (!editArticleId) {
+                articleData.createdAt = serverTimestamp();
+            }
+
+            await setDoc(doc(firestore, "articles", docId), articleData, { merge: true });
+
+            msgDiv.className = "text-xs mb-3 text-green-500 font-bold";
+            msgDiv.innerText = editArticleId ? "Artikel berhasil diperbarui!" : "Artikel berhasil dikirim untuk ditinjau admin!";
+            
+            resetForm();
+        } catch (error) {
+            console.error("Error simpan artikel:", error);
+            msgDiv.className = "text-xs mb-3 text-red-500 font-bold";
+            msgDiv.innerText = "Gagal menyimpan artikel. Coba lagi.";
+        } finally {
+            document.getElementById('submit-btn').disabled = false;
+            document.getElementById('submit-btn').innerText = "Kirim untuk Ditinjau";
+        }
+    };
+
+    // --- AMBIL DATA ARTIKEL SAYA (REALTIME) ---
+    function loadMyArticles() {
+        const q = query(articlesRef, where("authorId", "==", currentUID));
+        
+        onSnapshot(q, (snapshot) => {
+            const listDiv = document.getElementById('my-articles-list');
+            listDiv.innerHTML = "";
+
+            if (snapshot.empty) {
+                listDiv.innerHTML = '<div class="py-6 text-center text-xs text-gray-400">Kamu belum pernah menulis artikel.</div>';
+                return;
+            }
+
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                const id = docSnap.id;
+                
+                let statusBadge = `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-[10px] font-bold">Ditinjau</span>`;
+                if (data.status === 'published') {
+                    statusBadge = `<span class="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded text-[10px] font-bold">Tayang</span>`;
+                } else if (data.status === 'rejected') {
+                    statusBadge = `<span class="bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded text-[10px] font-bold">Ditolak</span>`;
+                }
+
+                const actionButton = data.status !== 'published' 
+                    ? `<button onclick="editArticle('${id}', \\`${data.title.replace(/"/g, '&quot;')}\\`, \\`${(data.cover || '')}\\`, \\`${data.content.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\\`)" class="text-indigo-600 hover:underline">Edit</button>`
+                    : `<span class="text-gray-400">Permanen</span>`;
+
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-xs";
+                item.innerHTML = `
+                    <div class="space-y-1 max-w-[70%]">
+                        <p class="font-bold text-gray-900 truncate">${data.title}</p>
+                        <div class="flex items-center space-x-2">
+                            \${statusBadge}
+                            <span class="text-[10px] text-gray-400">/\${data.slug}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3 font-semibold">
+                        \${actionButton}
+                        <button onclick="deleteArticle('\${id}')" class="text-red-500 hover:underline">Hapus</button>
+                    </div>
+                `;
+                listDiv.appendChild(item);
+            });
+        });
+    }
+
+    // --- FUNGSI EDIT ARTIKEL ---
+    window.editArticle = function(id, title, cover, content) {
+        editArticleId = id;
+        document.getElementById('form-title').innerText = "Edit Artikel";
+        document.getElementById('article-title').value = title;
+        document.getElementById('article-cover').value = cover;
+        document.getElementById('article-content').value = content;
+        document.getElementById('cancel-edit-btn').classList.remove('hidden');
+        document.getElementById('submit-btn').innerText = "Simpan Perubahan";
+        window.onTitleInput();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // --- FUNGSI HAPUS ARTIKEL ---
+    window.deleteArticle = async function(id) {
+        if (confirm("Apakah kamu yakin ingin menghapus artikel ini?")) {
+            try {
+                await deleteDoc(doc(firestore, "articles", id));
+                alert("Artikel berhasil dihapus.");
+            } catch (error) {
+                console.error("Gagal menghapus:", error);
+                alert("Gagal menghapus artikel.");
+            }
+        }
+    };
+
+    // --- RESET FORM KE SEMULA ---
+    window.resetForm = function() {
+        editArticleId = null;
+        document.getElementById('form-title').innerText = "Tulis Artikel Baru";
+        document.getElementById('article-title').value = "";
+        document.getElementById('article-cover').value = "";
+        document.getElementById('article-content').value = "";
+        document.getElementById('cancel-edit-btn').classList.add('hidden');
+        document.getElementById('submit-btn').innerText = "Kirim untuk Ditinjau";
+        document.getElementById('slug-preview').innerText = "/judul-artikel";
+    };
+
+</script>
+</body>
+</html>
