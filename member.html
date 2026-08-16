@@ -5,22 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AFATSUMAZER — Member NFT</title>
   <meta name="description" content="Kartu member NFT komunitas AFATSUMAZER.">
-
   <!-- Font: display teknikal + body + mono untuk data ID/wallet -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
   <!-- Tailwind CDN: dipakai oleh markup kartu di user/nft-member-card.js -->
   <script src="https://cdn.tailwindcss.com"></script>
-
   <!-- Styling halaman NFT ini saja — nama file & class di-namespace "afz-"
        supaya tidak menimpa style.css / class lain yang sudah ada di situs Anda -->
   <link rel="stylesheet" href="css/afatsumazer-nft.css">
 </head>
 <body>
 <div class="afz-nft-page">
-
   <header class="afz-header">
     <a href="#" class="afz-wordmark">
       <span class="afz-wordmark-dot" aria-hidden="true"></span>
@@ -28,7 +24,6 @@
     </a>
     <span class="afz-header-tag">Polygon · Member NFT</span>
   </header>
-
   <section class="afz-hero">
     <p class="afz-hero-eyebrow">Kartu keanggotaan digital</p>
     <h1 class="afz-hero-title">Satu NFT, satu identitas member.</h1>
@@ -38,30 +33,26 @@
       dapat dihubungkan.
     </p>
   </section>
-
   <section class="afz-cards-section">
     <div class="afz-cards-section-head">
       <h2>Direktori member</h2>
       <span id="member-count-label">memuat data…</span>
     </div>
-
     <div id="users-container">
       <p class="afz-cards-loading">Mengambil daftar member dari server…</p>
     </div>
   </section>
-
   <footer class="afz-footer">
     <span>© 2026 AFATSUMAZER</span>
     <span>app.afatsumazer.eu.org</span>
   </footer>
-
 </div>
-
   <!-- Firebase (compat SDK, supaya bisa dipakai sebagai script biasa) -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-
-  <!-- Logika kartu NFT: baca/tulis Firestore, render kartu, connect/verify wallet -->
+  <!-- WAJIB untuk login member (Google + Email/Password) di kartu wallet -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <!-- Logika kartu NFT: baca/tulis Firestore, render kartu, login, connect wallet lewat passkey -->
   <script src="user/nft-member-card.js"></script>
   <script>
     const observer = new MutationObserver(() => {
@@ -73,6 +64,5 @@
     });
     observer.observe(document.getElementById('users-container'), { childList: true });
   </script>
-
 </body>
 </html>
