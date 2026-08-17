@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi - Afatsumazer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 pb-16 min-h-screen">
+
+    <div id="access-checking" class="min-h-screen flex items-center justify-center">
+        <p class="text-xs font-bold text-gray-400">Memuat halaman absensi...</p>
+    </div>
+
+    <div id="absensi-content" class="hidden">
+
+        <!-- Header dengan Bel Notifikasi -->
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+            <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span class="text-lg">🕒</span>
+                    <h1 class="text-base font-black text-gray-900 tracking-tight">Absensi</h1>
+                </div>
+                <div class="relative">
+                    <button id="bell-btn" onclick="toggleBellDropdown()" class="relative p-2 rounded-xl hover:bg-gray-100 transition">
+                        <span class="text-xl">🔔</span>
+                        <span id="bell-dot" class="hidden absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                        <span id="bell-dot-static" class="hidden absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                    </button>
+                    <div id="bell-dropdown" class="hidden absolute right-0 mt-2 w-72 bg-white rounded-2xl border border-gray-200 shadow-xl p-3 z-40">
+                        <p class="text-[10px] font-extrabold uppercase text-gray-400 mb-2 px-1">Pengingat</p>
+                        <div id="bell-dropdown-list" class="space-y-1.5 max-h-60 overflow-y-auto">
+                            <p class="text-xs text-gray-400 italic px-1 py-2">Belum ada pengingat.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-md mx-auto px-4 mt-6 space-y-5">
+
+            <!-- Kartu Status Absensi Hari Ini -->
+            <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-center">
+                <p id="absensi-tanggal" class="text-[10px] font-extrabold uppercase text-gray-400 mb-1">-</p>
+                <div id="absensi-status-icon" class="text-4xl mb-2">⏳</div>
+                <p id="absensi-status-text" class="text-sm font-extrabold text-gray-900 mb-1">Memuat status...</p>
+                <p id="absensi-status-sub" class="text-xs text-gray-500 mb-5">Mohon tunggu</p>
+
+                <div class="grid grid-cols-2 gap-3 mb-5 text-left">
+                    <div class="bg-gray-50 rounded-xl p-3">
+                        <p class="text-[9px] font-extrabold uppercase text-gray-400">Jam Masuk</p>
+                        <p id="absensi-jam-masuk" class="text-sm font-black text-gray-800">--:--</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-3">
+                        <p class="text-[9px] font-extrabold uppercase text-gray-400">Jam Pulang</p>
+                        <p id="absensi-jam-pulang" class="text-sm font-black text-gray-800">--:--</p>
+                    </div>
+                </div>
+
+                <button id="absensi-scan-btn" onclick="bukaScanner()" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-extrabold px-4 py-3 rounded-xl text-sm shadow-sm transition">
+                    📷 Scan QR Absen Masuk
+                </button>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-[11px] text-amber-800 leading-relaxed">
+                ℹ️ Absensi memakai jam server (bukan jam HP) untuk mencegah kecurangan. Pastikan mengarahkan kamera ke QR resmi yang ditempel di kantor.
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ MODAL SCANNER QR ============ -->
+    <div id="scanner-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/70 px-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-5">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-extrabold text-sm text-gray-900">Arahkan ke QR Kantor</h3>
+                <button onclick="tutupScanner()" class="text-gray-400 hover:text-gray-700 text-lg leading-none">✕</button>
+            </div>
+            <div id="qr-reader" class="rounded-xl overflow-hidden"></div>
+            <p id="scanner-status" class="text-[11px] text-gray-500 mt-3 text-center">Memuat kamera...</p>
+        </div>
+    </div>
+
+    <div id="absensi-toast" class="fixed left-1/2 -bottom-16 -translate-x-1/2 bg-gray-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl z-50 transition-all duration-300"></div>
+
+    <script type="module" src="js/absensi.js"></script>
+</body>
+</html>
