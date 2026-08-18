@@ -95,6 +95,8 @@ function hitungPotonganPersen(telatMenit) {
     return Math.min(persen, aturan.maksimalPersen || 50);
 }
 
+let isActingAsSuperAdmin = false;
+
 // ================= 1. GERBANG AKSES ADMIN INSTITUSI =================
 onAuthStateChanged(auth, (user) => {
     if (!user) {
@@ -107,37 +109,20 @@ onAuthStateChanged(auth, (user) => {
         const profile = data.profile || {};
         document.getElementById('access-checking').classList.add('hidden');
 
+        // Super Admin BOLEH juga mengoperasikan panel admin institusi (satu akun,
+        // dua kemampuan) — tapi karena super admin tidak "terikat" ke satu institusi,
+        // dia harus pilih dulu institusi mana yang mau dikelola.
         if (profile.peran === 'superadmin') {
-            window.location.href = "superadmin.html";
+            adminUID = user.uid;
+            isActingAsSuperAdmin = true;
+            await tampilkanPemilihInstitusi();
             return;
         }
 
         if (profile.peran === 'admin' && profile.institusiId) {
             adminUID = user.uid;
             myInstitusiId = profile.institusiId;
-
-            const instSnap = await getDoc(doc(firestore, 'institutions', myInstitusiId));
-            if (!instSnap.exists() || instSnap.data().status !== 'aktif') {
-                document.getElementById('admin-content').classList.add('hidden');
-                document.getElementById('access-denied').classList.remove('hidden');
-                document.getElementById('access-denied').classList.add('flex');
-                document.getElementById('access-denied-msg').textContent = !instSnap.exists()
-                    ? 'Institusi tidak ditemukan.'
-                    : 'Langganan institusi ini sedang tidak aktif. Hubungi penyedia layanan.';
-                return;
-            }
-            institusiData = instSnap.data();
-            document.getElementById('admin-institusi-nama').textContent = institusiData.nama || myInstitusiId;
-
-            document.getElementById('admin-content').classList.remove('hidden');
-            loadMissions();
-            loadVouchers();
-            loadAllUsers();
-            loadDivisiList();
-            loadQuickMenu();
-            loadOrderReview();
-            loadArticles();
-            loadLokasiDivisiForm();
+            await masukKePanelInstitusi();
         } else {
             document.getElementById('access-denied').classList.remove('hidden');
             document.getElementById('access-denied').classList.add('flex');
@@ -149,6 +134,73 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById('access-denied').classList.add('flex');
     });
 });
+
+// Dipanggil setelah myInstitusiId sudah ditentukan (baik dari profile admin biasa,
+// maupun hasil pilihan super admin) — memuat data institusi & seluruh tab panel.
+async function masukKePanelInstitusi() {
+    const instSnap = await getDoc(doc(firestore, 'institutions', myInstitusiId));
+    if (!instSnap.exists() || instSnap.data().status !== 'aktif') {
+        document.getElementById('admin-content').classList.add('hidden');
+        document.getElementById('access-denied').classList.remove('hidden');
+        document.getElementById('access-denied').classList.add('flex');
+        document.getElementById('access-denied-msg').textContent = !instSnap.exists()
+            ? 'Institusi tidak ditemukan.'
+            : 'Langganan institusi ini sedang tidak aktif. Hubungi penyedia layanan.';
+        return;
+    }
+    institusiData = instSnap.data();
+    document.getElementById('admin-institusi-nama').textContent = institusiData.nama || myInstitusiId;
+    if (isActingAsSuperAdmin) document.getElementById('admin-institusi-nama').textContent += ' (mode Super Admin)';
+
+    document.getElementById('admin-content').classList.remove('hidden');
+    loadMissions();
+    loadVouchers();
+    loadAllUsers();
+    loadDivisiList();
+    loadQuickMenu();
+    loadOrderReview();
+    loadArticles();
+    loadLokasiDivisiForm();
+}
+
+// Super Admin: tampilkan daftar institusi untuk dipilih. Kalau cuma ada satu
+// institusi aktif, langsung dipakai tanpa perlu klik apa-apa.
+async function tampilkanPemilihInstitusi() {
+    const snap = await getDocs(collection(firestore, 'institutions'));
+    const daftar = [];
+    snap.forEach(d => daftar.push({ id: d.id, ...d.data() }));
+
+    if (daftar.length === 0) {
+        document.getElementById('access-denied').classList.remove('hidden');
+        document.getElementById('access-denied').classList.add('flex');
+        document.getElementById('access-denied-msg').textContent = 'Belum ada institusi terdaftar. Buat dulu lewat superadmin.html.';
+        return;
+    }
+
+    if (daftar.length === 1) {
+        myInstitusiId = daftar[0].id;
+        await masukKePanelInstitusi();
+        return;
+    }
+
+    // Lebih dari satu institusi -> tampilkan pemilih
+    const picker = document.getElementById('institusi-picker');
+    const list = document.getElementById('institusi-picker-list');
+    list.innerHTML = daftar.map(i => `
+        <button onclick="pilihInstitusiSuperAdmin('${i.id}')" class="w-full text-left p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition">
+            <p class="text-xs font-extrabold text-gray-800">${escapeHtml(i.nama)}</p>
+            <p class="text-[10px] text-gray-400">${i.status === 'aktif' ? '🟢 Aktif' : '⚪ Nonaktif'}</p>
+        </button>`).join('');
+    picker.classList.remove('hidden');
+    picker.classList.add('flex');
+}
+
+window.pilihInstitusiSuperAdmin = async function(institusiId) {
+    myInstitusiId = institusiId;
+    document.getElementById('institusi-picker').classList.add('hidden');
+    document.getElementById('institusi-picker').classList.remove('flex');
+    await masukKePanelInstitusi();
+};
 
 window.adminLogout = function() {
     if (confirm('Keluar dari panel admin?')) {
