@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         #lokasi-peta { height: 320px; z-index: 0; }
@@ -272,6 +273,13 @@
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h3 class="font-extrabold text-sm text-gray-900 mb-1">QR Absensi Kantor</h3>
+                    <p class="text-xs text-gray-500 mb-4">QR ini unik untuk institusi ini saja — tidak bisa dipakai institusi lain. Cetak dan tempel di kantor untuk karyawan scan absen masuk/pulang.</p>
+                    <div id="qr-kantor-container" class="flex justify-center bg-white p-4 rounded-xl border border-dashed border-gray-300 mb-3" style="width:fit-content;"></div>
+                    <button onclick="unduhQrKantor()" class="bg-gray-800 hover:bg-gray-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl">Unduh QR sebagai Gambar</button>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                     <h3 class="font-extrabold text-sm text-gray-900 mb-1">Aturan Potongan Keterlambatan</h3>
                     <p class="text-xs text-gray-500 mb-4">Tiap kelipatan menit telat akan memotong sekian persen dari gaji harian karyawan, sampai batas maksimal.</p>
                     <div class="grid grid-cols-3 gap-3">
@@ -299,6 +307,14 @@
                         <button onclick="addDivisi()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl">+ Tambah</button>
                     </div>
                     <div id="divisi-list" class="space-y-2"></div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h3 class="font-extrabold text-sm text-gray-900 mb-1">Integrasi Google Sheets</h3>
+                    <p class="text-xs text-gray-500 mb-4">Setiap absen (scan maupun input manual) otomatis dikirim ke Google Sheets lewat Apps Script — gratis, tanpa Cloud Functions berbayar. Lihat file <code>appscript/Code.gs</code> untuk cara pasang di sisi Google Sheets.</p>
+                    <input id="sheet-webhook-url" type="text" placeholder="https://script.google.com/macros/s/xxxxx/exec" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold mb-3">
+                    <button onclick="saveIntegrasiSheet()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl">Simpan URL Web App</button>
+                    <p id="sheet-webhook-status" class="text-[10px] text-gray-400 mt-2"></p>
                 </div>
             </section>
 
