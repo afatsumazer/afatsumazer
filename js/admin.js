@@ -808,6 +808,57 @@ function loadLokasiDivisiForm() {
     document.getElementById('potongan-kelipatan').value = (institusiData.aturanPotongan && institusiData.aturanPotongan.kelipatanMenit) || 15;
     document.getElementById('potongan-persen').value = (institusiData.aturanPotongan && institusiData.aturanPotongan.persenPerKelipatan) || 1;
     document.getElementById('potongan-maksimal').value = (institusiData.aturanPotongan && institusiData.aturanPotongan.maksimalPersen) || 50;
+    document.getElementById('sheet-webhook-url').value = institusiData.sheetWebhookUrl || '';
+    renderQrKantor();
+}
+
+// Teks QR resmi — HARUS SAMA PERSIS dengan yang dicek di js/absensi.js (kodeQrInstitusi()).
+// Unik per institusi supaya QR institusi A tidak bisa dipakai absen di institusi B.
+function kodeQrKantor() {
+    return `AFATSUMAZER-ABSEN-KANTOR:${myInstitusiId}`;
+}
+
+function renderQrKantor() {
+    const container = document.getElementById('qr-kantor-container');
+    if (!container || typeof QRCode === 'undefined') return;
+    container.innerHTML = '';
+    new QRCode(container, { text: kodeQrKantor(), width: 220, height: 220 });
+}
+
+window.unduhQrKantor = function() {
+    const canvas = document.querySelector('#qr-kantor-container canvas');
+    if (!canvas) { showToast('QR belum siap, coba lagi sesaat lagi'); return; }
+    const link = document.createElement('a');
+    link.download = `qr-absensi-${(institusiData.nama || 'kantor').toLowerCase().replace(/\s+/g, '-')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+};
+
+window.saveIntegrasiSheet = function() {
+    const url = document.getElementById('sheet-webhook-url').value.trim();
+    if (url && !url.startsWith('https://script.google.com/')) {
+        showToast('URL harus dari script.google.com (Web App Apps Script)');
+        return;
+    }
+    updateDoc(institusiDocRef(), { sheetWebhookUrl: url }).then(() => {
+        institusiData.sheetWebhookUrl = url;
+        document.getElementById('sheet-webhook-status').textContent = url ? 'Tersimpan — absen berikutnya otomatis terkirim ke Sheets.' : 'Integrasi dinonaktifkan (URL dikosongkan).';
+        showToast('Integrasi Google Sheets disimpan');
+    }).catch(err => showToast('Gagal: ' + err.message));
+};
+
+// Kirim satu baris data absen ke Apps Script Web App (fire-and-forget). Pakai
+// mode 'no-cors' karena Apps Script tidak selalu kirim header CORS yang bisa dibaca
+// balik oleh browser — kita tidak butuh baca responsnya, cukup tahu request terkirim.
+function kirimAbsensiKeSheet(payload) {
+    const url = institusiData.sheetWebhookUrl;
+    if (!url) return;
+    fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' }, // hindari CORS preflight yang bisa diblok Apps Script
+        body: JSON.stringify(payload)
+    }).catch(() => { /* diabaikan - absensi tetap tersimpan di Firestore walau Sheets gagal */ });
 }
 
 // Peta dimuat lewat Leaflet (CDN) di admin.html. Klik peta ATAU ketik koordinat manual
@@ -960,6 +1011,14 @@ window.catatAbsensiManual = async function() {
         showToast('Absensi manual disimpan');
         document.getElementById('manual-absen-jam').value = '';
         if (rekapCacheBulan === tanggal.slice(0, 7)) loadRekapAbsensi();
+
+        const namaKaryawan = ((allUsersCache[uid] || {}).profile || {}).name || uid;
+        kirimAbsensiKeSheet({
+            docId, tanggal, nama: namaKaryawan, uid,
+            jamMasuk: jenis === 'masuk' ? jam : '',
+            jamPulang: jenis === 'pulang' ? jam : '',
+            status: jenis, sumber: 'Manual'
+        });
     } catch (err) {
         showToast('Gagal: ' + err.message);
     }

@@ -14,9 +14,8 @@ const firebaseConfig = {
     measurementId: "G-WB9YW9D726"
 };
 
-// Teks yang harus ada di dalam QR resmi kantor (ditempel fisik di kantor).
-// Ganti sesuai kebutuhan — dicetak sekali, tidak perlu diubah tiap hari.
-const KODE_QR_RESMI = 'AFATSUMAZER-ABSEN-KANTOR';
+// Teks QR resmi kantor dibuat per-institusi (lihat kodeQrInstitusi() di bawah) —
+// supaya QR institusi A tidak bisa dipakai absen di institusi B.
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -52,6 +51,12 @@ function jarakMeter(lat1, lon1, lat2, lon2) {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+// Teks QR resmi institusi ini — HARUS SAMA PERSIS dengan yang dipakai admin saat
+// generate QR di admin.html (tab Lokasi & Divisi -> QR Absensi Kantor).
+function kodeQrInstitusi() {
+    return `AFATSUMAZER-ABSEN-KANTOR:${myInstitusiId}`;
+}
+
 function ambilLokasi() {
     return new Promise((resolve, reject) => {
         if (!navigator.geolocation) { reject(new Error('Perangkat tidak mendukung GPS')); return; }
@@ -64,6 +69,7 @@ function ambilLokasi() {
 }
 
 // ================= 1. GERBANG AKSES =================
+let myNama = '';
 onAuthStateChanged(auth, async (user) => {
     if (!user) { window.location.href = "login.html"; return; }
     myUID = user.uid;
@@ -71,6 +77,7 @@ onAuthStateChanged(auth, async (user) => {
     const userSnap = await getDoc(doc(firestore, 'users', user.uid));
     const profile = (userSnap.exists() ? userSnap.data() : {}).profile || {};
     myInstitusiId = profile.institusiId;
+    myNama = profile.name || user.uid;
 
     document.getElementById('access-checking').classList.add('hidden');
 
@@ -88,6 +95,18 @@ onAuthStateChanged(auth, async (user) => {
     await muatStatusHariIni();
     aturPengingatSenyap();
 });
+
+// Kirim satu baris data absen ke Apps Script Web App milik institusi ini (fire-and-forget).
+function kirimAbsensiKeSheet(payload) {
+    const url = institusiData.sheetWebhookUrl;
+    if (!url) return;
+    fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
+    }).catch(() => { /* absensi tetap tersimpan di Firestore walau Sheets gagal dikirim */ });
+}
 
 // ================= 2. STATUS ABSENSI HARI INI =================
 async function muatStatusHariIni() {
@@ -161,7 +180,7 @@ window.tutupScanner = function() {
 };
 
 async function onScanSukses(decodedText) {
-    if (decodedText.trim() !== KODE_QR_RESMI) {
+    if (decodedText.trim() !== kodeQrInstitusi()) {
         document.getElementById('scanner-status').textContent = 'QR tidak dikenali, coba lagi.';
         return;
     }
@@ -200,6 +219,7 @@ async function catatAbsensi(lokasi) {
     const docId = `${tanggal}_${myUID}`;
     const ref = doc(firestore, 'institutions', myInstitusiId, 'attendance', docId);
     const existing = await getDoc(ref);
+    const jamSekarang = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
     if (!existing.exists()) {
         await setDoc(ref, {
@@ -208,9 +228,13 @@ async function catatAbsensi(lokasi) {
             lokasi_masuk: lokasi, lokasi_pulang: null
         });
         modeScanSaatIni = 'pulang';
+        kirimAbsensiKeSheet({ docId, tanggal, nama: myNama, uid: myUID, jamMasuk: jamSekarang, jamPulang: '', status: 'masuk', sumber: 'Scan' });
     } else {
         await updateDoc(ref, { status: 'pulang', jam_pulang: serverTimestamp(), lokasi_pulang: lokasi });
         modeScanSaatIni = 'masuk';
+        const d = existing.data();
+        const jamMasukLama = d.jam_masuk && d.jam_masuk.toDate ? d.jam_masuk.toDate().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
+        kirimAbsensiKeSheet({ docId, tanggal, nama: myNama, uid: myUID, jamMasuk: jamMasukLama, jamPulang: jamSekarang, status: 'pulang', sumber: 'Scan' });
     }
 }
 
